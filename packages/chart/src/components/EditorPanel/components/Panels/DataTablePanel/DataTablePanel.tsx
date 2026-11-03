@@ -1,10 +1,5 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 
 type DataTablePanelProps = {
@@ -19,20 +14,15 @@ const DataTablePanel = ({ config, columns, updateField, isDashboard, isLoadedFro
   if (config.visualizationType === 'Spark Line') return null
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Data Table</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <DataTableEditor
-          config={config}
-          columns={columns}
-          updateField={updateField}
-          isDashboard={isDashboard}
-          isLoadedFromUrl={isLoadedFromUrl}
-        />{' '}
-      </AccordionItemPanel>
-    </AccordionItem>
+    <PanelSection title='Data Table'>
+      <DataTableEditor
+        config={config}
+        columns={columns}
+        updateField={updateField}
+        isDashboard={isDashboard}
+        isLoadedFromUrl={isLoadedFromUrl}
+      />{' '}
+    </PanelSection>
   )
 }
 

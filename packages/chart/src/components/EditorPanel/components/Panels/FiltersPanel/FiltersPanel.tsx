@@ -1,10 +1,5 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 
 type FiltersPanelProps = {
@@ -15,14 +10,9 @@ type FiltersPanelProps = {
 }
 
 const FiltersPanel = ({ config, updateField, rawData, hasFootnotes }: FiltersPanelProps) => (
-  <AccordionItem>
-    <AccordionItemHeading>
-      <AccordionItemButton>Filters</AccordionItemButton>
-    </AccordionItemHeading>
-    <AccordionItemPanel>
-      <VizFilterEditor config={config} updateField={updateField} rawData={rawData} hasFootnotes={hasFootnotes} />
-    </AccordionItemPanel>
-  </AccordionItem>
+  <PanelSection title='Filters'>
+    <VizFilterEditor config={config} updateField={updateField} rawData={rawData} hasFootnotes={hasFootnotes} />
+  </PanelSection>
 )
 
 export default FiltersPanel

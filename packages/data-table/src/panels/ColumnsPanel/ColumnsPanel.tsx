@@ -1,23 +1,12 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
-
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 
 import { type ColumnsPanelProps } from './types'
 
 const ColumnsPanel: React.FC<ColumnsPanelProps> = ({ config, updateField, deleteColumn }) => (
-  <AccordionItem>
-    <AccordionItemHeading>
-      <AccordionItemButton>Columns</AccordionItemButton>
-    </AccordionItemHeading>
-    <AccordionItemPanel>
-      <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
-    </AccordionItemPanel>
-  </AccordionItem>
+  <PanelSection title='Columns'>
+    <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
+  </PanelSection>
 )
 
 export default ColumnsPanel

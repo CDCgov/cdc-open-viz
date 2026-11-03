@@ -10,6 +10,7 @@ import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMa
 import Icon from '@cdc/core/components/ui/Icon'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import { buildForecastPaletteOptions } from '../../../../../helpers/buildForecastPaletteOptions'
 import { getSeriesColumnConfig, upsertSeriesColumnConfig } from '../../../../../helpers/seriesColumnSettings'
 
@@ -574,7 +575,7 @@ const SeriesColumnSettings = props => {
 
   return (
     <>
-      <span className='divider-heading'>Series Column Settings</span>
+      <PanelHeader>Series Column Settings</PanelHeader>
       <TextField
         value={columnConfig.label || ''}
         section='seriesColumn'

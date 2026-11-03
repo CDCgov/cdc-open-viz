@@ -1,4 +1,5 @@
 import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import {
@@ -15,7 +16,7 @@ const ValueAxisNumberFormatting = () => {
 
   return (
     <>
-      <span className='divider-heading'>Number Formatting</span>
+      <PanelHeader>Number Formatting</PanelHeader>
       <CheckBox
         value={format.commas as boolean}
         section='dataFormat'

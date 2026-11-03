@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import { DATA_FUNCTIONS } from '@cdc/core/helpers/constants'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
@@ -41,7 +42,7 @@ const DataPanel = () => {
           />
         </li>
       </ul>
-      <span className='divider-heading'>Number Formatting</span>
+      <PanelHeader>Number Formatting</PanelHeader>
       <ul className='column-edit'>
         <li className='three-col'>
           <TextField

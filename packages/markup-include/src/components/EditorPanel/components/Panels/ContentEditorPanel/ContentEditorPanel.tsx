@@ -1,5 +1,6 @@
 import { useContext, useRef } from 'react'
 import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import ConfigContext from '../../../../../ConfigContext'
 
@@ -11,7 +12,7 @@ const ContentEditorPanel = () => {
 
   return (
     <>
-      <span className='divider-heading'>Enter Markup</span>
+      <PanelHeader>Enter Markup</PanelHeader>
       <CheckBox
         value={useInlineHTML}
         section='contentEditor'

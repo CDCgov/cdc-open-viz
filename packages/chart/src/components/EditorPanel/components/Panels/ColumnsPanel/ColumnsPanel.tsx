@@ -1,10 +1,5 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 
 type ColumnsPanelProps = {
@@ -18,19 +13,14 @@ const ColumnsPanel = ({ config, updateField, deleteColumn, hiddenColumnNames }: 
   if (['Box Plot', 'Sankey'].includes(config.visualizationType)) return null
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Columns</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <ColumnsEditor
-          config={config}
-          updateField={updateField}
-          deleteColumn={deleteColumn}
-          hiddenColumnNames={hiddenColumnNames}
-        />{' '}
-      </AccordionItemPanel>
-    </AccordionItem>
+    <PanelSection title='Columns'>
+      <ColumnsEditor
+        config={config}
+        updateField={updateField}
+        deleteColumn={deleteColumn}
+        hiddenColumnNames={hiddenColumnNames}
+      />{' '}
+    </PanelSection>
   )
 }
 

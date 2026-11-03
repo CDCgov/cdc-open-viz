@@ -1,10 +1,5 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import type { Datasets } from '@cdc/core/types/DataSet'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 
@@ -15,14 +10,9 @@ type FootnotesPanelProps = {
 }
 
 const FootnotesPanel = ({ config, updateField, datasets }: FootnotesPanelProps) => (
-  <AccordionItem>
-    <AccordionItemHeading>
-      <AccordionItemButton>Footnotes</AccordionItemButton>
-    </AccordionItemHeading>
-    <AccordionItemPanel>
-      <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
-    </AccordionItemPanel>
-  </AccordionItem>
+  <PanelSection title='Footnotes'>
+    <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+  </PanelSection>
 )
 
 export default FootnotesPanel

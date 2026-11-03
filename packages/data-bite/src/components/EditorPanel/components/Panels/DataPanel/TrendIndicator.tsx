@@ -2,6 +2,7 @@ import { useContext, useMemo } from 'react'
 
 import Button from '@cdc/core/components/elements/Button'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
@@ -133,9 +134,7 @@ const TrendIndicator = () => {
 
   return (
     <div className='checkbox-group'>
-      <span className='divider-heading' style={{ marginTop: 0 }}>
-        Trend Indicator
-      </span>
+      <PanelHeader style={{ marginTop: 0 }}>Trend Indicator</PanelHeader>
       <Select
         value={trendMode}
         fieldName='mode'

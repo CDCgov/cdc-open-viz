@@ -5,6 +5,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -151,7 +152,7 @@ const DataSeriesSection = () => {
             )}
             {showConfidenceKeys && (
               <>
-                <span className='divider-heading'>Confidence Keys</span>
+                <PanelHeader>Confidence Keys</PanelHeader>
                 <Select
                   value={model.confidenceKeys.upper || ''}
                   label='Upper'
