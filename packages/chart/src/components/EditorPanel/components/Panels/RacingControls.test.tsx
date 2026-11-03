@@ -9,8 +9,6 @@ import barRaceConfig from '../../../../../examples/feature/bar/bar-chart-race-an
 import lineRaceConfig from '../../../../../examples/feature/line/line-chart-race.json'
 import RacingControls from './RacingControls'
 
-const originalUrl = window.location.href
-
 const renderControls = (config: ChartConfig) => {
   const updateConfig = vi.fn()
   const updateField = vi.fn()
@@ -44,7 +42,6 @@ const StatefulControls = ({ initialConfig }: { initialConfig: ChartConfig }) => 
       <EditorPanelContext.Provider value={{ updateField: vi.fn() }}>
         <RacingControls />
       </EditorPanelContext.Provider>
-      <button onClick={() => setConfig(current => ({ ...current, title: 'Updated title' }))}>Update title</button>
     </ConfigContext.Provider>
   )
 }
@@ -53,27 +50,10 @@ const getSubtypeValues = () =>
   Array.from((screen.getByLabelText('Chart Subtype') as HTMLSelectElement).options).map(option => option.value)
 
 describe('RacingControls', () => {
-  beforeEach(() => {
-    window.history.replaceState({}, '', window.location.pathname)
-  })
-
-  afterEach(() => {
-    window.history.replaceState({}, '', originalUrl)
-  })
-
-  it('hides the Bar racing option outside COVE developer mode', () => {
-    renderControls({ ...barRaceConfig, visualizationSubType: 'regular' } as ChartConfig)
-
-    expect(getSubtypeValues()).toEqual(['regular', 'stacked'])
-  })
-
-  it('shows the Bar racing option for an ineligible chart in COVE developer mode', () => {
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
-
+  it('shows and applies the Bar racing option for an eligible new chart', () => {
     const { updateConfig, updateField } = renderControls({
       ...barRaceConfig,
-      visualizationSubType: 'regular',
-      data: []
+      visualizationSubType: 'regular'
     } as ChartConfig)
 
     expect(getSubtypeValues()).toEqual(['regular', 'stacked', 'racing'])
@@ -90,21 +70,14 @@ describe('RacingControls', () => {
     )
   })
 
-  it('keeps Racing selected when the chart is ineligible and its controls rerender', () => {
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
-    const initialConfig = {
+  it('hides the Bar racing option for an ineligible new chart', () => {
+    renderControls({
       ...barRaceConfig,
       visualizationSubType: 'regular',
-      xAxis: { ...barRaceConfig.xAxis, type: 'date' }
-    } as ChartConfig
+      data: []
+    } as ChartConfig)
 
-    render(<StatefulControls initialConfig={initialConfig} />)
-    fireEvent.change(screen.getByLabelText('Chart Subtype'), { target: { value: 'racing' } })
-
-    expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Update title' }))
-    expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
+    expect(getSubtypeValues()).toEqual(['regular', 'stacked'])
   })
 
   it('keeps the option visible for an ineligible existing Bar race outside COVE developer mode', () => {
