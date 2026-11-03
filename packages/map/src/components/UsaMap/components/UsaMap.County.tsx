@@ -10,7 +10,16 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import usExtendedGeography from '../data/us-extended-geography.json'
 import useMapLayers from '../../../hooks/useMapLayers'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
+import { CountyDotDensityContext } from '../../../context/CountyDotDensityContext'
+import { prepareCountyDotDensity, drawCountyDotDensity } from '../../../helpers/countyDotDensityLayer'
+import type { DotDensityGeometry } from '../../../helpers/dotDensity'
+import {
+  getDotDensityConfig,
+  getConfiguredDotDensitySeries,
+  isDotDensitySupported
+} from '../../../helpers/dotDensityConfig'
+import DotDensityLegend from '../../DotDensityLegend'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
@@ -238,6 +247,8 @@ const isTopoReady = (topoData, config: MapConfig, runtimeFilters) => {
 }
 
 const CountyMap = () => {
+  const previewDotDensity = useContext(CountyDotDensityContext)
+  const dispatch = useContext(MapDispatchContext)
   const {
     container,
     containerEl,
@@ -254,6 +265,34 @@ const CountyMap = () => {
     interactionLabel
   } = useContext(ConfigContext)
 
+  const authoredDensity = useMemo(() => getDotDensityConfig(config), [config.dotDensity])
+  const authoredSeries = useMemo(
+    () => getConfiguredDotDensitySeries(config),
+    [config.dotDensity, config.general.geoType, config.general.type]
+  )
+  const [hiddenDensitySeries, setHiddenDensitySeries] = useState<string[]>([])
+  const authoredSettings = useMemo(
+    () =>
+      isDotDensitySupported(config) && authoredDensity.enabled
+        ? { dotValue: authoredDensity.dotValue, seed: authoredDensity.seed, series: authoredSeries }
+        : undefined,
+    [authoredDensity, authoredSeries, config.general.geoType, config.general.type]
+  )
+  const dotDensity = useMemo(
+    () =>
+      previewDotDensity ||
+      (authoredSettings
+        ? {
+            settings: authoredSettings,
+            radius: authoredDensity.radius,
+            hiddenSeries: hiddenDensitySeries.filter(id => authoredSeries.some(series => series.id === id))
+          }
+        : null),
+    [previewDotDensity, authoredSettings, authoredDensity.radius, hiddenDensitySeries, authoredSeries]
+  )
+  const densitySettings = dotDensity?.settings
+  const initialStateCode = previewDotDensity?.initialStateCode
+
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   // CREATE STATE LINES
@@ -261,6 +300,21 @@ const CountyMap = () => {
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [topoData, setTopoData] = useState<TopoData>({} as TopoData)
+  const densityLayer = useMemo(
+    () =>
+      densitySettings
+        ? prepareCountyDotDensity(
+            (topoData.counties || []) as unknown as DotDensityGeometry[],
+            runtimeData as unknown as Record<string, Record<string, unknown>>,
+            densitySettings
+          )
+        : null,
+    [densitySettings, topoData.counties, runtimeData]
+  )
+  useEffect(() => {
+    if (initialStateCode !== undefined)
+      dispatch({ type: 'SET_FILTERED_STATE_COUNTY_CODE', payload: { stateCode: initialStateCode, countyCode: '' } })
+  }, [initialStateCode, dispatch])
   const focus = useMemo(() => {
     if (!isTopoReady(topoData, config, runtimeFilters) || !filteredStateCode) return {} as Focus
     const stateGeo = topoData.states.find(state => state.id === filteredStateCode)
@@ -357,6 +411,7 @@ const CountyMap = () => {
   const zoomTransformRef = useRef(d3ZoomIdentity)
   const zoomBehaviorRef = useRef()
   const zoomFrameRef = useRef<number | null>(null)
+  const renderFrameRef = useRef<() => void>(() => {})
   const geoPathCacheRef = useRef<Map<string, Path2D>>(new Map())
   const geoPathCacheKeyRef = useRef('')
 
@@ -570,7 +625,7 @@ const CountyMap = () => {
     if (zoomFrameRef.current) return
     zoomFrameRef.current = window.requestAnimationFrame(() => {
       zoomFrameRef.current = null
-      renderFrame()
+      renderFrameRef.current()
     })
   }
 
@@ -889,7 +944,9 @@ const CountyMap = () => {
   // Sets up canvas dimensions and projection, rebuilds the Path2D cache only when geometry changes, then renders.
   // Called on data change, resize, focus change — NOT during zoom/pan.
   const drawCanvas = () => {
-    if (canvasRef.current && runtimeLegend.items.length > 0) {
+    if (canvasRef.current && (runtimeLegend.items?.length > 0 || densityLayer)) {
+      // Zoom listeners can outlive the render that installed them.
+      renderFrameRef.current = renderFrame
       const canvas = canvasRef.current
       const canvasWidth = canvas.clientWidth
       if (canvasWidth <= 0) return
@@ -923,7 +980,7 @@ const CountyMap = () => {
   // Fast render using cached Path2D objects — called during zoom/pan for smooth performance.
   // Skips canvas resize and projection setup; only applies the current zoom transform and redraws.
   const renderFrame = () => {
-    if (!canvasRef.current || !runtimeLegend.items.length || !topoData.mapData) return
+    if (!canvasRef.current || (!runtimeLegend.items?.length && !densityLayer) || !topoData.mapData) return
 
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
@@ -973,6 +1030,35 @@ const CountyMap = () => {
       }
       paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
+
+    if (densityLayer && dotDensity) {
+      // Paint selection fill before dots; keep the existing boundary layers above them.
+      if (countyHighlight) {
+        const { context, path2d, geoData, canvasWidth, strokeWidth, strokeColor } = countyHighlight
+        paintCountyGeo(context, path2d, geoData, canvasWidth, strokeWidth, strokeColor)
+        countyHighlight = null
+      }
+      drawCountyDotDensity(
+        context,
+        topoData.projection,
+        densityLayer,
+        dotDensity.radius,
+        zoomScale,
+        dotDensity.hiddenSeries,
+        id => !focus.id || config.general.showNeighboringStates || id.startsWith(focus.id)
+      )
+      const densityCanvas = context.canvas as HTMLCanvasElement
+      densityCanvas.dataset.zoomScale = String(zoomScale)
+      densityCanvas.dataset.zoomTransform = getZoomTransformString()
+      if (filteredCountyCode) {
+        const selected = cache.get(filteredCountyCode)
+        if (selected) {
+          context.strokeStyle = '#000000'
+          context.lineWidth = 2 * strokeScale
+          context.stroke(selected)
+        }
+      }
+    }
 
     let hsaHighlight = null
     if (config.general.showHSABoundaries) {
@@ -1152,7 +1238,28 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
+  }, [
+    isLoading,
+    topoData,
+    focus,
+    runtimeLegend,
+    runtimeData,
+    featureArray,
+    config,
+    filteredCountyCode,
+    densityLayer,
+    dotDensity
+  ])
+
+  const previousDensityRef = useRef(false)
+  useEffect(() => {
+    if (previousDensityRef.current && !densityLayer && canvasRef.current) {
+      const canvas = canvasRef.current as HTMLCanvasElement
+      if (!runtimeLegend.items?.length) canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
+      ;['drawnDots', 'seriesCounts', 'positionSignature', 'densityError'].forEach(key => delete canvas.dataset[key])
+    }
+    previousDensityRef.current = Boolean(densityLayer)
+  }, [densityLayer, runtimeLegend])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
@@ -1161,6 +1268,40 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
+      {!previewDotDensity && authoredSettings && authoredDensity.legend.show && (
+        <DotDensityLegend
+          density={{ ...authoredDensity, series: authoredSeries }}
+          hiddenSeries={hiddenDensitySeries}
+          onToggle={id =>
+            setHiddenDensitySeries(previous =>
+              previous.includes(id) ? previous.filter(value => value !== id) : [...previous, id]
+            )
+          }
+        />
+      )}
+      {densityLayer && dotDensity && (
+        <p role='status'>
+          {densityLayer.error ||
+            (Number.isFinite(dotDensity.radius) && dotDensity.radius > 0
+              ? `${densityLayer.dots
+                  .filter(
+                    dot =>
+                      !dotDensity.hiddenSeries.includes(dot.seriesId) &&
+                      (!focus.id || config.general.showNeighboringStates || dot.countyId.startsWith(focus.id))
+                  )
+                  .length.toLocaleString()} visible dots${
+                  dotDensity.hiddenSeries.length === dotDensity.settings.series.length
+                    ? previewDotDensity
+                      ? ' · No diseases selected.'
+                      : ' · No count series selected.'
+                    : ''
+                }`
+              : 'Choose a positive, finite dot radius.')}
+        </p>
+      )}
+      {densityLayer?.skippedValues > 0 && (
+        <p role='status'>{densityLayer.skippedValues.toLocaleString()} missing or invalid count values omitted.</p>
+      )}
       {isLoading && (
         <div style={{ height: 300 }}>
           <Loading />

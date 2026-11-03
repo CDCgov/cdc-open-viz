@@ -21,6 +21,8 @@ import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
 import { Datasets } from '@cdc/core/types/DataSet'
 import BubbleEditorSection from './BubbleEditorSection'
+import DotDensityEditorSection from './DotDensityEditorSection'
+import { getConfiguredDotDensitySeries } from '../../../helpers/dotDensityConfig'
 import TimePlaybackEditorSection from './TimePlaybackEditorSection'
 import InteractivitySection from './sections/InteractivitySection'
 import GeneralSection from './sections/GeneralSection'
@@ -71,7 +73,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     // Strip ref
     delete strippedState['']
 
-    if (strippedState.columns.geo.name && strippedState.columns.primary.name) {
+    if (
+      strippedState.columns.geo.name &&
+      (strippedState.columns.primary.name || getConfiguredDotDensitySeries(strippedState).length > 0)
+    ) {
       delete strippedState.newViz
     }
 
@@ -110,6 +115,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <TypeSection columnNames={columnsInData} />
               <GeneralSection />
               <ColumnsSection columnNames={columnsInData} />
+              <DotDensityEditorSection columnNames={columnsInData} />
               <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
               <FiltersSection />
               <FootnotesSection datasets={datasets} />

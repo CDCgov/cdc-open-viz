@@ -62,6 +62,7 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { withDotDensityColumns } from './helpers/dotDensityConfig'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
 import {
   DEFAULT_TIME_PLAYBACK_NOTE,
@@ -731,6 +732,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     preparedConfig = preparedBubbleTable.config
     preparedColumns = preparedBubbleTable.columns
     preparedRuntimeData = preparedBubbleTable.runtimeData
+    preparedConfig = withDotDensityColumns(preparedConfig)
+    preparedColumns = preparedConfig.columns
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
@@ -811,6 +814,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const revealRequiredMapField = ({ target, subsectionTarget }: MissingRequiredMapField) => {
     const revealTarget = () => {
+      if (target === 'map-dot-density-count') {
+        const densityButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-dot-density']")
+        if (densityButton?.getAttribute('aria-expanded') !== 'true') densityButton?.click()
+        window.requestAnimationFrame(() =>
+          container?.querySelector<HTMLElement>("[data-required-field-control='map-dot-density-count']")?.focus()
+        )
+        return
+      }
       const columnsButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-columns']")
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 

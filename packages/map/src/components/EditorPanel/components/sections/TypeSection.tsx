@@ -24,6 +24,7 @@ import ConfigContext, { MapDispatchContext } from '../../../../context'
 import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../../data/continent-bounding-boxes'
 import { supportedCountries, supportedStatesFipsCodes } from '../../../../data/supported-geos'
 import { addUIDs } from '../../../../helpers/addUIDs'
+import { getDotDensityConfig, isDotDensitySupported } from '../../../../helpers/dotDensityConfig'
 import { getSupportedCountryOptions } from '../../../../helpers/getCountriesPicked'
 import generateRuntimeData from '../../../../helpers/generateRuntimeData'
 import type { MapConfig } from '../../../../types/MapConfig'
@@ -55,6 +56,8 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const updateField = updateFieldFactory(config, setConfig)
   const general = config.general
+  const density = getDotDensityConfig(config)
+  const densityActive = isDotDensitySupported(config) && density.enabled
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
@@ -72,11 +75,18 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
   ]
 
   const handleMapTypeChange = (value: string) => {
+    if (value === 'dot-density' && general.geoType !== 'us-county') return
+    const nextConfig = {
+      ...config,
+      ...(config.dotDensity || value === 'dot-density'
+        ? { dotDensity: { ...density, enabled: value === 'dot-density' } }
+        : {})
+    }
     switch (value) {
       case 'us-geocode':
       case 'world-geocode':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             type: value
@@ -84,8 +94,9 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
         })
         break
       case 'data':
+      case 'dot-density':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             showSidebar: true,
@@ -95,7 +106,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
         break
       case 'navigation':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             showSidebar: false,
@@ -281,6 +292,8 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
         {(general.geoType === 'us' || general.geoType === 'us-county') && (
           <Select
             label='Geography Subtype'
+            fieldName='geoType'
+            section='general'
             value={general.geoType}
             options={[
               { value: 'us', label: 'US State-Level' },
@@ -453,14 +466,19 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
                   <p>
                     Select "Data" to create a color-coded data map. To create a navigation-only map, select
                     "Navigation."
+                    {general.geoType === 'us-county' &&
+                      ' Select "Dot Density" to represent county counts with dots, then configure the Dot Density section.'}
                   </p>
                 </Tooltip.Content>
               </Tooltip>
             </>
           }
-          value={general.type}
+          fieldName='type'
+          section='general'
+          value={densityActive ? 'dot-density' : general.type}
           options={[
             { value: 'data', label: 'Data' },
+            ...(general.geoType === 'us-county' ? [{ value: 'dot-density', label: 'Dot Density' }] : []),
             ...(general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
             ...(general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
             ...(general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : [])

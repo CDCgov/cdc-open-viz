@@ -1,3 +1,5 @@
+import { createDefaultDotDensityConfig } from '../helpers/dotDensityConfig'
+
 const createInitialState = () => {
   const paletteDefaults = {
     isReversed: false,
@@ -6,6 +8,7 @@ const createInitialState = () => {
   }
 
   return {
+    dotDensity: createDefaultDotDensityConfig(),
     annotations: [],
     general: {
       navigationTarget: '_self',
