@@ -5,10 +5,10 @@ import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useListManagement } from '@cdc/core/hooks/useListManagement'
 
-import { IMAGE_POSITIONS } from '../../../constants'
-import Context from '../../../context'
+import { IMAGE_POSITIONS } from '../../../../../constants'
+import Context from '../../../../../context'
 
-const ImagesSection = () => {
+const ImagesPanel = () => {
   const { config, updateConfig } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -226,4 +226,4 @@ const ImagesSection = () => {
   )
 }
 
-export default ImagesSection
+export default ImagesPanel

@@ -5,11 +5,11 @@ import { DATA_FUNCTIONS } from '@cdc/core/helpers/constants'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
-import Context from '../../../context'
-import DataPointFiltersSection from './DataPointFiltersSection'
-import TrendIndicatorSection from './TrendIndicatorSection'
+import Context from '../../../../../context'
+import DataPointFilters from './DataPointFilters'
+import TrendIndicator from './TrendIndicator'
 
-const DataAndFormattingSection = () => {
+const DataPanel = () => {
   const { config, updateConfig, data, editorData } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
   const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
@@ -85,12 +85,12 @@ const DataAndFormattingSection = () => {
         updateField={updateField}
       />
       <hr className='accordion__divider' />
-      <TrendIndicatorSection />
+      <TrendIndicator />
       <hr className='accordion__divider' />
 
-      <DataPointFiltersSection />
+      <DataPointFilters />
     </>
   )
 }
 
-export default DataAndFormattingSection
+export default DataPanel

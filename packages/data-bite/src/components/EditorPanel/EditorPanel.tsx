@@ -8,12 +8,7 @@ import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel
 import '@cdc/core/components/EditorPanel/editor.scss'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Accordion from '@cdc/core/components/ui/Accordion'
-import DataAndFormattingSection from './sections/DataAndFormattingSection'
-import DataDrivenColorsSection from './sections/DataDrivenColorsSection'
-import GeneralSection from './sections/GeneralSection'
-import ImagesSection from './sections/ImagesSection'
-import MarkupVariablesSection from './sections/MarkupVariablesSection'
-import VisualSettingsSection from './sections/VisualSettingsSection'
+import Panels from './components/Panels'
 
 const EditorPanel = () => {
   const { config, updateConfig, loading, setParentConfig, isDashboard } = useContext(Context)
@@ -31,41 +26,41 @@ const EditorPanel = () => {
         <>
           <Accordion>
             <Accordion.Section title='General'>
-              <GeneralSection />
+              <Panels.General />
             </Accordion.Section>
 
             <Accordion.Section title='Data'>
-              <DataAndFormattingSection />
+              <Panels.Data />
             </Accordion.Section>
 
             {/* Visual section for TP5 style */}
             {config.biteStyle === 'tp5' && (
               <Accordion.Section title='Visual'>
-                <VisualSettingsSection variant='tp5' />
+                <Panels.Visual variant='tp5' />
               </Accordion.Section>
             )}
 
             {config.biteStyle === 'tp5' && (
               <Accordion.Section title='Data-Driven Colors'>
-                <DataDrivenColorsSection />
+                <Panels.DataDrivenColors />
               </Accordion.Section>
             )}
 
             {/* Visual section for other bite styles */}
             {config.biteStyle !== 'tp5' && (
               <Accordion.Section title='Visual'>
-                <VisualSettingsSection variant='standard' />
+                <Panels.Visual variant='standard' />
               </Accordion.Section>
             )}
 
             {['title', 'body', 'graphic'].includes(config.biteStyle) && (
               <Accordion.Section title={`Image${['dynamic'].includes(config.imageData.display) ? 's' : ''}`}>
-                <ImagesSection />
+                <Panels.Images />
               </Accordion.Section>
             )}
 
             <Accordion.Section title='Markup Variables'>
-              <MarkupVariablesSection />
+              <Panels.MarkupVariables />
             </Accordion.Section>
           </Accordion>
           <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

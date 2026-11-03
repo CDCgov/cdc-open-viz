@@ -3,9 +3,9 @@ import { useContext } from 'react'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
-import Context from '../../../context'
+import Context from '../../../../../context'
 
-const MarkupVariablesSection = () => {
+const MarkupVariablesPanel = () => {
   const { config, updateConfig, data, editorData } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -24,4 +24,4 @@ const MarkupVariablesSection = () => {
   )
 }
 
-export default MarkupVariablesSection
+export default MarkupVariablesPanel

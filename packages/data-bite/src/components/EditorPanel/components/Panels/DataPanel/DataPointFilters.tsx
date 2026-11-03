@@ -7,9 +7,9 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 
-import Context from '../../../context'
+import Context from '../../../../../context'
 
-const DataPointFiltersSection = () => {
+const DataPointFilters = () => {
   const { config, updateConfig, data, editorData } = useContext(Context)
   const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
   const columns = useDataColumns(sourceData)
@@ -78,4 +78,4 @@ const DataPointFiltersSection = () => {
   )
 }
 
-export default DataPointFiltersSection
+export default DataPointFilters

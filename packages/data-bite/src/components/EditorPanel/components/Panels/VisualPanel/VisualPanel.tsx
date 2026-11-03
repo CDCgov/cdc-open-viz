@@ -5,13 +5,13 @@ import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5V
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
-import Context from '../../../context'
+import Context from '../../../../../context'
 
-type VisualSettingsSectionProps = {
+type VisualPanelProps = {
   variant: 'tp5' | 'standard'
 }
 
-const VisualSettingsSection = ({ variant }: VisualSettingsSectionProps) => {
+const VisualPanel = ({ variant }: VisualPanelProps) => {
   const { config, updateConfig } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -69,4 +69,4 @@ const VisualSettingsSection = ({ variant }: VisualSettingsSectionProps) => {
   )
 }
 
-export default VisualSettingsSection
+export default VisualPanel

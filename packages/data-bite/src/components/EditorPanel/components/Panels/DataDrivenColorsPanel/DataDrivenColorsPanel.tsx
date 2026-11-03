@@ -9,7 +9,7 @@ import { DATA_COLOR_PRESETS } from '@cdc/core/helpers/dataColors'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
-import Context from '../../../context'
+import Context from '../../../../../context'
 
 type DataColorDisplayEntry = {
   sourceValue: string
@@ -17,7 +17,7 @@ type DataColorDisplayEntry = {
   key: string
 }
 
-const DataDrivenColorsSection = () => {
+const DataDrivenColorsPanel = () => {
   const { config, updateConfig, data, editorData } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
   const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
@@ -194,4 +194,4 @@ const DataDrivenColorsSection = () => {
   )
 }
 
-export default DataDrivenColorsSection
+export default DataDrivenColorsPanel

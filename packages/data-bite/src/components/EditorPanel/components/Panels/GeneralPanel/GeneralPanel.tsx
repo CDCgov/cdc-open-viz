@@ -5,10 +5,10 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
-import { BITE_LOCATIONS } from '../../../constants'
-import Context from '../../../context'
+import { BITE_LOCATIONS } from '../../../../../constants'
+import Context from '../../../../../context'
 
-const GeneralSection = () => {
+const GeneralPanel = () => {
   const { config, updateConfig } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -105,4 +105,4 @@ const GeneralSection = () => {
   )
 }
 
-export default GeneralSection
+export default GeneralPanel

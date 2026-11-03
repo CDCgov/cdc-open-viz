@@ -10,7 +10,7 @@ import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/tr
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
-import Context from '../../../context'
+import Context from '../../../../../context'
 
 type TrendDisplayEntry = {
   sourceValue: string
@@ -18,7 +18,7 @@ type TrendDisplayEntry = {
   key: string
 }
 
-const TrendIndicatorSection = () => {
+const TrendIndicator = () => {
   const { config, updateConfig, data, editorData } = useContext(Context)
   const updateField = updateFieldFactory(config, updateConfig, true)
   const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
@@ -317,4 +317,4 @@ const TrendIndicatorSection = () => {
   )
 }
 
-export default TrendIndicatorSection
+export default TrendIndicator
