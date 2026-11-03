@@ -145,7 +145,7 @@ export const Primary: Story = {
             </Button>
             <p className='button-audit__meta'>
               Used where shared Button is called with old `btn-danger` classes. Ref:
-              `packages/chart/src/components/EditorPanel/components/Panels/Panel.PatternSettings.tsx`
+              `packages/chart/src/components/EditorPanel/components/Panels/PatternSettingsPanel/PatternSettingsPanel.tsx`
             </p>
           </div>
         </div>
@@ -448,7 +448,7 @@ export const Primary: Story = {
                 <button className='button-audit__icon-button series-list__remove' aria-label='Remove Series'>
                   x
                 </button>
-                <p className='button-audit__meta'>Used in chart/sidebar series remove controls. Ref: `packages/chart/src/components/EditorPanel/components/Panels/Panel.Series.tsx`</p>
+                <p className='button-audit__meta'>Used in chart/sidebar series remove controls. Ref: `packages/chart/src/components/EditorPanel/components/Panels/DataSeriesPanel/SeriesEditor.tsx`</p>
               </div>
               <div className='button-audit__example'>
                 <button className='btn btn-outline-warning button-audit__outline-warning'>Rollback</button>
