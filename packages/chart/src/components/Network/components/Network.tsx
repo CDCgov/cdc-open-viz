@@ -70,8 +70,13 @@ const Network = ({ data, width, height, runtime }: NetworkProps) => {
   )
   const constrainedNodeRadius = resolveNetworkNodeRadius(network?.nodeRadius ?? 8, chartWidth, plotHeight)
   const resolvedLabels = useMemo(
-    () => resolveNetworkLabels(layout.nodes, layout.links, { nodeRadius: constrainedNodeRadius }),
-    [constrainedNodeRadius, layout.links, layout.nodes]
+    () =>
+      resolveNetworkLabels(layout.nodes, layout.links, {
+        nodeRadius: constrainedNodeRadius,
+        width: chartWidth,
+        height: plotHeight
+      }),
+    [chartWidth, constrainedNodeRadius, layout.links, layout.nodes, plotHeight]
   )
   const labelsByNodeId = useMemo(
     () => new Map(resolvedLabels.map(placement => [placement.nodeId, placement])),

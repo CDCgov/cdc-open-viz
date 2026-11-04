@@ -14,8 +14,12 @@ export default meta
 type Story = StoryObj<typeof Chart>
 
 type BrushSelectionState = {
-  x: string | null
-  width: string | null
+  x: number
+  width: number
+  overlayWidth: number
+  startRatio: number
+  widthRatio: number
+  endRatio: number
 }
 
 const getBrushSelection = (canvasElement: HTMLElement) => {
@@ -24,21 +28,57 @@ const getBrushSelection = (canvasElement: HTMLElement) => {
   return selection!
 }
 
+const getBrushOverlay = (canvasElement: HTMLElement) => {
+  const overlay = canvasElement.querySelector('.visx-brush-overlay') as SVGRectElement | null
+  expect(overlay).toBeTruthy()
+  return overlay!
+}
+
+const readFiniteAttribute = (element: Element, attribute: string) => {
+  const rawValue = element.getAttribute(attribute)
+  expect(rawValue).not.toBeNull()
+
+  const value = Number(rawValue)
+  expect(Number.isFinite(value)).toBe(true)
+  return value
+}
+
 const readBrushSelectionState = (canvasElement: HTMLElement): BrushSelectionState => {
   const selection = getBrushSelection(canvasElement)
+  const overlay = getBrushOverlay(canvasElement)
+  const x = readFiniteAttribute(selection, 'x')
+  const width = readFiniteAttribute(selection, 'width')
+  const overlayX = readFiniteAttribute(overlay, 'x')
+  const overlayWidth = readFiniteAttribute(overlay, 'width')
+
+  expect(width).toBeGreaterThan(0)
+  expect(overlayWidth).toBeGreaterThan(0)
+
   return {
-    x: selection.getAttribute('x'),
-    width: selection.getAttribute('width')
+    x,
+    width,
+    overlayWidth,
+    startRatio: (x - overlayX) / overlayWidth,
+    widthRatio: width / overlayWidth,
+    endRatio: (x - overlayX + width) / overlayWidth
   }
 }
 
-const getBrushPoint = (canvasElement: HTMLElement, x: number) => {
-  const overlay = canvasElement.querySelector('.visx-brush-overlay') as SVGRectElement | null
-  expect(overlay).toBeTruthy()
+const expectBrushSelectionStable = (canvasElement: HTMLElement, initial: BrushSelectionState) => {
+  const current = readBrushSelectionState(canvasElement)
+  const ratioTolerance = 0.5 / Math.max(initial.overlayWidth, current.overlayWidth)
 
-  const rect = overlay!.getBoundingClientRect()
+  // Normalize responsive re-layout while allowing no more than half a pixel of proportional drift.
+  expect(Math.abs(current.startRatio - initial.startRatio)).toBeLessThanOrEqual(ratioTolerance)
+  expect(Math.abs(current.widthRatio - initial.widthRatio)).toBeLessThanOrEqual(ratioTolerance)
+  expect(Math.abs(current.endRatio - initial.endRatio)).toBeLessThanOrEqual(ratioTolerance)
+}
+
+const getBrushPoint = (canvasElement: HTMLElement, x: number) => {
+  const overlay = getBrushOverlay(canvasElement)
+  const rect = overlay.getBoundingClientRect()
   return {
-    target: overlay!,
+    target: overlay,
     clientX: rect.left + x,
     clientY: rect.top + rect.height / 2
   }
@@ -85,8 +125,8 @@ export const OutsideSelectionInteractionsBlocked: Story = {
     })
 
     const initial = readBrushSelectionState(canvasElement)
-    const selectionX = Number(initial.x)
-    const selectionWidth = Number(initial.width)
+    const selectionX = initial.x
+    const selectionWidth = initial.width
 
     const outsideLeft = getBrushPoint(canvasElement, Math.max(1, selectionX - 40))
     dispatchPointer(outsideLeft.target, 'pointerdown', outsideLeft.clientX, outsideLeft.clientY)
@@ -100,13 +140,14 @@ export const OutsideSelectionInteractionsBlocked: Story = {
       })
     )
     await settleInteraction()
-    expect(readBrushSelectionState(canvasElement)).toEqual(initial)
+    expectBrushSelectionStable(canvasElement, initial)
 
-    const outsideRight = getBrushPoint(canvasElement, selectionX + selectionWidth + 40)
+    const current = readBrushSelectionState(canvasElement)
+    const outsideRight = getBrushPoint(canvasElement, current.x + current.width + 40)
     dispatchPointer(outsideRight.target, 'pointerdown', outsideRight.clientX, outsideRight.clientY)
     dispatchPointer(outsideRight.target, 'pointermove', outsideRight.clientX + 80, outsideRight.clientY)
     dispatchPointer(outsideRight.target, 'pointerup', outsideRight.clientX + 80, outsideRight.clientY, 0)
     await settleInteraction()
-    expect(readBrushSelectionState(canvasElement)).toEqual(initial)
+    expectBrushSelectionStable(canvasElement, initial)
   }
 }

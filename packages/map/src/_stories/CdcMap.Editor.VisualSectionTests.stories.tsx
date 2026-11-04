@@ -184,24 +184,12 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
 
         // Select a different palette (skip the first one as it might be selected)
         const alternativePalette = palettes.find((element, idx) => idx > 0 && !element.classList.contains('selected'))
-        if (alternativePalette) {
-          await userEvent.click(alternativePalette)
+        expect(alternativePalette).toBeTruthy()
+        await userEvent.click(alternativePalette!)
 
-          // Wait for changes to apply, then check for modal
-          await new Promise(resolve => setTimeout(resolve, 100))
-
-          // Check if modal appeared and handle it
-          const modal = canvasElement.querySelector('.modal-overlay')
-          if (modal) {
-            const confirmButton = Array.from(canvasElement.querySelectorAll('button')).find(btn =>
-              btn.textContent?.includes('Convert to New Palette')
-            )
-            if (confirmButton) {
-              await userEvent.click(confirmButton)
-              // Wait for modal to close and changes to apply
-              await new Promise(resolve => setTimeout(resolve, 500))
-            }
-          }
+        const confirmButton = canvas.queryByRole('button', { name: 'Convert to New Palette' })
+        if (confirmButton) {
+          await userEvent.click(confirmButton)
         }
       },
       (before, after) => {

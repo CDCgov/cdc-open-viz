@@ -1,15 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, userEvent, expect } from 'storybook/test'
+import { within, userEvent, expect, spyOn } from 'storybook/test'
 import DataBite from '../CdcDataBite'
+import DataColorsConfig from '../../examples/tp5-data-colors.json'
+import DefaultConfig from '../../examples/default.json'
+import TrendArrowConfig from '../../examples/trend-arrow.json'
 import {
   performAndAssert,
   waitForPresence,
   waitForAbsence,
-  waitForTextContent,
   waitForEditor,
   openAccordion,
-  getDisplayValue,
-  getTitleText
+  getDisplayValue
 } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof DataBite> = {
@@ -22,6 +23,112 @@ const meta: Meta<typeof DataBite> = {
 
 export default meta
 type Story = StoryObj<typeof DataBite>
+
+const GeneralSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'graphic',
+  data: [{ Category: 'Total', Value: 1234, 'Report Date': '2026-01-15' }],
+  dataFunction: 'Pass Through',
+  title: 'Test Data Bite Title',
+  biteBody: 'Test data bite body text',
+  subtext: 'Test citation {{reportDate}}',
+  locale: 'en-US',
+  enableMarkupVariables: true,
+  markupVariables: [
+    {
+      name: 'Report Date',
+      tag: '{{reportDate}}',
+      columnName: 'Report Date',
+      conditions: [],
+      dateParseFormat: '%Y-%m-%d',
+      dateDisplayFormat: '%B %-d, %Y'
+    }
+  ]
+}
+
+const VisualSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  biteFontSize: 36,
+  fontSize: 'medium',
+  visual: {
+    ...DefaultConfig.visual,
+    border: false
+  }
+}
+
+const Tp5VisualSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'tp5',
+  visual: {
+    ...DefaultConfig.visual,
+    whiteBackground: false,
+    useWrap: false
+  }
+}
+
+const ImagesSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'title',
+  bitePosition: 'Left',
+  dataFormat: {
+    ...DefaultConfig.dataFormat,
+    commas: false
+  },
+  imageData: {
+    display: 'none',
+    url: '',
+    alt: '',
+    options: []
+  }
+}
+
+const ImagesSectionIneligibleConfig = {
+  ...ImagesSectionConfig,
+  biteStyle: 'split'
+}
+
+const DataSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  data: [
+    { Primary: 1000, Secondary: 1200 },
+    { Primary: 2000, Secondary: 2400 },
+    { Primary: 0, Secondary: 0 }
+  ],
+  dataColumn: 'Primary',
+  dataFunction: 'Mean (Average)',
+  dataFormat: {
+    prefix: '',
+    suffix: '',
+    roundToPlace: 2,
+    commas: false,
+    ignoreZeros: false
+  }
+}
+
+const MarkupVariablesSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  data: [
+    { Category: 'Total', Value: 1234 },
+    { Category: 'Other', Value: 5678 }
+  ],
+  dataColumn: 'Value',
+  dataFunction: 'Pass Through',
+  biteBody: 'Reported value: {{reported-value}}',
+  enableMarkupVariables: false,
+  markupVariables: [
+    {
+      name: 'Reported Value',
+      tag: '{{reported-value}}',
+      sourceType: 'column',
+      columnName: 'Value',
+      conditions: [],
+      selectionMode: 'first'
+    }
+  ]
+}
 
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
@@ -66,10 +173,30 @@ export const BasicEditorLoadingTests: Story = {
     await expect(generalButton).toBeVisible()
     await expect(dataButton).toBeVisible()
     await expect(visualButton).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: 'Data-Driven Colors' })).not.toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Markup Variables' })).toBeVisible()
 
-    // Verify the data-bite component is rendered
-    const titleElement = canvas.getByText(/test data bite title/i)
+    const advancedOptionsToggle = canvasElement.querySelector('.advanced-toggle-link') as HTMLElement
+    await expect(advancedOptionsToggle).toBeVisible()
+    await userEvent.click(advancedOptionsToggle)
+    const applyAdvancedConfigButton = canvas.getByRole('button', { name: 'Apply Configuration Changes' })
+    await expect(applyAdvancedConfigButton).toBeVisible()
+    await expect(canvas.getByRole('link', { name: /Get Help with Data Bite/ })).toBeVisible()
+
+    const titleElement = canvasElement.querySelector('.cove-visualization__header') as HTMLElement
     await expect(titleElement).toBeVisible()
+    await expect(titleElement).toHaveTextContent('Test Data Bite Title')
+    await userEvent.dblClick(canvasElement.querySelector('#title_display') as HTMLElement)
+    const advancedTitleInput = canvasElement.querySelector('#title_textarea') as HTMLTextAreaElement
+    await userEvent.clear(advancedTitleInput)
+    await userEvent.type(advancedTitleInput, 'Advanced Editor Title')
+    await userEvent.keyboard('{Enter}')
+    await performAndAssert(
+      'Apply Advanced Editor Configuration',
+      () => titleElement.textContent?.trim() || '',
+      async () => await userEvent.click(applyAdvancedConfigButton),
+      (before, after) => before === 'Test Data Bite Title' && after === 'Advanced Editor Title'
+    )
   }
 }
 
@@ -79,140 +206,110 @@ export const BasicEditorLoadingTests: Story = {
 // ============================================================================
 export const GeneralSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: GeneralSectionConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
-    await openAccordion(canvas, 'general')
+    await openAccordion(canvas, 'General')
 
-    // ============================================================================
-    // TEST 1: Bite Style Change
-    // Expectation: Visualization style changes from graphic to text mode and back
-    // ============================================================================
-    const biteStyleSelect = canvasElement.querySelector('select[name="biteStyle"]') as HTMLSelectElement
-    expect(biteStyleSelect).toBeTruthy()
-
-    const getCurrentVisualization = () => {
-      const svg = canvasElement.querySelector('svg')
-      const textElements = canvasElement.querySelectorAll('.bite-text, svg text')
-      return {
-        hasSvg: !!svg,
-        textCount: textElements.length,
-        containerClasses: canvasElement.querySelector('.cove-visualization')?.className || ''
+    const biteStyleSelect = canvas.getByLabelText('Data Bite Style') as HTMLSelectElement
+    const isGeneralSectionVisible = () => {
+      let element: HTMLElement | null = biteStyleSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
       }
+      return true
     }
+    await performAndAssert(
+      'Open General Accordion',
+      isGeneralSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
 
-    const currentValue = biteStyleSelect.value
-    const options = Array.from(biteStyleSelect.options).map(opt => opt.value)
-    const targetValue = currentValue === 'graphic' ? 'split' : 'graphic'
+    const getBiteStyleState = () => ({
+      hasGraphic: Boolean(canvasElement.querySelector('.bite-content-container svg')),
+      hasSplitValue: Boolean(canvasElement.querySelector('.bite-content-container > .bite-content .bite-value'))
+    })
+    await performAndAssert(
+      'Bite Style Change',
+      getBiteStyleState,
+      async () => await userEvent.selectOptions(biteStyleSelect, 'split'),
+      (before, after) => before.hasGraphic && !before.hasSplitValue && !after.hasGraphic && after.hasSplitValue
+    )
+    await performAndAssert(
+      'Bite Style Restore',
+      getBiteStyleState,
+      async () => await userEvent.selectOptions(biteStyleSelect, 'graphic'),
+      (before, after) => !before.hasGraphic && before.hasSplitValue && after.hasGraphic && !after.hasSplitValue
+    )
 
-    if (options.includes(targetValue)) {
-      await performAndAssert(
-        'Bite Style Change',
-        getCurrentVisualization,
-        async () => {
-          await userEvent.selectOptions(biteStyleSelect, targetValue)
-        },
-        (before, after) =>
-          before.hasSvg !== after.hasSvg ||
-          before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
-      )
-
-      // Switch back to show the difference
-      await performAndAssert(
-        'Bite Style Restore',
-        getCurrentVisualization,
-        async () => {
-          await userEvent.selectOptions(biteStyleSelect, currentValue)
-        },
-        (before, after) =>
-          before.hasSvg !== after.hasSvg ||
-          before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
-      )
-    }
-
-    // ============================================================================
-    // TEST 2: Title Update
-    // Expectation: Header text updates to new string.
-    // ============================================================================
-    const titleInput = canvas.getByDisplayValue(/test data bite title/i)
-    await userEvent.clear(titleInput)
-    await userEvent.type(titleInput, 'Updated Data Bite Title')
-
+    const titleInput = canvas.getByLabelText('Title')
     await performAndAssert(
       'Title Update',
       () => canvasElement.querySelector('.cove-visualization__header')?.textContent?.trim() || '',
-      async () => {}, // action already performed above
-      (before, after) => after === 'Updated Data Bite Title'
-    )
-
-    // ============================================================================
-    // TEST 3: Show Title Toggle
-    // Expectation: Title visibility changes (DOM presence/absence).
-    // ============================================================================
-    const showTitleCheckbox = canvasElement.querySelector('input[name="showTitle"]') as HTMLInputElement
-    expect(showTitleCheckbox).toBeTruthy()
-
-    const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-visualization__header') as HTMLElement
-      return titleElement && titleElement.offsetParent !== null
-    }
-
-    const wasVisible = getTitleVisibility()
-    await performAndAssert(
-      'Title Toggle',
-      getTitleVisibility,
       async () => {
-        await userEvent.click(showTitleCheckbox)
+        await userEvent.clear(titleInput)
+        await userEvent.type(titleInput, 'Updated Data Bite Title')
       },
-      (before, after) => after !== before
+      (_before, after) => after === 'Updated Data Bite Title'
     )
 
-    // Toggle back to original state
+    const showTitleCheckbox = canvas.getByLabelText('Show Title')
     await performAndAssert(
-      'Title Toggle Reset',
-      getTitleVisibility,
-      async () => {
-        await userEvent.click(showTitleCheckbox)
-      },
-      (before, after) => after === wasVisible
+      'Hide Title',
+      () => Boolean(canvasElement.querySelector('.cove-visualization__header')),
+      async () => await userEvent.click(showTitleCheckbox),
+      (before, after) => before && !after
+    )
+    await performAndAssert(
+      'Restore Title',
+      () => canvasElement.querySelector('.cove-visualization__header')?.textContent?.trim() || '',
+      async () => await userEvent.click(showTitleCheckbox),
+      (_before, after) => after === 'Updated Data Bite Title'
     )
 
-    // ============================================================================
-    // TEST 4: Body Text / Message Change
-    // Expectation: Primary message text updates to new content string.
-    // ============================================================================
-    const bodyTextarea = canvasElement.querySelector('textarea[name="null-null-biteBody"]') as HTMLTextAreaElement
-    expect(bodyTextarea).toBeTruthy()
+    const bodyTextarea = canvas.getByLabelText(/Message/) as HTMLTextAreaElement
+    await performAndAssert(
+      'Message Update',
+      () => canvasElement.querySelector('.bite-content-container .bite-text')?.textContent?.trim() || '',
+      async () => {
+        await userEvent.clear(bodyTextarea)
+        await userEvent.type(bodyTextarea, 'Updated body text for E2E testing')
+      },
+      (_before, after) => after.includes('Updated body text for E2E testing')
+    )
 
-    const newBodyContent = 'Updated body text for E2E testing'
-    await userEvent.clear(bodyTextarea)
-    await userEvent.type(bodyTextarea, newBodyContent)
+    const subtextInput = canvas.getByLabelText(/Subtext\/Citation/) as HTMLInputElement
+    const getRenderedSubtext = () =>
+      (canvasElement.querySelector('.bite-content-container .bite-subtext')?.textContent?.trim() || '').replace(
+        /\s+/g,
+        ' '
+      )
+    await performAndAssert(
+      'Subtext Update',
+      getRenderedSubtext,
+      async () => {
+        await userEvent.clear(subtextInput)
+        await userEvent.click(subtextInput)
+        await userEvent.paste('Updated citation {{reportDate}}')
+      },
+      (_before, after) => after === 'Updated citation January 15, 2026'
+    )
 
-    const bodyElement = canvasElement.querySelector('.bite-body, .bite-text, .message-text') as HTMLElement
-    if (bodyElement) {
-      await waitForTextContent(bodyElement, newBodyContent)
-    }
-
-    // ============================================================================
-    // TEST 5: Subtext / Citation Change
-    // Expectation: Subtext element text content updates to new citation string.
-    // ============================================================================
-    const subtextInput = canvasElement.querySelector('input[name="null-null-subtext"]') as HTMLInputElement
-    expect(subtextInput).toBeTruthy()
-
-    const newSubtext = 'Updated citation for E2E testing'
-    await userEvent.clear(subtextInput)
-    await userEvent.type(subtextInput, newSubtext)
-
-    const subtextElement = canvasElement.querySelector('.bite-subtext, .citation, .subtext') as HTMLElement
-    if (subtextElement) {
-      await waitForTextContent(subtextElement, newSubtext)
-    }
+    const localeSelect = canvas.getByLabelText(/Language for dates and numbers/) as HTMLSelectElement
+    await performAndAssert(
+      'Locale Update',
+      getRenderedSubtext,
+      async () => await userEvent.selectOptions(localeSelect, 'es-MX'),
+      (before, after) => before === 'Updated citation January 15, 2026' && after === 'Updated citation enero 15, 2026'
+    )
   }
 }
 
@@ -222,7 +319,7 @@ export const GeneralSectionTests: Story = {
 // ============================================================================
 export const DataSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: DataSectionConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -230,377 +327,98 @@ export const DataSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Data')
 
-    // Get the current data value for comparison
-    const getDataValue = () => canvasElement.querySelector('svg text, .bite-text')?.textContent?.trim() || ''
-
-    // ============================================================================
-    // TEST 1: Data Column Selection
-    // Expectation: Changing data column updates the displayed value
-    // ============================================================================
-    const dataColumnSelect = canvasElement.querySelector('select[name="dataColumn"]') as HTMLSelectElement
-    expect(dataColumnSelect).toBeTruthy()
-
-    const currentColumn = dataColumnSelect.value
-    const options = Array.from(dataColumnSelect.options)
-      .map(opt => opt.value)
-      .filter(val => val && val !== currentColumn)
-
-    if (options.length > 0) {
-      const targetColumn = options[0]
-      await performAndAssert(
-        'Data Column Change',
-        getDataValue,
-        async () => {
-          await userEvent.selectOptions(dataColumnSelect, targetColumn)
-        },
-        (before, after) => after !== before
-      )
+    const dataColumnSelect = canvas.getByLabelText('Data Column')
+    const isDataSectionVisible = () => {
+      let element: HTMLElement | null = dataColumnSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
     }
+    await performAndAssert(
+      'Open Data Accordion',
+      isDataSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
+    const getRenderedMetric = () => canvasElement.querySelector('.bite-value')?.textContent?.trim() || ''
 
-    // ============================================================================
-    // TEST 2: Data Function Selection
-    // Expectation: Changing data function (Mean, Sum, etc.) updates the displayed value
-    // ============================================================================
-    const dataFunctionSelect = canvasElement.querySelector('select[name="dataFunction"]') as HTMLSelectElement
-    expect(dataFunctionSelect).toBeTruthy()
+    await performAndAssert(
+      'Data Column Change',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataColumnSelect, 'Secondary'),
+      (before, after) => before === '1000.00' && after === '1200.00'
+    )
 
-    const currentFunction = dataFunctionSelect.value
-    const functionOptions = Array.from(dataFunctionSelect.options)
-      .map(opt => opt.value)
-      .filter(val => val && val !== currentFunction)
+    const dataFunctionSelect = canvas.getByLabelText('Data Function')
+    await performAndAssert(
+      'Data Function Change',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataFunctionSelect, 'Sum'),
+      (before, after) => before === '1200.00' && after === '3600.00'
+    )
 
-    if (functionOptions.length > 0) {
-      const targetFunction = functionOptions[0]
-      await performAndAssert(
-        'Data Function Change',
-        getDataValue,
-        async () => {
-          await userEvent.selectOptions(dataFunctionSelect, targetFunction)
-        },
-        (before, after) => after !== before
-      )
-    }
-
-    // NOTE: Data Point Filters test moved to TEST 9 (final test) below
-
-    // ============================================================================
-    // TEST 3: Data Prefix Input
-    // Expectation: Data value gets prefix (e.g., "$42" when prefix is "$")
-    // ============================================================================
-    const prefixInput = canvasElement.querySelector('input[name="dataFormat-null-prefix"]') as HTMLInputElement
-    expect(prefixInput).toBeTruthy()
-
+    const prefixInput = canvas.getByLabelText('Prefix')
     await performAndAssert(
       'Prefix Addition',
-      getDataValue,
-      async () => {
-        await userEvent.clear(prefixInput)
-        await userEvent.type(prefixInput, '$')
-        await userEvent.tab() // Trigger change event
-      },
-      (before, after) => after.startsWith('$') && after !== before
+      getRenderedMetric,
+      async () => await userEvent.type(prefixInput, '$'),
+      (before, after) => before === '3600.00' && after === '$3600.00'
     )
 
-    // ============================================================================
-    // TEST 4: Data Suffix Input
-    // Expectation: Data value gets suffix (e.g., "42%" when suffix is "%")
-    // ============================================================================
-    const suffixInput = canvasElement.querySelector('input[name="dataFormat-null-suffix"]') as HTMLInputElement
-    expect(suffixInput).toBeTruthy()
-
+    const suffixInput = canvas.getByLabelText('Suffix')
     await performAndAssert(
       'Suffix Addition',
-      getDataValue,
-      async () => {
-        await userEvent.clear(suffixInput)
-        await userEvent.type(suffixInput, ' miles')
-        await userEvent.tab() // Trigger change event
-      },
-      (before, after) => after.includes('miles') && after !== before
+      getRenderedMetric,
+      async () => await userEvent.type(suffixInput, ' units'),
+      (before, after) => before === '$3600.00' && after === '$3600.00 units'
     )
 
-    // ============================================================================
-    // TEST 6: Round to Place Input
-    // Expectation: Data value rounding changes (e.g., 42.345 → 42 when roundToPlace=0)
-    // ============================================================================
-    try {
-      const roundInput = canvasElement.querySelector('input[name="dataFormat-null-roundToPlace"]') as HTMLInputElement
-      expect(roundInput).toBeTruthy()
+    const roundInput = canvas.getByLabelText('Round')
+    await performAndAssert(
+      'Round to Place Change',
+      getRenderedMetric,
+      async () => {
+        await userEvent.clear(roundInput)
+        await userEvent.type(roundInput, '0')
+      },
+      (before, after) => before === '$3600.00 units' && after === '$3600 units'
+    )
 
-      await performAndAssert(
-        'Round to Place Change',
-        getDataValue,
-        async () => {
-          const currentValue = roundInput.value
-          const newValue = currentValue === '0' ? '2' : '0'
-          await userEvent.clear(roundInput)
-          await userEvent.type(roundInput, newValue)
-          await userEvent.tab() // Trigger change event
-        },
-        (before, after) => after !== before
-      )
-    } catch (error) {
-      throw error
-    }
+    const commasCheckbox = canvas.getByLabelText('Add commas')
+    await performAndAssert(
+      'Commas Formatting',
+      getRenderedMetric,
+      async () => await userEvent.click(commasCheckbox),
+      (before, after) => before === '$3600 units' && after === '$3,600 units'
+    )
 
-    // ============================================================================
-    // TEST 7: Commas Toggle (comprehensive boolean testing)
-    // Expectation: Checkbox toggles in both directions regardless of visual impact
-    // ============================================================================
-    const commasCheckbox = canvasElement.querySelector('input[name="commas"]') as HTMLInputElement
-    expect(commasCheckbox).toBeTruthy()
+    await performAndAssert(
+      'Prepare Mean for Ignore Zeros',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataFunctionSelect, 'Mean (Average)'),
+      (before, after) => before === '$3,600 units' && after === '$1,200 units'
+    )
 
-    // Test commas checkbox with visual validation (data value formatting may change)
-    const getDataValueFormatting = () => {
-      const dataElement = canvasElement.querySelector('.bite-data-value, .data-value, [class*="data"]')
-      return {
-        textContent: dataElement?.textContent || '',
-        innerHTML: dataElement?.innerHTML || '',
-        hasCommas: (dataElement?.textContent || '').includes(',')
-      }
-    }
-
-    const commasInitialCheckboxState = commasCheckbox.checked
-    const commasInitialVisualState = getDataValueFormatting()
-
-    // First toggle: change to opposite state
-    await userEvent.click(commasCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const commasFirstToggleCheckboxState = commasCheckbox.checked
-    const commasFirstToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox changed (visual may or may not change depending on data)
-    expect(commasFirstToggleCheckboxState).not.toBe(commasInitialCheckboxState)
-    // Note: Visual change is optional for commas (depends on number size)
-
-    // Second toggle: return to original state
-    await userEvent.click(commasCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const commasSecondToggleCheckboxState = commasCheckbox.checked
-    const commasSecondToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox and visual state returned to original
-    expect(commasSecondToggleCheckboxState).toBe(commasInitialCheckboxState)
-    expect(commasSecondToggleVisualState).toEqual(commasInitialVisualState)
-
-    // ============================================================================
-    // TEST 8: Ignore Zeros Toggle (comprehensive boolean testing)
-    // Expectation: Checkbox toggles in both directions regardless of visual impact
-    // ============================================================================
-    const ignoreZerosCheckbox = canvasElement.querySelector('input[name="ignoreZeros"]') as HTMLInputElement
-    expect(ignoreZerosCheckbox).toBeTruthy()
-
-    // Test ignore zeros checkbox with visual validation (data calculation may change)
-    const ignoreZerosInitialCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosInitialVisualState = getDataValueFormatting()
-
-    // First toggle: change to opposite state
-    await userEvent.click(ignoreZerosCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const ignoreZerosFirstToggleCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosFirstToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox changed (visual may or may not change depending on data)
-    expect(ignoreZerosFirstToggleCheckboxState).not.toBe(ignoreZerosInitialCheckboxState)
-    // Note: Visual change is optional for ignoreZeros (depends on whether zeros exist in data)
-
-    // Second toggle: return to original state
-    await userEvent.click(ignoreZerosCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const ignoreZerosSecondToggleCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosSecondToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox and visual state returned to original
-    expect(ignoreZerosSecondToggleCheckboxState).toBe(ignoreZerosInitialCheckboxState)
-    expect(ignoreZerosSecondToggleVisualState).toEqual(ignoreZerosInitialVisualState)
-
-    // ============================================================================
-    // TEST 9: Data Point Filters (Add/Remove Filters workflow) - FINAL TEST
-    // Expectation: "Add Filters" button exists, clicking reveals filter configuration, test removal
-    // ============================================================================
-    try {
-      // Look for "Add Filters" button or similar
-      const addFilterButtons = canvasElement.querySelectorAll(
-        'button, [role="button"], .btn, [class*="add"], [class*="filter"]'
-      )
-
-      let addFilterButton = null
-      addFilterButtons.forEach((button, index) => {
-        const element = button as HTMLElement
-        const text = element.textContent?.toLowerCase() || ''
-        const className = element.className || ''
-
-        if (
-          (text.includes('add') && text.includes('filter')) ||
-          text.includes('add filter') ||
-          (className.includes('add') && className.includes('filter'))
-        ) {
-          addFilterButton = element
-        }
-      })
-
-      if (addFilterButton) {
-        // Step 1: Click the Add Filters button
-        await userEvent.click(addFilterButton)
-
-        // Wait a moment for the filter configuration to appear
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        // Step 2: Look for and configure filter column
-        const columnSelectors = [
-          'select[name*="filterColumn"]',
-          'select[name*="filter-column"]',
-          'select[name*="column"]',
-          'select[name*="Column"]'
-        ]
-
-        let columnSelect = null
-        for (const selector of columnSelectors) {
-          columnSelect = canvasElement.querySelector(selector) as HTMLSelectElement
-          if (columnSelect) {
-            break
-          }
-        }
-
-        if (columnSelect) {
-          const options = Array.from(columnSelect.options).map(opt => ({
-            value: (opt as HTMLOptionElement).value,
-            text: (opt as HTMLOptionElement).textContent
-          }))
-
-          if (options.length > 1) {
-            // Prioritize columns that are more likely to have discrete filterable values
-            const preferredColumns = ['Coverage Status', 'state', 'Region Name', 'Year (Good filter option)']
-            let targetOption = null
-
-            // First try to find a preferred column
-            for (const preferred of preferredColumns) {
-              targetOption = options.find(opt => opt.text?.includes(preferred))
-              if (targetOption) {
-                break
-              }
-            }
-
-            // If no preferred column found, use any available option that's not current
-            if (!targetOption) {
-              targetOption = options.find(opt => opt.value !== '' && opt.value !== columnSelect.value)
-            }
-
-            if (targetOption) {
-              await userEvent.selectOptions(columnSelect, targetOption.value)
-
-              // Wait longer for value input to appear, and check multiple times
-              await new Promise(resolve => setTimeout(resolve, 1500))
-            }
-          }
-        }
-
-        // Step 3: Look for and fill filter value input with enhanced detection
-        const valueSelectors = [
-          'input[name*="filterValue"]',
-          'input[name*="filter-value"]',
-          'input[name*="value"]',
-          'input[name*="Value"]',
-          'select[name*="filterValue"]',
-          'select[name*="filter-value"]',
-          'select[name*="value"]',
-          'select[name*="Value"]',
-          // Try more generic selectors within filter areas
-          '.filter input',
-          '.filter select',
-          '[class*="filter"] input',
-          '[class*="filter"] select'
-        ]
-
-        let valueInput = null
-        for (const selector of valueSelectors) {
-          const elements = canvasElement.querySelectorAll(selector)
-
-          if (elements.length > 0) {
-            // Get the last (most recently added) element
-            valueInput = elements[elements.length - 1] as HTMLInputElement | HTMLSelectElement
-
-            // Verify it's visible and not disabled
-            const isVisible = valueInput.offsetParent !== null
-            const isEnabled = !valueInput.disabled
-
-            if (isVisible && isEnabled) {
-              break
-            } else {
-              valueInput = null // Keep looking if this one isn't usable
-            }
-          }
-        }
-
-        if (valueInput) {
-          if (valueInput.tagName === 'INPUT') {
-            const inputElement = valueInput as HTMLInputElement
-            await userEvent.clear(inputElement)
-            await userEvent.type(inputElement, 'Test Filter Value')
-          } else if (valueInput.tagName === 'SELECT') {
-            const selectElement = valueInput as HTMLSelectElement
-            const options = Array.from(selectElement.options).map(opt => ({
-              value: (opt as HTMLOptionElement).value,
-              text: (opt as HTMLOptionElement).textContent
-            }))
-            if (options.length > 1) {
-              const targetOption = options.find(opt => opt.value !== '' && opt.value !== selectElement.value)
-              if (targetOption) {
-                await userEvent.selectOptions(selectElement, targetOption.value)
-              }
-            }
-          }
-        } else {
-          // Log all inputs and selects for debugging
-          const allInputs = canvasElement.querySelectorAll('input, select')
-          allInputs.forEach((input, index) => {
-            const element = input as HTMLInputElement | HTMLSelectElement
-          })
-        }
-
-        // Step 4: Test filter removal
-        await new Promise(resolve => setTimeout(resolve, 500))
-        const removeButtons = canvasElement.querySelectorAll('button, [role="button"], .btn')
-        let removeButton = null
-
-        removeButtons.forEach((button, index) => {
-          const element = button as HTMLElement
-          const text = element.textContent?.toLowerCase() || ''
-          const className = element.className || ''
-
-          if (
-            text.includes('remove') ||
-            text.includes('delete') ||
-            text.includes('×') ||
-            className.includes('remove') ||
-            className.includes('delete') ||
-            className.includes('close')
-          ) {
-            removeButton = element
-          }
-        })
-
-        if (removeButton) {
-          await userEvent.click(removeButton)
-
-          // Verify filter controls are gone
-          await new Promise(resolve => setTimeout(resolve, 300))
-          const filtersAfterRemove = canvasElement.querySelectorAll('select[name*="filter"], input[name*="filter"]')
-        } else {
-        }
-      } else {
-      }
-    } catch (error) {
-      throw error
-    }
+    const ignoreZerosCheckbox = canvas.getByLabelText('Ignore Zeros')
+    await performAndAssert(
+      'Ignore Zeros Calculation',
+      getRenderedMetric,
+      async () => await userEvent.click(ignoreZerosCheckbox),
+      (before, after) => before === '$1,200 units' && after === '$1,800 units'
+    )
   }
 }
 
 // ============================================================================
-// TEST 3: Visual Section Functionality
-// Expectation: All Visual controls change rendered styling and appearance.
+// TEST 4: Data Point Filters Functionality
+// Expectation: Filter controls preserve empty, configured, and removed states and update the displayed metric.
 // ============================================================================
-export const VisualSectionTests: Story = {
+export const DataPointFiltersSectionTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
@@ -608,258 +426,854 @@ export const VisualSectionTests: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
+    const addFilterButton = canvas.getByRole('button', { name: 'Add Filter' })
+    const isFiltersSectionVisible = () => {
+      let element: HTMLElement | null = addFilterButton
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data Accordion for Filters',
+      isFiltersSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
+
+    const initialDisplayValue = getDisplayValue(canvasElement)
+    await expect(canvas.getByText('There are currently no filters.')).toBeVisible()
+    await expect(canvas.queryByLabelText('Column Name')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Column Value')).not.toBeInTheDocument()
+
+    await userEvent.click(addFilterButton)
+    await expect(canvas.queryByText('There are currently no filters.')).not.toBeInTheDocument()
+    const columnNameSelect = await canvas.findByLabelText('Column Name')
+    const columnValueSelect = canvas.getByLabelText('Column Value') as HTMLSelectElement
+    await expect(canvas.getByRole('button', { name: 'Remove' })).toBeVisible()
+
+    await performAndAssert(
+      'Choose Filter Column',
+      () => Array.from(columnValueSelect.options).map(option => option.value),
+      async () => await userEvent.selectOptions(columnNameSelect, 'Coverage Status'),
+      (before, after) =>
+        before.length === 1 &&
+        after.includes('Insured') &&
+        after.includes('Uninsured') &&
+        after.indexOf('Insured') < after.indexOf('Uninsured')
+    )
+
+    await performAndAssert(
+      'Choose Filter Value',
+      () => getDisplayValue(canvasElement),
+      async () => await userEvent.selectOptions(columnValueSelect, 'Uninsured'),
+      (before, after) => before === initialDisplayValue && after !== before
+    )
+
+    await performAndAssert(
+      'Remove Filter',
+      () => getDisplayValue(canvasElement),
+      async () => await userEvent.click(canvas.getByRole('button', { name: 'Remove' })),
+      (before, after) => before !== initialDisplayValue && after === initialDisplayValue
+    )
+    await expect(canvas.getByText('There are currently no filters.')).toBeVisible()
+    await expect(canvas.queryByLabelText('Column Name')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Column Value')).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 5: Trend Indicator Functionality
+// Expectation: Trend controls preserve their conditional UI and rendered arrow behavior.
+// ============================================================================
+export const TrendIndicatorSectionTests: Story = {
+  args: {
+    config: TrendArrowConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const trendModeSelect = canvas.getByLabelText('Trend Mode') as HTMLSelectElement
+    const isTrendSectionVisible = () => {
+      let element: HTMLElement | null = trendModeSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data Accordion',
+      isTrendSectionVisible,
+      async () => {
+        if (!isTrendSectionVisible()) {
+          await openAccordion(canvas, 'Data')
+        }
+      },
+      (_before, after) => after
+    )
+
+    const dataFunctionSelect = canvas.getByLabelText('Data Function') as HTMLSelectElement
+    const dataColumnSelect = canvas.getByLabelText('Data Column') as HTMLSelectElement
+    const trendColumnSelect = canvas.getByLabelText(/Trend Column/) as HTMLSelectElement
+
+    await expect(trendModeSelect).toHaveValue('numeric')
+    await expect(dataFunctionSelect).toHaveValue('Mean (Average)')
+    await expect(trendColumnSelect).toBeVisible()
+    await expect(canvas.getByLabelText(/Threshold/)).toBeVisible()
+    await expect(canvas.getByLabelText('Show indicator for no change')).toBeVisible()
+    await waitForPresence('.cove-trend-arrow', canvasElement)
+
+    const upLabelInput = canvas.getByLabelText('Up Label') as HTMLInputElement
+    await performAndAssert(
+      'Numeric Trend Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(upLabelInput)
+        await userEvent.type(upLabelInput, 'Increasing')
+      },
+      (_before, after) => after === 'Increasing'
+    )
+
+    await performAndAssert(
+      'Trend Column Change Removes Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.selectOptions(trendColumnSelect, 'Rate'),
+      (before, after) => before && !after
+    )
+    await performAndAssert(
+      'Trend Column Restore Shows Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.selectOptions(trendColumnSelect, 'oldrate'),
+      (before, after) => !before && after
+    )
+
+    await performAndAssert(
+      'Numeric Down Arrow',
+      () => Boolean(canvas.queryByRole('img', { name: 'Trend down' })),
+      async () => {
+        await userEvent.selectOptions(dataColumnSelect, 'oldrate')
+        await userEvent.selectOptions(trendColumnSelect, 'Rate')
+      },
+      (_before, after) => after
+    )
+    const downLabelInput = canvas.getByLabelText('Down Label') as HTMLInputElement
+    await performAndAssert(
+      'Numeric Down Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(downLabelInput)
+        await userEvent.type(downLabelInput, 'Decreasing')
+      },
+      (_before, after) => after === 'Decreasing'
+    )
+    await userEvent.selectOptions(dataColumnSelect, 'Rate')
+    await userEvent.selectOptions(trendColumnSelect, 'Rate')
+    await waitForAbsence('.cove-trend-arrow', canvasElement)
+
+    const showNoChangeCheckbox = canvas.getByLabelText('Show indicator for no change') as HTMLInputElement
+    await performAndAssert(
+      'Show No Change Arrow',
+      () => Boolean(canvas.queryByRole('img', { name: 'Trend flat' })),
+      async () => await userEvent.click(showNoChangeCheckbox),
+      (_before, after) => after
+    )
+    const noChangeLabelInput = await canvas.findByLabelText('No Change Label')
+    await performAndAssert(
+      'No Change Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(noChangeLabelInput)
+        await userEvent.type(noChangeLabelInput, 'Stable')
+      },
+      (_before, after) => after === 'Stable'
+    )
+    await performAndAssert(
+      'Hide No Change Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.click(showNoChangeCheckbox),
+      (before, after) => before && !after
+    )
+    await expect(canvas.queryByLabelText('No Change Label')).not.toBeInTheDocument()
+
+    await userEvent.selectOptions(trendColumnSelect, 'oldrate')
+    await waitForPresence('.cove-trend-arrow', canvasElement)
+    const trendDescriptionInput = canvas.getByLabelText('Trend description') as HTMLInputElement
+    await performAndAssert(
+      'Trend Description Update',
+      () => canvasElement.querySelector('.cdc-callout__trend-footer-label')?.textContent || '',
+      async () => {
+        await userEvent.clear(trendDescriptionInput)
+        await userEvent.type(trendDescriptionInput, '(compared with prior period)')
+      },
+      (_before, after) => after === '(compared with prior period)'
+    )
+
+    const thresholdInput = canvas.getByLabelText(/Threshold/) as HTMLInputElement
+    await performAndAssert(
+      'Numeric Threshold Hides Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => {
+        await userEvent.clear(thresholdInput)
+        await userEvent.type(thresholdInput, '1')
+      },
+      (before, after) => before && !after
+    )
+
+    await userEvent.selectOptions(trendModeSelect, '')
+    await expect(canvas.queryByLabelText(/Trend Column/)).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText(/Threshold/)).not.toBeInTheDocument()
+
+    await userEvent.selectOptions(dataFunctionSelect, 'Pass Through')
+    await userEvent.selectOptions(trendModeSelect, 'categorical')
+    const categoricalTrendColumnSelect = await canvas.findByLabelText(/Trend Column/)
+    await userEvent.selectOptions(categoricalTrendColumnSelect, 'oldrate')
+    await expect(canvas.queryByLabelText(/Threshold/)).not.toBeInTheDocument()
+
+    const sourceValueRow = Array.from(canvasElement.querySelectorAll('.cove-accordion__panel-row')).find(
+      row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim() === '7'
+    ) as HTMLElement
+    await expect(sourceValueRow).toBeTruthy()
+    await performAndAssert(
+      'Categorical Arrow Mapping',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => await userEvent.selectOptions(within(sourceValueRow).getByRole('combobox'), 'down'),
+      (_before, after) => after === 'Decreasing'
+    )
+
+    const addMappingButton = canvas.getByRole('button', { name: 'Add Trend Mapping' })
+    await userEvent.click(addMappingButton)
+    const customMappingInput = await canvas.findByPlaceholderText('Enter value')
+    await userEvent.type(customMappingInput, 'Custom trend')
+    await userEvent.click(canvas.getByTitle('Remove mapping'))
+    await waitForAbsence('input[placeholder="Enter value"]', canvasElement)
+
+    await userEvent.selectOptions(dataFunctionSelect, 'Count')
+    await userEvent.selectOptions(trendModeSelect, 'numeric')
+    await expect(
+      await canvas.findByText('Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.')
+    ).toBeVisible()
+    await expect(canvas.queryByLabelText(/Trend Column/)).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 6: Data-Driven Colors Functionality
+// Expectation: Data color controls preserve conditional UI and rendered callout colors.
+// ============================================================================
+export const DataDrivenColorsSectionTests: Story = {
+  args: {
+    config: DataColorsConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const colorColumnSelect = canvas.getByLabelText(/Color Column/) as HTMLSelectElement
+    const isDataColorsSectionVisible = () => {
+      let element: HTMLElement | null = colorColumnSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data-Driven Colors Accordion',
+      isDataColorsSectionVisible,
+      async () => {
+        if (!isDataColorsSectionVisible()) {
+          await openAccordion(canvas, 'Data-Driven Colors')
+        }
+      },
+      (_before, after) => after
+    )
+
+    const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
+    const getCalloutColorState = () => ({
+      hasDataColorClass: callout.classList.contains('cdc-callout--data-color'),
+      backgroundColor: getComputedStyle(callout).backgroundColor,
+      textColor: getComputedStyle(callout).color
+    })
+
+    await expect(colorColumnSelect).toHaveValue('Status')
+    await expect(canvas.getByRole('button', { name: 'Add Color Mapping' })).toBeVisible()
+    await expect(callout).toHaveClass('cdc-callout--data-color')
+
+    await performAndAssert(
+      'Clear Color Column',
+      getCalloutColorState,
+      async () => await userEvent.selectOptions(colorColumnSelect, ''),
+      (before, after) =>
+        before.hasDataColorClass &&
+        !after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+    await expect(canvas.queryByRole('button', { name: 'Add Color Mapping' })).not.toBeInTheDocument()
+    await expect(canvasElement.querySelectorAll('.cove-accordion__panel-row')).toHaveLength(0)
+
+    await performAndAssert(
+      'Restore Color Column',
+      getCalloutColorState,
+      async () => await userEvent.selectOptions(colorColumnSelect, 'Status'),
+      (before, after) =>
+        !before.hasDataColorClass &&
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    const mappingRows = Array.from(canvasElement.querySelectorAll('.cove-accordion__panel-row'))
+    await expect(mappingRows.map(row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim())).toEqual([
+      'Critical',
+      'High',
+      'Low',
+      'Medium'
+    ])
+    const highRow = mappingRows.find(
+      row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim() === 'High'
+    ) as HTMLElement
+    await expect(highRow).toBeTruthy()
+
+    await userEvent.click(within(highRow).getByRole('button', { name: '#f45b53' }))
+    await performAndAssert(
+      'Change Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: '#a03169' })),
+      (before, after) =>
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(within(highRow).getByRole('button', { name: '#a03169' }))
+    await performAndAssert(
+      'Remove Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: 'None' })),
+      (before, after) =>
+        before.hasDataColorClass &&
+        !after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(within(highRow).getByRole('button', { name: 'Select color' }))
+    await performAndAssert(
+      'Restore Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: '#f45b53' })),
+      (before, after) =>
+        !before.hasDataColorClass &&
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Add Color Mapping' }))
+    const customMappingInput = await canvas.findByPlaceholderText('Enter value')
+    await userEvent.type(customMappingInput, 'Custom status')
+    await userEvent.click(canvas.getByTitle('Remove mapping'))
+    await waitForAbsence('input[placeholder="Enter value"]', canvasElement)
+  }
+}
+
+// ============================================================================
+// TEST 7: Non-TP5 Visual Section Functionality
+// Expectation: DataBite sizing controls and shared border integration change rendered output.
+// ============================================================================
+export const VisualSectionTests: Story = {
+  args: {
+    config: VisualSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
     await openAccordion(canvas, 'Visual')
 
-    // ============================================================================
-    // TEST 1: Bite Font Size Change
-    // Expectation: Font size of the main data bite value changes
-    // ============================================================================
-    try {
-      // Try multiple selectors to find the bite font size input
-      const selectors = [
-        'input[name*="biteFontSize"]',
-        'input[name="biteFontSize"]',
-        'input[placeholder*="font"]',
-        'input[type="number"]'
-      ]
+    const biteFontSizeInput = canvas.getByLabelText('Bite Font Size')
+    await performAndAssert(
+      'Bite Font Size Change',
+      () => (canvasElement.querySelector('.bite-value') as HTMLElement).style.fontSize,
+      async () => {
+        await userEvent.clear(biteFontSizeInput)
+        await userEvent.type(biteFontSizeInput, '42')
+      },
+      (before, after) => before === '36px' && after === '42px'
+    )
 
-      let biteFontSizeInput: HTMLInputElement | null = null
-      for (const selector of selectors) {
-        biteFontSizeInput = canvasElement.querySelector(selector) as HTMLInputElement
-        if (biteFontSizeInput) {
-          break
+    const overallFontSizeSelect = canvas.getByLabelText('Overall Font Size')
+    await performAndAssert(
+      'Overall Font Size Change',
+      () => ({
+        medium: canvasElement.querySelector('.cove-visualization.type-data-bite')?.classList.contains('font-medium'),
+        large: canvasElement.querySelector('.cove-visualization.type-data-bite')?.classList.contains('font-large')
+      }),
+      async () => await userEvent.selectOptions(overallFontSizeSelect, 'large'),
+      (before, after) => before.medium && !before.large && !after.medium && after.large
+    )
+
+    const displayBorderCheckbox = canvas.getByLabelText('Display Border')
+    await performAndAssert(
+      'Shared Display Border Integration',
+      () => canvasElement.querySelector('.cove-visualization__body')?.classList.contains('no-borders') ?? false,
+      async () => await userEvent.click(displayBorderCheckbox),
+      (before, after) => !before && after
+    )
+  }
+}
+
+// ============================================================================
+// TEST 8: TP5 Visual Section Functionality
+// Expectation: Shared white-background and DataBite wrapping controls change rendered layout.
+// ============================================================================
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    config: Tp5VisualSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+
+    const whiteBackgroundCheckbox = canvas.getByLabelText('Use White Background Style')
+    await performAndAssert(
+      'Shared TP5 White Background Integration',
+      () => ({
+        whiteBackground: canvasElement
+          .querySelector('.cove-visualization__body')
+          ?.classList.contains('white-background-style'),
+        hasFlag: Boolean(canvasElement.querySelector('.cdc-callout__flag'))
+      }),
+      async () => await userEvent.click(whiteBackgroundCheckbox),
+      (before, after) => !before.whiteBackground && before.hasFlag && after.whiteBackground && !after.hasFlag
+    )
+
+    const valueAboveMessageCheckbox = canvas.getByLabelText('Value Above Message')
+    await performAndAssert(
+      'Value Above Message Layout',
+      () => ({
+        useWrap: canvasElement.querySelector('.cove-visualization__body')?.classList.contains('use-wrap'),
+        contentRight: canvasElement
+          .querySelector('.cdc-callout__body')
+          ?.classList.contains('cdc-callout__body--content-right'),
+        contentBelow: canvasElement
+          .querySelector('.cdc-callout__body')
+          ?.classList.contains('cdc-callout__body--content-below')
+      }),
+      async () => await userEvent.click(valueAboveMessageCheckbox),
+      (before, after) =>
+        !before.useWrap &&
+        before.contentRight &&
+        !before.contentBelow &&
+        after.useWrap &&
+        !after.contentRight &&
+        after.contentBelow
+    )
+  }
+}
+
+// ============================================================================
+// TEST 9: Image Section Applicability
+// Expectation: Styles outside title/body/graphic do not expose an Image accordion.
+// ============================================================================
+export const ImagesSectionApplicabilityTests: Story = {
+  args: {
+    config: ImagesSectionIneligibleConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await expect(canvas.queryByRole('button', { name: /^Images?$/ })).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 10: Image Section Functionality
+// Expectation: Static and dynamic image controls preserve rendered images and rule authoring behavior.
+// ============================================================================
+export const ImagesSectionTests: Story = {
+  args: {
+    config: ImagesSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const imageAccordionButton = canvas.getByRole('button', { name: /^Images?$/ })
+    const imageDisplaySelect = canvas.getByLabelText('Image Display Type')
+    const imagePositionSelect = canvas.getByLabelText('Image/Graphic Position')
+    const imagePanel = imageDisplaySelect.closest('.cove-accordion__panel') as HTMLElement
+    await expect(imagePanel).toBeTruthy()
+    const isImageSectionVisible = () => {
+      let element: HTMLElement | null = imageDisplaySelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
         }
+        element = element.parentElement
       }
-
-      if (biteFontSizeInput) {
-        // Use the performAndAssert helper with direct value setting
-        await performAndAssert(
-          'Bite Font Size Change',
-          () => biteFontSizeInput.value,
-          async () => {
-            const newValue = '26' // Change from 24 to 26 (nearby 2-digit number)
-
-            // Focus the input first
-            await userEvent.click(biteFontSizeInput)
-
-            // Set the value directly via DOM property to avoid concatenation issues
-            biteFontSizeInput.value = newValue
-
-            // Trigger input and change events to notify React
-            biteFontSizeInput.dispatchEvent(new Event('input', { bubbles: true }))
-            biteFontSizeInput.dispatchEvent(new Event('change', { bubbles: true }))
-
-            // Blur to commit the change
-            await userEvent.tab()
-
-            // Wait for debounce (TextField uses 500ms debounce)
-            await new Promise(resolve => setTimeout(resolve, 600))
-          },
-          (before, after) => {
-            // Check for clean change from 24 to 26
-            return before === '24' && after === '26'
-          }
-        )
-      } else {
-        // Log all inputs for debugging
-        const allInputs = canvasElement.querySelectorAll('input')
-        allInputs.forEach((input, i) => {})
-      }
-    } catch (error) {
-      throw error
+      return true
     }
-
-    // ============================================================================
-    // TEST 2: Overall Font Size Change
-    // Expectation: Overall typography size changes
-    // ============================================================================
-    try {
-      await performAndAssert(
-        'Overall Font Size Change',
-        () => {
-          const select = canvasElement.querySelector('select[name="fontSize"]') as HTMLSelectElement
-          if (select) {
-            const options = Array.from(select.options).map(opt => opt.text)
-            return select.value
-          }
-          return null
-        },
-        async () => {
-          const select = canvasElement.querySelector('select[name="fontSize"]') as HTMLSelectElement
-          const currentValue = select.value
-          const targetValue = currentValue === 'medium' ? 'large' : 'medium'
-          await userEvent.selectOptions(select, targetValue)
-        },
-        (before, after) => {
-          return after !== before
+    await performAndAssert(
+      'Open Image Accordion',
+      isImageSectionVisible,
+      async () => {
+        if (!isImageSectionVisible()) {
+          await userEvent.click(imageAccordionButton)
         }
-      )
-    } catch (error) {
-      throw error
-    }
+      },
+      (_before, after) => after
+    )
+    await expect(imageDisplaySelect).toBeVisible()
+    await expect(imagePositionSelect).toBeVisible()
+    await expect(canvas.queryByLabelText('Image URL')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Image URL (default)')).not.toBeInTheDocument()
+    await expect(canvasElement.querySelector('.bite-image')).not.toBeInTheDocument()
 
-    // ============================================================================
-    // TEST 3: Display Border Toggle
-    // Expectation: Border styling changes when toggled (classes or computed styles)
-    // ============================================================================
-    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
-    expect(contentContainer()).toBeTruthy()
+    await performAndAssert(
+      'Show Static Image Fields',
+      () => ({
+        url: Boolean(canvas.queryByLabelText('Image URL')),
+        alt: Boolean(canvas.queryByLabelText('Alt Text'))
+      }),
+      async () => await userEvent.selectOptions(imageDisplaySelect, 'static'),
+      (before, after) => !before.url && !before.alt && after.url && after.alt
+    )
 
-    // Note: Border checkbox uses name="border", other checkboxes use similar simple names
+    const staticUrl = 'https://example.com/static-image.png'
+    const staticAlt = 'Static image description'
+    const staticUrlInput = canvas.getByLabelText('Image URL')
+    await performAndAssert(
+      'Static Image URL',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => await userEvent.type(staticUrlInput, staticUrl),
+      (_before, after) => after === staticUrl
+    )
 
-    // Try multiple possible selectors for the border checkbox
-    const borderSelectors = [
-      'input[name="visual-null-border"]',
-      'input[name="border"]',
-      'input[name*="border"]',
-      'input[name*="Border"]'
-    ]
+    const staticAltInput = canvas.getByLabelText('Alt Text')
+    await performAndAssert(
+      'Static Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => await userEvent.type(staticAltInput, staticAlt),
+      (_before, after) => after === staticAlt
+    )
 
-    let borderCheckbox: HTMLInputElement | null = null
-    for (const selector of borderSelectors) {
-      borderCheckbox = canvasElement.querySelector(selector) as HTMLInputElement
-      if (borderCheckbox) {
-        break
-      }
-    }
+    await performAndAssert(
+      'Static Image Position',
+      () => ({
+        left: Boolean(canvasElement.querySelector('.bite.bite-left')),
+        bottom: Boolean(canvasElement.querySelector('.bite.bite-bottom'))
+      }),
+      async () => await userEvent.selectOptions(imagePositionSelect, 'Bottom'),
+      (before, after) => before.left && !before.bottom && !after.left && after.bottom
+    )
 
-    if (!borderCheckbox) {
-      // If no border checkbox found, just skip this test gracefully
-      return
-    }
+    await performAndAssert(
+      'Show Dynamic Image Fields',
+      () => ({
+        defaultUrl: Boolean(canvas.queryByLabelText('Image URL (default)')),
+        defaultAlt: Boolean(canvas.queryByLabelText('Alt Text (default)')),
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.')),
+        addButton: Boolean(canvas.queryByRole('button', { name: 'Add Dynamic Image' }))
+      }),
+      async () => await userEvent.selectOptions(imageDisplaySelect, 'dynamic'),
+      (before, after) =>
+        !before.defaultUrl &&
+        !before.defaultAlt &&
+        !before.emptyMessage &&
+        !before.addButton &&
+        after.defaultUrl &&
+        after.defaultAlt &&
+        after.emptyMessage &&
+        after.addButton
+    )
 
-    // Find the wrapper element (following waffle chart pattern)
-    const borderWrapper = borderCheckbox!.closest(
-      '.cove-input__checkbox--small, .checkbox-wrapper, label'
-    ) as HTMLElement
-    const clickTarget = borderWrapper || borderCheckbox!
+    const dynamicDefaultUrl = 'https://example.com/default-dynamic-image.png'
+    const dynamicDefaultAlt = 'Default dynamic image description'
+    const dynamicDefaultUrlInput = canvas.getByLabelText('Image URL (default)')
+    await performAndAssert(
+      'Dynamic Default Image URL',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => {
+        await userEvent.clear(dynamicDefaultUrlInput)
+        await userEvent.type(dynamicDefaultUrlInput, dynamicDefaultUrl)
+      },
+      (before, after) => before === staticUrl && after === dynamicDefaultUrl
+    )
 
-    // Test border checkbox with comprehensive boolean testing AND visual validation
-    const getBorderVisualState = () => {
-      const element = canvasElement.querySelector('.cove-visualization__body')
-      return {
-        classes: Array.from(element!.classList).sort().join(' '),
-        hasNoBordersClass: element!.classList.contains('no-borders'),
-        borderEnabled: !element!.classList.contains('no-borders') // true = border shown, false = border hidden
-      }
-    }
+    const dynamicDefaultAltInput = canvas.getByLabelText('Alt Text (default)')
+    await performAndAssert(
+      'Dynamic Default Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => {
+        await userEvent.clear(dynamicDefaultAltInput)
+        await userEvent.type(dynamicDefaultAltInput, dynamicDefaultAlt)
+      },
+      (before, after) => before === staticAlt && after === dynamicDefaultAlt
+    )
 
-    const initialCheckboxState = borderCheckbox!.checked
-    const initialVisualState = getBorderVisualState()
+    await performAndAssert(
+      'Add Dynamic Image',
+      () => ({
+        rows: imagePanel.querySelectorAll('fieldset.edit-block').length,
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.'))
+      }),
+      async () => await userEvent.click(canvas.getByRole('button', { name: 'Add Dynamic Image' })),
+      (before, after) => before.rows === 0 && before.emptyMessage && after.rows === 1 && !after.emptyMessage
+    )
 
-    // First toggle: change to opposite state
-    await userEvent.click(borderCheckbox!)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const firstToggleCheckboxState = borderCheckbox!.checked
-    const firstToggleVisualState = getBorderVisualState()
+    const getDynamicImageFieldset = () => canvas.getByText('Image #1').closest('fieldset') as HTMLFieldSetElement
+    const dynamicImageFieldset = getDynamicImageFieldset()
+    await expect(dynamicImageFieldset).toBeTruthy()
+    await performAndAssert(
+      'Author First Dynamic Condition',
+      () => ({
+        operator: getDynamicImageFieldset().querySelectorAll('select')[0].value,
+        threshold: (getDynamicImageFieldset().querySelectorAll('input[type="number"]')[0] as HTMLInputElement).value
+      }),
+      async () => {
+        await userEvent.selectOptions(getDynamicImageFieldset().querySelectorAll('select')[0], '>')
+        await userEvent.type(getDynamicImageFieldset().querySelectorAll('input[type="number"]')[0], '100')
+      },
+      (before, after) =>
+        before.operator === '<' && before.threshold === '' && after.operator === '>' && after.threshold === '100'
+    )
 
-    // Verify checkbox changed
-    expect(firstToggleCheckboxState).not.toBe(initialCheckboxState)
+    const dynamicSource = 'https://example.com/matched-dynamic-image.png'
+    const dynamicAlt = 'Matched dynamic image description'
+    const dynamicTextInputs = dynamicImageFieldset.querySelectorAll('input[type="text"]')
+    const dynamicSourceInput = dynamicTextInputs[0]
+    const dynamicAltInput = dynamicTextInputs[1]
+    await expect(dynamicTextInputs).toHaveLength(2)
+    await performAndAssert(
+      'Dynamic Image Source',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => await userEvent.type(dynamicSourceInput, dynamicSource),
+      (_before, after) => after === dynamicSource
+    )
+    await performAndAssert(
+      'Dynamic Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => await userEvent.type(dynamicAltInput, dynamicAlt),
+      (before, after) => before === dynamicDefaultAlt && after === dynamicAlt
+    )
 
-    // Verify visualization changed (with flexible handling)
-    if (JSON.stringify(firstToggleVisualState) === JSON.stringify(initialVisualState)) {
-      // Continue test but note the potential issue
-    } else {
-      expect(firstToggleVisualState).not.toEqual(initialVisualState)
-    }
+    const thenAndSelect = getDynamicImageFieldset().querySelectorAll('select')[1]
+    await performAndAssert(
+      'Add Second Dynamic Condition',
+      () => ({
+        selects: getDynamicImageFieldset().querySelectorAll('select').length,
+        thresholds: getDynamicImageFieldset().querySelectorAll('input[type="number"]').length,
+        thenLabel: Boolean(getDynamicImageFieldset().querySelector('.accordion__panel-row.text-capitalize'))
+      }),
+      async () => await userEvent.selectOptions(thenAndSelect, 'and'),
+      (before, after) =>
+        before.selects === 2 &&
+        before.thresholds === 1 &&
+        !before.thenLabel &&
+        after.selects === 3 &&
+        after.thresholds === 2 &&
+        after.thenLabel
+    )
 
-    // Second toggle: return to original state
-    await userEvent.click(borderCheckbox!)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const secondToggleCheckboxState = borderCheckbox!.checked
-    const secondToggleVisualState = getBorderVisualState()
+    await performAndAssert(
+      'Author Second Dynamic Condition',
+      () => ({
+        operator: getDynamicImageFieldset().querySelectorAll('select')[2].value,
+        threshold: (getDynamicImageFieldset().querySelectorAll('input[type="number"]')[1] as HTMLInputElement).value
+      }),
+      async () => {
+        await userEvent.selectOptions(getDynamicImageFieldset().querySelectorAll('select')[2], '>')
+        await userEvent.type(getDynamicImageFieldset().querySelectorAll('input[type="number"]')[1], '100')
+      },
+      (before, after) =>
+        before.operator === '<' && before.threshold === '' && after.operator === '>' && after.threshold === '100'
+    )
 
-    // Verify both checkbox AND visualization returned to original
-    expect(secondToggleCheckboxState).toBe(initialCheckboxState)
-    expect(secondToggleVisualState).toEqual(initialVisualState)
+    const secondConditionModeSelect = getDynamicImageFieldset().querySelectorAll('select')[1]
+    await expect(within(secondConditionModeSelect).getByRole('option', { name: 'Then' })).toHaveValue('then')
+    await expect(within(secondConditionModeSelect).getByRole('option', { name: 'And' })).toHaveValue('and')
+    await userEvent.selectOptions(secondConditionModeSelect, 'then')
 
-    // ============================================================================
-    // TEST 4: Border Color Theme Toggle
-    // Expectation: Border color theme classes change when toggled
-    // ============================================================================
-    const borderColorThemeSelectors = [
-      'input[name="visual-null-borderColorTheme"]',
-      'input[name="borderColorTheme"]',
-      'input[name*="borderColorTheme"]',
-      'input[name*="BorderColor"]'
-    ]
+    await performAndAssert(
+      'Remove Dynamic Image',
+      () => ({
+        rows: imagePanel.querySelectorAll('fieldset.edit-block').length,
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.')),
+        source: canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+        alt: canvasElement.querySelector('.bite-image')?.getAttribute('alt') || ''
+      }),
+      async () => await userEvent.click(within(getDynamicImageFieldset()).getByRole('button', { name: 'Remove' })),
+      (before, after) =>
+        before.rows === 1 &&
+        !before.emptyMessage &&
+        before.source === dynamicSource &&
+        before.alt === dynamicAlt &&
+        after.rows === 0 &&
+        after.emptyMessage &&
+        after.source === dynamicDefaultUrl &&
+        after.alt === dynamicDefaultAlt
+    )
+  }
+}
 
-    let borderColorThemeCheckbox: HTMLInputElement | null = null
-    for (const selector of borderColorThemeSelectors) {
-      borderColorThemeCheckbox = canvasElement.querySelector(selector) as HTMLInputElement
-      if (borderColorThemeCheckbox) break
-    }
+// ============================================================================
+// TEST 11: Markup Variables Section Functionality
+// Expectation: Enablement, column conditions, formatting, and authoring controls remain wired to rendered content.
+// ============================================================================
+export const MarkupVariablesSectionTests: Story = {
+  args: {
+    config: MarkupVariablesSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Markup Variables')
 
-    // Test remaining checkboxes with comprehensive boolean testing AND visual validation
-    const getGeneralVisualState = () => {
-      const element = canvasElement.querySelector('.cove-visualization__body')
-      return {
-        classes: Array.from(element!.classList).sort().join(' '),
-        // Check for specific component classes that these controls add
-        hasAccentClass: element!.classList.contains('component--has-accent'),
-        hasBackgroundClass: element!.classList.contains('component--has-background'),
-        hasBorderColorThemeClass: element!.classList.contains('component--has-border-color-theme'),
-        hideBackgroundColorClass: element!.classList.contains('component--hide-background-color'),
-        themeClass: Array.from(element!.classList).find(cls => cls.includes('theme-')) || 'no-theme',
-        backgroundStyle: getComputedStyle(element!).backgroundColor
-      }
-    }
+    const enableMarkupVariablesCheckbox = canvas.getByLabelText('Enable Markup Variables')
+    const getRenderedMessage = () =>
+      (canvasElement.querySelector('.bite-text')?.textContent?.trim() || '').replace(/\s+/g, ' ')
+    await expect(canvas.queryByRole('button', { name: /Add Variable/ })).not.toBeInTheDocument()
+    await performAndAssert(
+      'Enable Markup Variables',
+      getRenderedMessage,
+      async () => await userEvent.click(enableMarkupVariablesCheckbox),
+      (before, after) => before === 'Reported value: {{reported-value}}' && after === 'Reported value: 1234'
+    )
 
-    const checkboxTests = [
-      { name: 'borderColorTheme', checkbox: borderColorThemeCheckbox },
-      { name: 'accent', checkbox: canvasElement.querySelector('input[name="accent"]') as HTMLInputElement },
-      { name: 'background', checkbox: canvasElement.querySelector('input[name="background"]') as HTMLInputElement },
-      {
-        name: 'hideBackgroundColor',
-        checkbox: canvasElement.querySelector('input[name="hideBackgroundColor"]') as HTMLInputElement
-      }
-    ]
+    await expect(canvas.getByText(/Use variables in your content with/)).toBeVisible()
+    const addVariableButton = canvas.getByRole('button', { name: /Add Variable/ })
+    await expect(addVariableButton).toBeVisible()
+    const reportedValueCard = canvas.getByText('Reported Value').closest('.variable-item') as HTMLElement
+    await expect(reportedValueCard).toBeTruthy()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Edit' }))
 
-    for (const test of checkboxTests) {
-      if (test.checkbox) {
-        const initialCheckboxState = test.checkbox.checked
-        const initialVisualState = getGeneralVisualState()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Close' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Conditions' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Formatting Options' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Delete Variable' })).toBeVisible()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Close' }))
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Edit' })).toBeVisible()
+    await expect(within(reportedValueCard).queryByRole('button', { name: 'Basic Settings' })).not.toBeInTheDocument()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Edit' }))
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Close' })).toBeVisible()
 
-        // First toggle: change to opposite state
-        await userEvent.click(test.checkbox)
-        await new Promise(resolve => setTimeout(resolve, 100))
-        const firstToggleCheckboxState = test.checkbox.checked
-        const firstToggleVisualState = getGeneralVisualState()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' }))
+    await expect(within(reportedValueCard).getByLabelText('Source')).toHaveValue('column')
+    await expect(within(reportedValueCard).getByLabelText('Data Column')).toHaveValue('Value')
+    const variableNameInput = within(reportedValueCard).getByLabelText('Variable Name')
+    await expect(variableNameInput).toHaveValue('Reported Value')
+    await expect(within(reportedValueCard).getByLabelText('Tag (auto-generated)')).toHaveValue('{{reported-value}}')
 
-        // Verify checkbox changed
-        expect(firstToggleCheckboxState).not.toBe(initialCheckboxState)
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Formatting Options' }))
+    const addCommasCheckbox = within(reportedValueCard).getByLabelText('Format numbers with commas')
+    await performAndAssert(
+      'Format Markup Number with Commas',
+      getRenderedMessage,
+      async () => await userEvent.click(addCommasCheckbox),
+      (before, after) => before === 'Reported value: 1234' && after === 'Reported value: 1,234'
+    )
 
-        // Verify visualization changed (with flexible handling)
-        if (JSON.stringify(firstToggleVisualState) === JSON.stringify(initialVisualState)) {
-          // Continue test but note the potential issue
-        } else {
-          expect(firstToggleVisualState).not.toEqual(initialVisualState)
-        }
+    const markupRoundInput = within(reportedValueCard).getByLabelText('Round to decimal point')
+    await performAndAssert(
+      'Round Markup Number',
+      getRenderedMessage,
+      async () => await userEvent.type(markupRoundInput, '2'),
+      (before, after) => before === 'Reported value: 1,234' && after === 'Reported value: 1,234.00'
+    )
+    await expect(within(reportedValueCard).getByLabelText('Date Parse Format')).toBeVisible()
+    await expect(within(reportedValueCard).getByLabelText('Date Display Format')).toBeVisible()
+    await expect(within(reportedValueCard).getByLabelText('Hide section when value is null')).toBeVisible()
 
-        // Second toggle: return to original state
-        await userEvent.click(test.checkbox)
-        await new Promise(resolve => setTimeout(resolve, 100))
-        const secondToggleCheckboxState = test.checkbox.checked
-        const secondToggleVisualState = getGeneralVisualState()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Conditions' }))
+    const displayAllRowsSelect = reportedValueCard.querySelector('select[name="selectionMode"]') as HTMLSelectElement
+    await expect(displayAllRowsSelect).toBeTruthy()
+    await expect(displayAllRowsSelect).toHaveValue('no')
+    await expect(within(displayAllRowsSelect).getByRole('option', { name: 'Yes' })).toHaveValue('yes')
+    await expect(within(displayAllRowsSelect).getByRole('option', { name: 'No' })).toHaveValue('no')
 
-        // Verify both checkbox AND visualization returned to original
-        expect(secondToggleCheckboxState).toBe(initialCheckboxState)
-        expect(secondToggleVisualState).toEqual(initialVisualState)
-      }
-    }
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: /Add Condition/ }))
+    const conditionColumnSelect = within(reportedValueCard).getByLabelText('Column')
+    const conditionOperatorSelect = within(reportedValueCard).getByLabelText('Operator')
+    await expect(conditionOperatorSelect).toHaveValue('is')
+    await userEvent.selectOptions(conditionColumnSelect, 'Category')
+    const conditionValueSelect = within(reportedValueCard).getByLabelText('Value')
+    await performAndAssert(
+      'Apply Markup Variable Condition',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionValueSelect, 'Other'),
+      (before, after) => before === 'Reported value:' && after === 'Reported value: 5,678.00'
+    )
+    await performAndAssert(
+      'Change Markup Condition Operator',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionOperatorSelect, 'is not'),
+      (before, after) => before === 'Reported value: 5,678.00' && after === 'Reported value: 1,234.00'
+    )
+    await performAndAssert(
+      'Restore Markup Condition Operator',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionOperatorSelect, 'is'),
+      (before, after) => before === 'Reported value: 1,234.00' && after === 'Reported value: 5,678.00'
+    )
+    await performAndAssert(
+      'Remove Markup Variable Condition',
+      getRenderedMessage,
+      async () => await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Remove Condition' })),
+      (before, after) => before === 'Reported value: 5,678.00' && after === 'Reported value: 1,234.00'
+    )
 
-    // ============================================================================
-    // TEST 8: Theme Color Selection
-    // Expectation: Theme color buttons exist and change visualization theme
-    // ============================================================================
-    const themeButtons = canvasElement.querySelectorAll('.color-palette button, .color-palette li')
-    expect(themeButtons.length).toBeGreaterThan(1)
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' }))
+    await performAndAssert(
+      'Update Markup Variable Name and Tag',
+      getRenderedMessage,
+      async () => {
+        const currentVariableNameInput = within(reportedValueCard).getByLabelText('Variable Name')
+        await userEvent.clear(currentVariableNameInput)
+        await userEvent.type(currentVariableNameInput, 'Updated Value')
+      },
+      (before, after) => before === 'Reported value: 1,234.00' && after === 'Reported value: {{reported-value}}'
+    )
+    await expect(within(reportedValueCard).getByLabelText('Tag (auto-generated)')).toHaveValue('{{updated-value}}')
 
-    // Click on the second theme button to change theme
-    const targetButton = themeButtons[1] as HTMLElement
-    await userEvent.click(targetButton)
-
-    // Wait for any theme change effects
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await performAndAssert(
+      'Add Markup Variable',
+      () => canvasElement.querySelectorAll('.variable-item').length,
+      async () => await userEvent.click(addVariableButton),
+      (before, after) => before === 1 && after === 2
+    )
+    const unnamedVariableCard = canvas.getByText('Unnamed Variable').closest('.variable-item') as HTMLElement
+    await expect(unnamedVariableCard).toBeTruthy()
+    const confirmDelete = spyOn(window, 'confirm').mockReturnValue(true)
+    await performAndAssert(
+      'Delete Newly Added Markup Variable',
+      () => canvasElement.querySelectorAll('.variable-item').length,
+      async () => await userEvent.click(within(unnamedVariableCard).getByRole('button', { name: 'Delete Variable' })),
+      (before, after) => before === 2 && after === 1
+    )
+    await expect(confirmDelete).toHaveBeenCalledWith('Are you sure you want to delete the variable "Unnamed Variable"?')
+    confirmDelete.mockRestore()
+    await expect(canvas.queryByText('Unnamed Variable')).not.toBeInTheDocument()
+    await expect(canvas.getByText('Updated Value')).toBeVisible()
   }
 }

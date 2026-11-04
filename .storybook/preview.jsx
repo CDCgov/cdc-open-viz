@@ -16,6 +16,15 @@ export const parameters = {
       date: /Date$/
     }
   },
+  a11y: {
+    test: 'error',
+    options: {
+      runOnly: {
+        type: 'rule',
+        values: ['aria-command-name']
+      }
+    }
+  },
   docs: {
     theme: previewTheme,
     source: {
