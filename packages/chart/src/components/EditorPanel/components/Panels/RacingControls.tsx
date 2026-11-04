@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext } from 'react'
+import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext, useRef } from 'react'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
@@ -16,6 +16,7 @@ const RacingControls = () => {
   const applyConfig = updateConfig!
   const applyField = updateField!
   const { visualizationType, visualizationSubType } = config
+  const initiallyFreshBar = useRef(visualizationType === 'Bar' && Boolean(config.newViz)).current
   const supportsRacing = visualizationType === 'Bar' || visualizationType === 'Line'
   const candidateConfig = {
     ...config,
@@ -32,7 +33,11 @@ const RacingControls = () => {
     visualizationType === 'Line'
       ? getLineRaceEligibility(config, transformedData)
       : getBarRaceEligibility(config, transformedData)
-  const racingOptionAvailable = supportsRacing && (candidateEligibility.eligible || visualizationSubType === 'racing')
+  const racingOptionAvailable =
+    supportsRacing &&
+    (candidateEligibility.eligible ||
+      visualizationSubType === 'racing' ||
+      (visualizationType === 'Bar' && initiallyFreshBar))
   const raceConfigKey = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
   const secondsPerFrame = clampRaceSecondsPerFrame(config[raceConfigKey]?.secondsPerFrame)
 
