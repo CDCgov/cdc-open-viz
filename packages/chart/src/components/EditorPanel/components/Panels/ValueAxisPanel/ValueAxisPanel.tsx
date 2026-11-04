@@ -1,9 +1,4 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import WarningImage from '../../../../../images/warning.svg'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 import PieDataFormatSection from '../CategoryAxisPanel/PieDataFormatSection'
@@ -54,11 +49,9 @@ const ValueAxisPanel = ({
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton
-          data-required-field-section={config.visualizationType === 'Pie' ? 'pie-data-column' : undefined}
-        >
+    <PanelSection
+      title={
+        <>
           {config.visualizationType === 'Pie'
             ? 'Data Format'
             : config.orientation === 'vertical'
@@ -67,21 +60,23 @@ const ValueAxisPanel = ({
           {config.visualizationType === 'Pie' && !config.yAxis.dataKey ? (
             <WarningImage width='25' className='warning-icon' />
           ) : null}
-        </AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {config.visualizationType === 'Pie' && (
-          <PieDataFormatSectionProvider value={pieDataFormatValue}>
-            <PieDataFormatSection />
-          </PieDataFormatSectionProvider>
-        )}
-        {config.visualizationType !== 'Pie' && (
-          <ValueAxisControlsProvider value={controlsValue}>
-            <ValueAxisControls />
-          </ValueAxisControlsProvider>
-        )}
-      </AccordionItemPanel>
-    </AccordionItem>
+        </>
+      }
+      buttonProps={{
+        'data-required-field-section': config.visualizationType === 'Pie' ? 'pie-data-column' : undefined
+      }}
+    >
+      {config.visualizationType === 'Pie' && (
+        <PieDataFormatSectionProvider value={pieDataFormatValue}>
+          <PieDataFormatSection />
+        </PieDataFormatSectionProvider>
+      )}
+      {config.visualizationType !== 'Pie' && (
+        <ValueAxisControlsProvider value={controlsValue}>
+          <ValueAxisControls />
+        </ValueAxisControlsProvider>
+      )}
+    </PanelSection>
   )
 }
 

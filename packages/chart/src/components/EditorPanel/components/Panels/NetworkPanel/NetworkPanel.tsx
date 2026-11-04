@@ -1,11 +1,6 @@
 import { useContext, FC } from 'react'
-import {
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton
-} from 'react-accessible-accordion'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 
 import ConfigContext from '../../../../../ConfigContext'
 import type { ChartContext } from '../../../../../types/ChartContext'
@@ -62,140 +57,140 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton data-required-field-section='network-columns'>
+    <PanelSection
+      title={
+        <>
           {name}
           {(isMissingColumn(columns.source) || isMissingColumn(columns.target)) && (
             <WarningImage width='25' className='warning-icon' />
           )}
-        </AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <Select
-          value={columns.source || ''}
-          section='network'
-          subsection='columns'
-          fieldName='source'
-          label='Source Column'
-          data-required-field-control='network-source'
-          initial='Select'
-          required
-          updateField={updateColumn}
-          options={columnOptions}
+        </>
+      }
+      buttonProps={{ 'data-required-field-section': 'network-columns' }}
+    >
+      <Select
+        value={columns.source || ''}
+        section='network'
+        subsection='columns'
+        fieldName='source'
+        label='Source Column'
+        data-required-field-control='network-source'
+        initial='Select'
+        required
+        updateField={updateColumn}
+        options={columnOptions}
+      />
+      <Select
+        value={columns.target || ''}
+        section='network'
+        subsection='columns'
+        fieldName='target'
+        label='Target Column'
+        data-required-field-control='network-target'
+        initial='Select'
+        required
+        updateField={updateColumn}
+        options={columnOptions}
+      />
+      <Select
+        value={columns.weight || ''}
+        section='network'
+        subsection='columns'
+        fieldName='weight'
+        label='Weight Column (Optional)'
+        initial='None'
+        updateField={updateColumn}
+        options={columnOptions}
+      />
+      <Select
+        value={columns.style || ''}
+        section='network'
+        subsection='columns'
+        fieldName='style'
+        label='Link Style Column (Optional)'
+        initial='None'
+        updateField={updateColumn}
+        options={columnOptions}
+      />
+      <TextField
+        value={network.linkStyleLabels?.solid ?? 'Solid'}
+        section='network'
+        subsection='linkStyleLabels'
+        fieldName='solid'
+        label='Solid Link Legend Label'
+        updateField={updateLinkStyleLabel}
+      />
+      <TextField
+        value={network.linkStyleLabels?.dashed ?? 'Dashed'}
+        section='network'
+        subsection='linkStyleLabels'
+        fieldName='dashed'
+        label='Dashed Link Legend Label'
+        updateField={updateLinkStyleLabel}
+      />
+      <Select
+        value={columns.nodeColor || ''}
+        section='network'
+        subsection='columns'
+        fieldName='nodeColor'
+        label='Node Color Column (Optional)'
+        initial='None'
+        updateField={updateColumn}
+        options={columnOptions}
+      />
+      <CheckBox
+        value={Boolean(network.directed)}
+        fieldName='directed'
+        label='Directed Network'
+        updateField={updateNetworkField}
+      />
+      <TextField
+        value={network.height ?? 500}
+        type='number'
+        section='network'
+        fieldName='height'
+        label='Height'
+        min={160}
+        updateField={updateNetworkField}
+      />
+      <TextField
+        value={network.nodeRadius ?? 8}
+        type='number'
+        section='network'
+        fieldName='nodeRadius'
+        label='Node Radius'
+        min={2}
+        updateField={updateNetworkField}
+      />
+      <label className='network-settings__range'>
+        <span className='edit-label column-heading'>
+          Link Distance: <output>{network.linkDistance ?? 90}</output>
+        </span>
+        <input
+          type='range'
+          aria-label='Link Distance'
+          min={20}
+          max={300}
+          step={5}
+          value={network.linkDistance ?? 90}
+          onChange={event => updateNetworkField('network', '', 'linkDistance', event.target.value)}
         />
-        <Select
-          value={columns.target || ''}
-          section='network'
-          subsection='columns'
-          fieldName='target'
-          label='Target Column'
-          data-required-field-control='network-target'
-          initial='Select'
-          required
-          updateField={updateColumn}
-          options={columnOptions}
+      </label>
+      <label className='network-settings__range'>
+        <span className='edit-label column-heading'>
+          Repulsion Strength: <output>{network.chargeStrength ?? -240}</output>
+        </span>
+        <input
+          type='range'
+          aria-label='Repulsion Strength'
+          min={-1000}
+          max={0}
+          step={10}
+          value={network.chargeStrength ?? -240}
+          onChange={event => updateNetworkField('network', '', 'chargeStrength', event.target.value)}
         />
-        <Select
-          value={columns.weight || ''}
-          section='network'
-          subsection='columns'
-          fieldName='weight'
-          label='Weight Column (Optional)'
-          initial='None'
-          updateField={updateColumn}
-          options={columnOptions}
-        />
-        <Select
-          value={columns.style || ''}
-          section='network'
-          subsection='columns'
-          fieldName='style'
-          label='Link Style Column (Optional)'
-          initial='None'
-          updateField={updateColumn}
-          options={columnOptions}
-        />
-        <TextField
-          value={network.linkStyleLabels?.solid ?? 'Solid'}
-          section='network'
-          subsection='linkStyleLabels'
-          fieldName='solid'
-          label='Solid Link Legend Label'
-          updateField={updateLinkStyleLabel}
-        />
-        <TextField
-          value={network.linkStyleLabels?.dashed ?? 'Dashed'}
-          section='network'
-          subsection='linkStyleLabels'
-          fieldName='dashed'
-          label='Dashed Link Legend Label'
-          updateField={updateLinkStyleLabel}
-        />
-        <Select
-          value={columns.nodeColor || ''}
-          section='network'
-          subsection='columns'
-          fieldName='nodeColor'
-          label='Node Color Column (Optional)'
-          initial='None'
-          updateField={updateColumn}
-          options={columnOptions}
-        />
-        <CheckBox
-          value={Boolean(network.directed)}
-          fieldName='directed'
-          label='Directed Network'
-          updateField={updateNetworkField}
-        />
-        <TextField
-          value={network.height ?? 500}
-          type='number'
-          section='network'
-          fieldName='height'
-          label='Height'
-          min={160}
-          updateField={updateNetworkField}
-        />
-        <TextField
-          value={network.nodeRadius ?? 8}
-          type='number'
-          section='network'
-          fieldName='nodeRadius'
-          label='Node Radius'
-          min={2}
-          updateField={updateNetworkField}
-        />
-        <label className='network-settings__range'>
-          <span className='edit-label column-heading'>
-            Link Distance: <output>{network.linkDistance ?? 90}</output>
-          </span>
-          <input
-            type='range'
-            aria-label='Link Distance'
-            min={20}
-            max={300}
-            step={5}
-            value={network.linkDistance ?? 90}
-            onChange={event => updateNetworkField('network', '', 'linkDistance', event.target.value)}
-          />
-        </label>
-        <label className='network-settings__range'>
-          <span className='edit-label column-heading'>
-            Repulsion Strength: <output>{network.chargeStrength ?? -240}</output>
-          </span>
-          <input
-            type='range'
-            aria-label='Repulsion Strength'
-            min={-1000}
-            max={0}
-            step={10}
-            value={network.chargeStrength ?? -240}
-            onChange={event => updateNetworkField('network', '', 'chargeStrength', event.target.value)}
-          />
-        </label>
-      </AccordionItemPanel>
-    </AccordionItem>
+      </label>
+    </PanelSection>
   )
 }
 

@@ -12,6 +12,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 import Alert from '@cdc/core/components/Alert'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../../ConfigContext'
 import { ChartContext } from '../../../../../types/ChartContext'
@@ -425,274 +426,262 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   if (config.visualizationType === 'Warming Stripes' || config.visualizationType === 'Radar') return
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Pattern Settings</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {Object.keys(currentPatterns).length > 0 && (
-          <>
-            <Alert
-              type={checkPatternContrasts() ? 'success' : 'danger'}
-              message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
-              showCloseButton={false}
-            />
-          </>
-        )}
+    <PanelSection title='Pattern Settings'>
+      {Object.keys(currentPatterns).length > 0 && (
+        <>
+          <Alert
+            type={checkPatternContrasts() ? 'success' : 'danger'}
+            message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
+            showCloseButton={false}
+          />
+        </>
+      )}
 
-        <GroupedList
-          items={Object.entries(currentPatterns)}
-          label='Pattern'
-          droppableId='chart-patterns-order'
-          onDragEnd={({ source, destination }) => {
-            if (!destination || source.index === destination.index) return
-            handlePatternReorder(source.index, destination.index)
-          }}
-          renderItem={([patternKey, pattern], index) => {
-            const p: LegendPattern = pattern || {}
-            const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
+      <GroupedList
+        items={Object.entries(currentPatterns)}
+        label='Pattern'
+        droppableId='chart-patterns-order'
+        onDragEnd={({ source, destination }) => {
+          if (!destination || source.index === destination.index) return
+          handlePatternReorder(source.index, destination.index)
+        }}
+        renderItem={([patternKey, pattern], index) => {
+          const p: LegendPattern = pattern || {}
+          const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
 
-            return (
-              <Draggable
-                key={`pattern-${patternKey}-${index}`}
-                draggableId={`pattern-${patternKey}-${index}`}
-                index={index}
-              >
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    className={snapshot.isDragging ? 'currently-dragging' : ''}
-                    style={provided.draggableProps.style}
-                  >
-                    <Accordion allowZeroExpanded preExpanded={['panel']}>
-                      <AccordionItem uuid='panel' className='series-item series-item--chart'>
-                        <AccordionItemHeading className='series-item__title'>
-                          <AccordionItemButton className='accordion__button'>
-                            <Icon display='move' size={15} style={{ cursor: 'default' }} />
-                            {p.application === 'portion' && p.dataKey
-                              ? `${p.dataKey}: Portion`
-                              : p.dataKey && p.dataValue
-                              ? `${p.dataKey}: ${p.dataValue}`
-                              : p.dataValue
-                              ? `All Series: ${p.dataValue}`
-                              : `Pattern ${index + 1}`}
-                          </AccordionItemButton>
-                        </AccordionItemHeading>
-                        <AccordionItemPanel>
-                          <div className='series-item__panel-actions'>
-                            <Button
-                              type='button'
-                              variant='danger'
-                              size='sm'
-                              className='grouped-list__remove'
-                              onClick={() => handleRemovePattern(patternKey)}
-                            >
-                              Remove Pattern
-                            </Button>
-                          </div>
-                          {p.contrastCheck ?? true ? (
-                            <Alert
-                              type='success'
-                              message='This pattern passes contrast checks'
-                              showCloseButton={false}
-                            />
-                          ) : (
-                            <Alert
-                              type='danger'
-                              message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
-                              showCloseButton={false}
-                            />
-                          )}
-
-                          <Select
-                            label='Pattern Application'
-                            value={p.application || 'value'}
-                            options={[
-                              { value: 'value', label: 'Match a data value' },
-                              { value: 'portion', label: 'Cover a portion of a bar' }
-                            ]}
-                            fieldName={`pattern-application-${domPatternKey}`}
-                            updateField={(section, subsection, fieldName, value) =>
-                              handleApplicationUpdate(patternKey, value as 'value' | 'portion')
-                            }
+          return (
+            <Draggable
+              key={`pattern-${patternKey}-${index}`}
+              draggableId={`pattern-${patternKey}-${index}`}
+              index={index}
+            >
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  className={snapshot.isDragging ? 'currently-dragging' : ''}
+                  style={provided.draggableProps.style}
+                >
+                  <Accordion allowZeroExpanded preExpanded={['panel']}>
+                    <AccordionItem uuid='panel' className='series-item series-item--chart'>
+                      <AccordionItemHeading className='series-item__title'>
+                        <AccordionItemButton className='accordion__button'>
+                          <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                          {p.application === 'portion' && p.dataKey
+                            ? `${p.dataKey}: Portion`
+                            : p.dataKey && p.dataValue
+                            ? `${p.dataKey}: ${p.dataValue}`
+                            : p.dataValue
+                            ? `All Series: ${p.dataValue}`
+                            : `Pattern ${index + 1}`}
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel>
+                        <div className='series-item__panel-actions'>
+                          <Button
+                            type='button'
+                            variant='danger'
+                            size='sm'
+                            className='grouped-list__remove'
+                            onClick={() => handleRemovePattern(patternKey)}
+                          >
+                            Remove Pattern
+                          </Button>
+                        </div>
+                        {p.contrastCheck ?? true ? (
+                          <Alert type='success' message='This pattern passes contrast checks' showCloseButton={false} />
+                        ) : (
+                          <Alert
+                            type='danger'
+                            message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
+                            showCloseButton={false}
                           />
+                        )}
 
-                          {p.application === 'portion' && !portionPatternsSupported && (
-                            <Alert
-                              type='danger'
-                              message='Portion patterns are supported only for regular unstacked bar charts and Combo charts with linear axes and without lollipops.'
-                              showCloseButton={false}
-                            />
-                          )}
+                        <Select
+                          label='Pattern Application'
+                          value={p.application || 'value'}
+                          options={[
+                            { value: 'value', label: 'Match a data value' },
+                            { value: 'portion', label: 'Cover a portion of a bar' }
+                          ]}
+                          fieldName={`pattern-application-${domPatternKey}`}
+                          updateField={(section, subsection, fieldName, value) =>
+                            handleApplicationUpdate(patternKey, value as 'value' | 'portion')
+                          }
+                        />
 
-                          {(p.application || 'value') === 'value' ? (
-                            <>
-                              <Select
-                                label='Data Key'
-                                value={p.dataKey || ''}
-                                options={fieldOptions}
-                                initial='Select Data Key'
-                                fieldName={`pattern-datakey-${domPatternKey}`}
-                                updateField={(section, subsection, fieldName, value) =>
-                                  handlePatternUpdate(patternKey, 'dataKey', value)
-                                }
-                              />
-
-                              <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
-                                Data Value
-                                <input
-                                  type='text'
-                                  id={`pattern-datavalue-${domPatternKey}`}
-                                  value={p.dataValue || ''}
-                                  onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                                  placeholder='Enter data value'
-                                />
-                              </label>
-                            </>
-                          ) : (
-                            <>
-                              <Select
-                                label='Target Bar Series'
-                                value={p.dataKey || ''}
-                                options={getAvailableTargetOptions(patternKey)}
-                                initial='Select Target Bar Series'
-                                fieldName={`pattern-target-series-${domPatternKey}`}
-                                updateField={(section, subsection, fieldName, value) =>
-                                  handlePatternUpdate(patternKey, 'dataKey', value)
-                                }
-                              />
-
-                              <Select
-                                label='Pattern Value Column'
-                                tooltip={
-                                  <Tooltip style={{ textTransform: 'none' }}>
-                                    <Tooltip.Target>
-                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                    </Tooltip.Target>
-                                    <Tooltip.Content>
-                                      <p>
-                                        Select the data column containing the absolute portion amount for each bar. For
-                                        a row to receive an overlay, its value must be numeric, greater than zero, and
-                                        no greater than the corresponding value in the Target Bar Series. Use
-                                        quantities, not percentages.
-                                      </p>
-                                    </Tooltip.Content>
-                                  </Tooltip>
-                                }
-                                value={p.patternValueKey || ''}
-                                options={fieldOptions}
-                                initial='Select Pattern Value Column'
-                                fieldName={`pattern-value-key-${domPatternKey}`}
-                                updateField={(section, subsection, fieldName, value) =>
-                                  handlePatternUpdate(patternKey, 'patternValueKey', value)
-                                }
-                              />
-
-                              {p.patternValueKey && findColumnConfigKey(config.columns || {}, p.patternValueKey) && (
-                                <div
-                                  className='border rounded p-2 mt-2 small'
-                                  data-testid='portion-pattern-column-note'
-                                >
-                                  <strong>Note:</strong> Configure this pattern&apos;s tooltip and data table settings
-                                  in Columns.
-                                </div>
-                              )}
-
-                              <Select
-                                label='Placement'
-                                value={p.placement === 'start' ? 'start' : 'end'}
-                                options={[
-                                  { value: 'start', label: 'Beginning' },
-                                  { value: 'end', label: 'End' }
-                                ]}
-                                fieldName={`pattern-placement-${domPatternKey}`}
-                                updateField={(section, subsection, fieldName, value) =>
-                                  handlePatternUpdate(patternKey, 'placement', value)
-                                }
-                              />
-                            </>
-                          )}
-
-                          <label htmlFor={`pattern-label-${domPatternKey}`}>
-                            Label (optional)
-                            <input
-                              type='text'
-                              id={`pattern-label-${domPatternKey}`}
-                              value={p.label || ''}
-                              onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
-                            />
-                          </label>
-
-                          <Select
-                            label='Pattern Type'
-                            value={p.shape || 'circles'}
-                            options={patternTypes}
-                            fieldName={`pattern-type-${domPatternKey}`}
-                            updateField={(section, subsection, fieldName, value) =>
-                              handlePatternUpdate(patternKey, 'shape', value)
-                            }
+                        {p.application === 'portion' && !portionPatternsSupported && (
+                          <Alert
+                            type='danger'
+                            message='Portion patterns are supported only for regular unstacked bar charts and Combo charts with linear axes and without lollipops.'
+                            showCloseButton={false}
                           />
+                        )}
 
-                          <Select
-                            label='Pattern Size'
-                            value={getPatternSizeText(p.patternSize || 10)}
-                            options={patternSizes}
-                            fieldName={`pattern-size-${domPatternKey}`}
-                            updateField={(section, subsection, fieldName, value) =>
-                              handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
-                            }
-                          />
+                        {(p.application || 'value') === 'value' ? (
+                          <>
+                            <Select
+                              label='Data Key'
+                              value={p.dataKey || ''}
+                              options={fieldOptions}
+                              initial='Select Data Key'
+                              fieldName={`pattern-datakey-${domPatternKey}`}
+                              updateField={(section, subsection, fieldName, value) =>
+                                handlePatternUpdate(patternKey, 'dataKey', value)
+                              }
+                            />
 
-                          <div className='mt-3'>
-                            <label htmlFor={`pattern-color-${domPatternKey}`}>
-                              Pattern Color
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    If this setting is used, it is the responsibility of the visualization author to
-                                    verify the visualization colors meet WCAG 3:1 contrast ratios.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
+                            <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
+                              Data Value
                               <input
                                 type='text'
-                                value={p.color || ''}
-                                id={`pattern-color-${domPatternKey}`}
-                                onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
-                                placeholder='#666666'
+                                id={`pattern-datavalue-${domPatternKey}`}
+                                value={p.dataValue || ''}
+                                onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                                placeholder='Enter data value'
                               />
                             </label>
-                          </div>
-                        </AccordionItemPanel>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
-                )}
-              </Draggable>
-            )
-          }}
-        />
+                          </>
+                        ) : (
+                          <>
+                            <Select
+                              label='Target Bar Series'
+                              value={p.dataKey || ''}
+                              options={getAvailableTargetOptions(patternKey)}
+                              initial='Select Target Bar Series'
+                              fieldName={`pattern-target-series-${domPatternKey}`}
+                              updateField={(section, subsection, fieldName, value) =>
+                                handlePatternUpdate(patternKey, 'dataKey', value)
+                              }
+                            />
 
-        {/* Add Pattern Button */}
-        <Button variant='editor-primary' onClick={handleAddPattern}>
-          Add Pattern
-        </Button>
+                            <Select
+                              label='Pattern Value Column'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Select the data column containing the absolute portion amount for each bar. For a
+                                      row to receive an overlay, its value must be numeric, greater than zero, and no
+                                      greater than the corresponding value in the Target Bar Series. Use quantities, not
+                                      percentages.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={p.patternValueKey || ''}
+                              options={fieldOptions}
+                              initial='Select Pattern Value Column'
+                              fieldName={`pattern-value-key-${domPatternKey}`}
+                              updateField={(section, subsection, fieldName, value) =>
+                                handlePatternUpdate(patternKey, 'patternValueKey', value)
+                              }
+                            />
 
-        {Object.keys(currentPatterns).length === 0 && (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>
-            No patterns configured. Use "Add Pattern" to create pattern configurations.
-          </p>
-        )}
-      </AccordionItemPanel>
-    </AccordionItem>
+                            {p.patternValueKey && findColumnConfigKey(config.columns || {}, p.patternValueKey) && (
+                              <div className='border rounded p-2 mt-2 small' data-testid='portion-pattern-column-note'>
+                                <strong>Note:</strong> Configure this pattern&apos;s tooltip and data table settings in
+                                Columns.
+                              </div>
+                            )}
+
+                            <Select
+                              label='Placement'
+                              value={p.placement === 'start' ? 'start' : 'end'}
+                              options={[
+                                { value: 'start', label: 'Beginning' },
+                                { value: 'end', label: 'End' }
+                              ]}
+                              fieldName={`pattern-placement-${domPatternKey}`}
+                              updateField={(section, subsection, fieldName, value) =>
+                                handlePatternUpdate(patternKey, 'placement', value)
+                              }
+                            />
+                          </>
+                        )}
+
+                        <label htmlFor={`pattern-label-${domPatternKey}`}>
+                          Label (optional)
+                          <input
+                            type='text'
+                            id={`pattern-label-${domPatternKey}`}
+                            value={p.label || ''}
+                            onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
+                          />
+                        </label>
+
+                        <Select
+                          label='Pattern Type'
+                          value={p.shape || 'circles'}
+                          options={patternTypes}
+                          fieldName={`pattern-type-${domPatternKey}`}
+                          updateField={(section, subsection, fieldName, value) =>
+                            handlePatternUpdate(patternKey, 'shape', value)
+                          }
+                        />
+
+                        <Select
+                          label='Pattern Size'
+                          value={getPatternSizeText(p.patternSize || 10)}
+                          options={patternSizes}
+                          fieldName={`pattern-size-${domPatternKey}`}
+                          updateField={(section, subsection, fieldName, value) =>
+                            handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
+                          }
+                        />
+
+                        <div className='mt-3'>
+                          <label htmlFor={`pattern-color-${domPatternKey}`}>
+                            Pattern Color
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  If this setting is used, it is the responsibility of the visualization author to
+                                  verify the visualization colors meet WCAG 3:1 contrast ratios.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                            <input
+                              type='text'
+                              value={p.color || ''}
+                              id={`pattern-color-${domPatternKey}`}
+                              onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
+                              placeholder='#666666'
+                            />
+                          </label>
+                        </div>
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              )}
+            </Draggable>
+          )
+        }}
+      />
+
+      {/* Add Pattern Button */}
+      <Button variant='editor-primary' onClick={handleAddPattern}>
+        Add Pattern
+      </Button>
+
+      {Object.keys(currentPatterns).length === 0 && (
+        <p style={{ color: '#666', fontStyle: 'italic' }}>
+          No patterns configured. Use "Add Pattern" to create pattern configurations.
+        </p>
+      )}
+    </PanelSection>
   )
 }
 export default PanelPatternSettings

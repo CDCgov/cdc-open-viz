@@ -9,6 +9,7 @@ import {
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import Button from '@cdc/core/components/elements/Button'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import ConfigContext from '../../../../../context'
 import type { MapContext } from '../../../../../types/MapContext'
 import type { BubbleLayer } from '../../../../../types/MapConfig'
@@ -198,24 +199,19 @@ const BubbleLayersPanel: React.FC<Props> = ({ columnNames, numberOfItemsLimit })
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Bubble Layers</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {bubbleLayers.length === 0 && <p>There are currently no bubble layers.</p>}
-        <GroupedList
-          items={bubbleLayers}
-          label='Bubble Layers'
-          droppableId='map-bubble-layers'
-          draggable={false}
-          renderItem={renderLayer}
-        />
-        <Button type='button' variant='editor-primary' onClick={addBubbleLayer}>
-          Add Bubble Layer
-        </Button>
-      </AccordionItemPanel>
-    </AccordionItem>
+    <PanelSection title='Bubble Layers'>
+      {bubbleLayers.length === 0 && <p>There are currently no bubble layers.</p>}
+      <GroupedList
+        items={bubbleLayers}
+        label='Bubble Layers'
+        droppableId='map-bubble-layers'
+        draggable={false}
+        renderItem={renderLayer}
+      />
+      <Button type='button' variant='editor-primary' onClick={addBubbleLayer}>
+        Add Bubble Layer
+      </Button>
+    </PanelSection>
   )
 }
 

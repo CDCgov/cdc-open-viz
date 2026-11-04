@@ -1,11 +1,5 @@
 import { useContext } from 'react'
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
-
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import type { Datasets } from '@cdc/core/types/DataSet'
@@ -24,14 +18,9 @@ const FootnotesPanel = ({ datasets }: FootnotesPanelProps) => {
   if (config.general.type === 'navigation') return null
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Footnotes</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
-      </AccordionItemPanel>
-    </AccordionItem>
+    <PanelSection title='Footnotes'>
+      <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+    </PanelSection>
   )
 }
 

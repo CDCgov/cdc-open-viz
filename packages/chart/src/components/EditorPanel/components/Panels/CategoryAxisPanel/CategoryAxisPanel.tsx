@@ -1,9 +1,4 @@
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import WarningImage from '../../../../../images/warning.svg'
 import type { ChartConfig } from '../../../../../types/ChartConfig'
 import CategoryAxisPanelBody from './CategoryAxisPanelBody'
@@ -15,21 +10,21 @@ type CategoryAxisPanelProps = {
 }
 
 const CategoryAxisPanel = ({ config, value }: CategoryAxisPanelProps) => (
-  <AccordionItem>
-    <AccordionItemHeading>
-      <AccordionItemButton
-        data-required-field-section={config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'}
-      >
+  <PanelSection
+    title={
+      <>
         {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
         {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
-      </AccordionItemButton>
-    </AccordionItemHeading>
-    <AccordionItemPanel>
-      <CategoryAxisPanelProvider value={value}>
-        <CategoryAxisPanelBody />
-      </CategoryAxisPanelProvider>
-    </AccordionItemPanel>
-  </AccordionItem>
+      </>
+    }
+    buttonProps={{
+      'data-required-field-section': config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'
+    }}
+  >
+    <CategoryAxisPanelProvider value={value}>
+      <CategoryAxisPanelBody />
+    </CategoryAxisPanelProvider>
+  </PanelSection>
 )
 
 export default CategoryAxisPanel

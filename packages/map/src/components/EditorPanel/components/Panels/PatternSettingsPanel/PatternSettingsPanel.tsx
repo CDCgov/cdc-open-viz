@@ -23,6 +23,7 @@ import { unwrapJsonModule } from '../../../../../helpers/unwrapJsonModule'
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import { applyLegendToRow } from '../../../../../helpers/applyLegendToRow'
 import { PatternSelection } from '../../../../../types/MapConfig'
 import { patternValuesMatch } from '../../../../../helpers/patternMatching'
@@ -171,145 +172,140 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>{name}</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {patterns.length > 0 && (
-          <Alert
-            type={checkPatternContrasts() ? 'success' : 'danger'}
-            message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
-          />
-        )}
-        <br />
-        <GroupedList
-          items={patterns}
-          label='Geo Patterns'
-          droppableId='map-geo-patterns'
-          draggable={false}
-          renderItem={(pattern, patternIndex) => {
-            const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
-            const dataKeyOptions = Object.keys(data[0])
-            dataValueOptions.unshift('Select')
-            dataKeyOptions.unshift('Select')
-
-            dataValueOptions.sort()
-            dataKeyOptions.sort()
-
-            return (
-              <Accordion allowZeroExpanded key={`accordion-pattern--${patternIndex}`}>
-                <AccordionItem className='series-item series-item--chart'>
-                  <AccordionItemHeading className='series-item__title'>
-                    <AccordionItemButton className='accordion__button'>
-                      {pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}
-                    </AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <>
-                      <div className='series-item__panel-actions'>
-                        <Button
-                          type='button'
-                          variant='danger'
-                          size='sm'
-                          className='grouped-list__remove'
-                          onClick={() => handleRemovePattern(patternIndex)}
-                        >
-                          Remove Pattern
-                        </Button>
-                      </div>
-                      {pattern.contrastCheck ?? true ? (
-                        <Alert type='success' message='This pattern passes contrast checks' />
-                      ) : (
-                        <Alert
-                          type='danger'
-                          message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
-                        />
-                      )}{' '}
-                      <Select
-                        label='Data Key:'
-                        value={pattern.dataKey}
-                        options={dataKeyOptions.filter(d => d !== 'Select')}
-                        initial='Select'
-                        fieldName={`pattern-dataKey--${patternIndex}`}
-                        updateField={(section, subsection, fieldName, value) =>
-                          handlePatternFieldUpdate('dataKey', value, patternIndex)
-                        }
-                      />
-                      <p className='edit-label mb-2'>
-                        Leave Data Key as &quot;Select&quot; to match this value across all columns.
-                      </p>
-                      <label htmlFor={`pattern-dataValue--${patternIndex}`}>
-                        Data Value:
-                        <input
-                          type='text'
-                          onChange={e => handlePatternFieldUpdate('dataValue', e.target.value, patternIndex)}
-                          id={`pattern-dataValue--${patternIndex}`}
-                          value={pattern.dataValue === '' ? '' : pattern.dataValue}
-                        />
-                      </label>
-                      <label htmlFor={`pattern-label--${patternIndex}`}>
-                        Label (optional):
-                        <input
-                          type='text'
-                          onChange={e => handlePatternFieldUpdate('label', e.target.value, patternIndex)}
-                          id={`pattern-label--${patternIndex}`}
-                          value={pattern.label === '' ? '' : pattern.label}
-                        />
-                      </label>
-                      <Select
-                        label='Pattern Type:'
-                        value={pattern?.pattern}
-                        options={PATTERN_TYPES}
-                        fieldName={`pattern-type--${patternIndex}`}
-                        updateField={(section, subsection, fieldName, value) =>
-                          handlePatternFieldUpdate('pattern', value, patternIndex)
-                        }
-                      />
-                      <Select
-                        label='Pattern Size:'
-                        value={pattern?.size}
-                        options={['small', 'medium', 'large']}
-                        fieldName={`pattern-size--${patternIndex}`}
-                        updateField={(section, subsection, fieldName, value) =>
-                          handlePatternFieldUpdate('size', value, patternIndex)
-                        }
-                      />
-                      <div className='pattern-input__color'>
-                        <label htmlFor='patternColor'>
-                          Pattern Color
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>{`If this setting is used, it is the reponsibility of the visualization author to verify the visualization colors meet WCAG 3:1 contrast ratios.`}</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                          <input
-                            type='text'
-                            value={pattern.color || ''}
-                            id='patternColor'
-                            name='patternColor'
-                            onChange={e => handlePatternFieldUpdate('color', e.target.value, patternIndex)}
-                          />
-                        </label>
-                      </div>
-                    </>
-                  </AccordionItemPanel>
-                </AccordionItem>
-              </Accordion>
-            )
-          }}
+    <PanelSection title={name}>
+      {patterns.length > 0 && (
+        <Alert
+          type={checkPatternContrasts() ? 'success' : 'danger'}
+          message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
         />
-        <Button variant='editor-primary' onClick={handleAddGeoPattern}>
-          Add Geo Pattern
-        </Button>
-      </AccordionItemPanel>
-    </AccordionItem>
+      )}
+      <br />
+      <GroupedList
+        items={patterns}
+        label='Geo Patterns'
+        droppableId='map-geo-patterns'
+        draggable={false}
+        renderItem={(pattern, patternIndex) => {
+          const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
+          const dataKeyOptions = Object.keys(data[0])
+          dataValueOptions.unshift('Select')
+          dataKeyOptions.unshift('Select')
+
+          dataValueOptions.sort()
+          dataKeyOptions.sort()
+
+          return (
+            <Accordion allowZeroExpanded key={`accordion-pattern--${patternIndex}`}>
+              <AccordionItem className='series-item series-item--chart'>
+                <AccordionItemHeading className='series-item__title'>
+                  <AccordionItemButton className='accordion__button'>
+                    {pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <>
+                    <div className='series-item__panel-actions'>
+                      <Button
+                        type='button'
+                        variant='danger'
+                        size='sm'
+                        className='grouped-list__remove'
+                        onClick={() => handleRemovePattern(patternIndex)}
+                      >
+                        Remove Pattern
+                      </Button>
+                    </div>
+                    {pattern.contrastCheck ?? true ? (
+                      <Alert type='success' message='This pattern passes contrast checks' />
+                    ) : (
+                      <Alert
+                        type='danger'
+                        message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
+                      />
+                    )}{' '}
+                    <Select
+                      label='Data Key:'
+                      value={pattern.dataKey}
+                      options={dataKeyOptions.filter(d => d !== 'Select')}
+                      initial='Select'
+                      fieldName={`pattern-dataKey--${patternIndex}`}
+                      updateField={(section, subsection, fieldName, value) =>
+                        handlePatternFieldUpdate('dataKey', value, patternIndex)
+                      }
+                    />
+                    <p className='edit-label mb-2'>
+                      Leave Data Key as &quot;Select&quot; to match this value across all columns.
+                    </p>
+                    <label htmlFor={`pattern-dataValue--${patternIndex}`}>
+                      Data Value:
+                      <input
+                        type='text'
+                        onChange={e => handlePatternFieldUpdate('dataValue', e.target.value, patternIndex)}
+                        id={`pattern-dataValue--${patternIndex}`}
+                        value={pattern.dataValue === '' ? '' : pattern.dataValue}
+                      />
+                    </label>
+                    <label htmlFor={`pattern-label--${patternIndex}`}>
+                      Label (optional):
+                      <input
+                        type='text'
+                        onChange={e => handlePatternFieldUpdate('label', e.target.value, patternIndex)}
+                        id={`pattern-label--${patternIndex}`}
+                        value={pattern.label === '' ? '' : pattern.label}
+                      />
+                    </label>
+                    <Select
+                      label='Pattern Type:'
+                      value={pattern?.pattern}
+                      options={PATTERN_TYPES}
+                      fieldName={`pattern-type--${patternIndex}`}
+                      updateField={(section, subsection, fieldName, value) =>
+                        handlePatternFieldUpdate('pattern', value, patternIndex)
+                      }
+                    />
+                    <Select
+                      label='Pattern Size:'
+                      value={pattern?.size}
+                      options={['small', 'medium', 'large']}
+                      fieldName={`pattern-size--${patternIndex}`}
+                      updateField={(section, subsection, fieldName, value) =>
+                        handlePatternFieldUpdate('size', value, patternIndex)
+                      }
+                    />
+                    <div className='pattern-input__color'>
+                      <label htmlFor='patternColor'>
+                        Pattern Color
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon
+                              display='question'
+                              style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                            />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>{`If this setting is used, it is the reponsibility of the visualization author to verify the visualization colors meet WCAG 3:1 contrast ratios.`}</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                        <input
+                          type='text'
+                          value={pattern.color || ''}
+                          id='patternColor'
+                          name='patternColor'
+                          onChange={e => handlePatternFieldUpdate('color', e.target.value, patternIndex)}
+                        />
+                      </label>
+                    </div>
+                  </>
+                </AccordionItemPanel>
+              </AccordionItem>
+            </Accordion>
+          )
+        }}
+      />
+      <Button variant='editor-primary' onClick={handleAddGeoPattern}>
+        Add Geo Pattern
+      </Button>
+    </PanelSection>
   )
 }
 

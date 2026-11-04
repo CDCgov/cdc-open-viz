@@ -14,6 +14,7 @@ import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { type ChartContext } from '../../../../../types/ChartContext.js'
 import { type PanelProps } from '../../PanelProps.js'
@@ -237,14 +238,9 @@ const RegionsPanel = ({ name }: PanelProps) => {
   const { config, updateConfig } = useContext<ChartContext>(ConfigContext)
 
   return visSupportsRegions() ? (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>{name}</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <RegionSettings config={config} updateConfig={updateConfig} />
-      </AccordionItemPanel>
-    </AccordionItem>
+    <PanelSection title={name}>
+      <RegionSettings config={config} updateConfig={updateConfig} />
+    </PanelSection>
   ) : null
 }
 

@@ -1,14 +1,8 @@
 import { useContext, FC } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import {
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton
-} from 'react-accessible-accordion'
-
 // core
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
@@ -78,273 +72,268 @@ const SmallMultiplesPanel: FC<PanelSmallMultiplesProps> = props => {
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Small Multiples</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <Select
-          value={config.smallMultiples?.tileColumn || ''}
-          fieldName='tileColumn'
-          section='smallMultiples'
-          label='Tile By Column'
-          initial='Select Column'
-          updateField={handleColumnChange}
-          options={columns}
-          tooltip={
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>
-                  Select the column whose unique values will create separate map tiles. Choosing a column will enable
-                  small multiples mode.
-                </p>
-              </Tooltip.Content>
-            </Tooltip>
-          }
-        />
+    <PanelSection title='Small Multiples'>
+      <Select
+        value={config.smallMultiples?.tileColumn || ''}
+        fieldName='tileColumn'
+        section='smallMultiples'
+        label='Tile By Column'
+        initial='Select Column'
+        updateField={handleColumnChange}
+        options={columns}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>
+                Select the column whose unique values will create separate map tiles. Choosing a column will enable
+                small multiples mode.
+              </p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
 
-        {config.smallMultiples?.tileColumn && (
-          <>
-            <TextField
-              type='number'
-              value={config.smallMultiples?.tilesPerRowDesktop}
-              section='smallMultiples'
-              fieldName='tilesPerRowDesktop'
-              label='Tiles Per Row (Desktop)'
-              updateField={updateField}
-              min={1}
-              max={3}
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>
-                      Number of map tiles to display per row on desktop screens. Mobile will always show 1 tile per row.
-                    </p>
-                  </Tooltip.Content>
-                </Tooltip>
+      {config.smallMultiples?.tileColumn && (
+        <>
+          <TextField
+            type='number'
+            value={config.smallMultiples?.tilesPerRowDesktop}
+            section='smallMultiples'
+            fieldName='tilesPerRowDesktop'
+            label='Tiles Per Row (Desktop)'
+            updateField={updateField}
+            min={1}
+            max={3}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>
+                    Number of map tiles to display per row on desktop screens. Mobile will always show 1 tile per row.
+                  </p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+
+          {/* Tile Ordering */}
+          {(() => {
+            const availableTiles = getTileKeys(config, config.data).map(String)
+            if (availableTiles.length === 0) return null
+
+            const tileOrderOptions = [
+              {
+                label: 'Ascending By Title',
+                value: 'asc'
+              },
+              {
+                label: 'Descending By Title',
+                value: 'desc'
+              },
+              {
+                label: 'Custom',
+                value: 'custom'
               }
-            />
+            ]
 
-            {/* Tile Ordering */}
+            const currentOrderType = config.smallMultiples?.tileOrderType || 'asc'
+
+            const handleOrderTypeChange = orderType => {
+              const newConfig = {
+                ...config,
+                smallMultiples: {
+                  ...config.smallMultiples,
+                  tileOrderType: orderType
+                }
+              }
+
+              // If switching to custom, initialize with current tile order
+              if (orderType === 'custom' && !config.smallMultiples?.tileOrder?.length) {
+                newConfig.smallMultiples.tileOrder = [...availableTiles]
+              }
+
+              setConfig(newConfig)
+            }
+
+            const handleCustomTileOrderChange = (sourceIndex, destinationIndex) => {
+              if (destinationIndex === null) return
+
+              const currentOrder = config.smallMultiples?.tileOrder || [...availableTiles]
+              const newOrder = [...currentOrder]
+              const [removed] = newOrder.splice(sourceIndex, 1)
+              newOrder.splice(destinationIndex, 0, removed)
+
+              setConfig({
+                ...config,
+                smallMultiples: {
+                  ...config.smallMultiples,
+                  tileOrder: newOrder,
+                  tileOrderType: 'custom'
+                }
+              })
+            }
+
+            return (
+              <>
+                <Select
+                  value={currentOrderType}
+                  options={tileOrderOptions}
+                  label='Tile Order'
+                  fieldName='tileOrderType'
+                  section='smallMultiples'
+                  updateField={(_section, _subsection, _fieldName, value) => {
+                    handleOrderTypeChange(value)
+                  }}
+                />
+
+                {currentOrderType === 'custom' && (
+                  <DragDropContext
+                    onDragEnd={({ source, destination }) =>
+                      handleCustomTileOrderChange(source.index, destination?.index)
+                    }
+                  >
+                    <Droppable droppableId='tile_order'>
+                      {provided => (
+                        <ul
+                          {...provided.droppableProps}
+                          className='sort-list'
+                          ref={provided.innerRef}
+                          style={{ marginTop: '1em' }}
+                        >
+                          {(config.smallMultiples?.tileOrder || availableTiles).map((tileKey, index) => (
+                            <Draggable key={tileKey} draggableId={`tile-${tileKey}`} index={index}>
+                              {(provided, snapshot) => (
+                                <li>
+                                  <div
+                                    className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                    style={provided.draggableProps.style}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    {tileKey}
+                                  </div>
+                                </li>
+                              )}
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </ul>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </>
+            )
+          })()}
+
+          {/* Custom Tile Titles */}
+          <div>
+            <label style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>Custom Tile Titles</label>
+
             {(() => {
               const availableTiles = getTileKeys(config, config.data).map(String)
               if (availableTiles.length === 0) return null
 
-              const tileOrderOptions = [
-                {
-                  label: 'Ascending By Title',
-                  value: 'asc'
-                },
-                {
-                  label: 'Descending By Title',
-                  value: 'desc'
-                },
-                {
-                  label: 'Custom',
-                  value: 'custom'
+              const handleTitleChange = (tileKey, customTitle) => {
+                const newTitles = { ...config.smallMultiples?.tileTitles }
+                if (customTitle.trim() === '' || customTitle === tileKey) {
+                  delete newTitles[tileKey] // Remove entry if empty or same as key
+                } else {
+                  newTitles[tileKey] = customTitle
                 }
-              ]
-
-              const currentOrderType = config.smallMultiples?.tileOrderType || 'asc'
-
-              const handleOrderTypeChange = orderType => {
-                const newConfig = {
-                  ...config,
-                  smallMultiples: {
-                    ...config.smallMultiples,
-                    tileOrderType: orderType
-                  }
-                }
-
-                // If switching to custom, initialize with current tile order
-                if (orderType === 'custom' && !config.smallMultiples?.tileOrder?.length) {
-                  newConfig.smallMultiples.tileOrder = [...availableTiles]
-                }
-
-                setConfig(newConfig)
-              }
-
-              const handleCustomTileOrderChange = (sourceIndex, destinationIndex) => {
-                if (destinationIndex === null) return
-
-                const currentOrder = config.smallMultiples?.tileOrder || [...availableTiles]
-                const newOrder = [...currentOrder]
-                const [removed] = newOrder.splice(sourceIndex, 1)
-                newOrder.splice(destinationIndex, 0, removed)
 
                 setConfig({
                   ...config,
                   smallMultiples: {
                     ...config.smallMultiples,
-                    tileOrder: newOrder,
-                    tileOrderType: 'custom'
+                    tileTitles: newTitles
                   }
                 })
               }
 
               return (
-                <>
-                  <Select
-                    value={currentOrderType}
-                    options={tileOrderOptions}
-                    label='Tile Order'
-                    fieldName='tileOrderType'
-                    section='smallMultiples'
-                    updateField={(_section, _subsection, _fieldName, value) => {
-                      handleOrderTypeChange(value)
-                    }}
-                  />
-
-                  {currentOrderType === 'custom' && (
-                    <DragDropContext
-                      onDragEnd={({ source, destination }) =>
-                        handleCustomTileOrderChange(source.index, destination?.index)
-                      }
-                    >
-                      <Droppable droppableId='tile_order'>
-                        {provided => (
-                          <ul
-                            {...provided.droppableProps}
-                            className='sort-list'
-                            ref={provided.innerRef}
-                            style={{ marginTop: '1em' }}
-                          >
-                            {(config.smallMultiples?.tileOrder || availableTiles).map((tileKey, index) => (
-                              <Draggable key={tileKey} draggableId={`tile-${tileKey}`} index={index}>
-                                {(provided, snapshot) => (
-                                  <li>
-                                    <div
-                                      className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                      style={provided.draggableProps.style}
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                    >
-                                      {tileKey}
-                                    </div>
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </ul>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-                  )}
-                </>
-              )
-            })()}
-
-            {/* Custom Tile Titles */}
-            <div>
-              <label style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>Custom Tile Titles</label>
-
-              {(() => {
-                const availableTiles = getTileKeys(config, config.data).map(String)
-                if (availableTiles.length === 0) return null
-
-                const handleTitleChange = (tileKey, customTitle) => {
-                  const newTitles = { ...config.smallMultiples?.tileTitles }
-                  if (customTitle.trim() === '' || customTitle === tileKey) {
-                    delete newTitles[tileKey] // Remove entry if empty or same as key
-                  } else {
-                    newTitles[tileKey] = customTitle
-                  }
-
-                  setConfig({
-                    ...config,
-                    smallMultiples: {
-                      ...config.smallMultiples,
-                      tileTitles: newTitles
-                    }
-                  })
-                }
-
-                return (
-                  <div className='tile-titles-editor' style={{ maxWidth: '100%', overflow: 'hidden' }}>
-                    {availableTiles.map(tileKey => {
-                      const customTitle = config.smallMultiples?.tileTitles?.[tileKey] || ''
-                      return (
-                        <div
-                          key={tileKey}
-                          className='tile-title-row'
+                <div className='tile-titles-editor' style={{ maxWidth: '100%', overflow: 'hidden' }}>
+                  {availableTiles.map(tileKey => {
+                    const customTitle = config.smallMultiples?.tileTitles?.[tileKey] || ''
+                    return (
+                      <div
+                        key={tileKey}
+                        className='tile-title-row'
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem',
+                          maxWidth: '100%'
+                        }}
+                      >
+                        <label
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginBottom: '0.75rem',
-                            maxWidth: '100%'
+                            minWidth: '80px',
+                            maxWidth: '120px',
+                            marginRight: '0.75rem',
+                            fontWeight: 'normal',
+                            fontSize: '13px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
                           }}
                         >
-                          <label
-                            style={{
-                              minWidth: '80px',
-                              maxWidth: '120px',
-                              marginRight: '0.75rem',
-                              fontWeight: 'normal',
-                              fontSize: '13px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0
-                            }}
-                          >
-                            {tileKey}:
-                          </label>
-                          <input
-                            type='text'
-                            value={customTitle}
-                            placeholder={tileKey}
-                            onChange={event => handleTitleChange(tileKey, event.target.value)}
-                            style={{
-                              flex: 1,
-                              minWidth: 0,
-                              maxWidth: '200px',
-                              fontSize: '13px',
-                              padding: '4px 8px',
-                              height: '30px',
-                              border: '1px solid #ccc',
-                              borderRadius: '3px'
-                            }}
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
-            </div>
+                          {tileKey}:
+                        </label>
+                        <input
+                          type='text'
+                          value={customTitle}
+                          placeholder={tileKey}
+                          onChange={event => handleTitleChange(tileKey, event.target.value)}
+                          style={{
+                            flex: 1,
+                            minWidth: 0,
+                            maxWidth: '200px',
+                            fontSize: '13px',
+                            padding: '4px 8px',
+                            height: '30px',
+                            border: '1px solid #ccc',
+                            borderRadius: '3px'
+                          }}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
 
-            <CheckBox
-              value={config.smallMultiples?.synchronizedTooltips}
-              fieldName='synchronizedTooltips'
-              section='smallMultiples'
-              label='Synchronized Tooltips'
-              updateField={updateField}
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>
-                      When checked, hovering over a geography in one map will show synchronized tooltips for that same
-                      geography on all other maps at the same position.
-                    </p>
-                  </Tooltip.Content>
-                </Tooltip>
-              }
-            />
-          </>
-        )}
-      </AccordionItemPanel>
-    </AccordionItem>
+          <CheckBox
+            value={config.smallMultiples?.synchronizedTooltips}
+            fieldName='synchronizedTooltips'
+            section='smallMultiples'
+            label='Synchronized Tooltips'
+            updateField={updateField}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>
+                    When checked, hovering over a geography in one map will show synchronized tooltips for that same
+                    geography on all other maps at the same position.
+                  </p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+        </>
+      )}
+    </PanelSection>
   )
 }
 

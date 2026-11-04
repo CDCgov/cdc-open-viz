@@ -1,11 +1,6 @@
 import { useContext, FC } from 'react'
-import {
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton
-} from 'react-accessible-accordion'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 
 import ConfigContext from '../../../../../ConfigContext'
 import type { ChartContext } from '../../../../../types/ChartContext'
@@ -58,68 +53,68 @@ const SankeyPanel: FC<PanelProps> = ({ name }) => {
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton data-required-field-section='sankey-columns'>
+    <PanelSection
+      title={
+        <>
           {name}
           {(isMissingColumn(selectedColumns.source) ||
             isMissingColumn(selectedColumns.target) ||
             isMissingColumn(selectedColumns.value)) && <WarningImage width='25' className='warning-icon' />}
-        </AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <Select
-          value={selectedColumns.source || ''}
-          section='sankey'
-          subsection='columns'
-          fieldName='source'
-          label='Source Column'
-          data-required-field-control='sankey-source'
-          initial='Select'
-          required={true}
-          updateField={updateSankeyColumn}
-          options={columnOptions}
-        />
-        <Select
-          value={selectedColumns.target || ''}
-          section='sankey'
-          subsection='columns'
-          fieldName='target'
-          label='Target Column'
-          data-required-field-control='sankey-target'
-          initial='Select'
-          required={true}
-          updateField={updateSankeyColumn}
-          options={columnOptions}
-        />
-        <Select
-          value={selectedColumns.value || ''}
-          section='sankey'
-          subsection='columns'
-          fieldName='value'
-          label='Value Column'
-          data-required-field-control='sankey-value'
-          initial='Select'
-          required={true}
-          updateField={updateSankeyColumn}
-          options={columnOptions}
-        />
-        <CheckBox
-          value={Boolean(config.enableTooltips)}
-          fieldName='enableTooltips'
-          label='Show Tooltips'
-          updateField={updateEnableTooltips}
-        />
-        <TextField
-          value={config.sankey?.horizontalScrollWidth ?? ''}
-          type='number'
-          section='sankey'
-          fieldName='horizontalScrollWidth'
-          label='Horizontal Scroll Width'
-          updateField={updateHorizontalScrollWidth}
-        />
-      </AccordionItemPanel>
-    </AccordionItem>
+        </>
+      }
+      buttonProps={{ 'data-required-field-section': 'sankey-columns' }}
+    >
+      <Select
+        value={selectedColumns.source || ''}
+        section='sankey'
+        subsection='columns'
+        fieldName='source'
+        label='Source Column'
+        data-required-field-control='sankey-source'
+        initial='Select'
+        required={true}
+        updateField={updateSankeyColumn}
+        options={columnOptions}
+      />
+      <Select
+        value={selectedColumns.target || ''}
+        section='sankey'
+        subsection='columns'
+        fieldName='target'
+        label='Target Column'
+        data-required-field-control='sankey-target'
+        initial='Select'
+        required={true}
+        updateField={updateSankeyColumn}
+        options={columnOptions}
+      />
+      <Select
+        value={selectedColumns.value || ''}
+        section='sankey'
+        subsection='columns'
+        fieldName='value'
+        label='Value Column'
+        data-required-field-control='sankey-value'
+        initial='Select'
+        required={true}
+        updateField={updateSankeyColumn}
+        options={columnOptions}
+      />
+      <CheckBox
+        value={Boolean(config.enableTooltips)}
+        fieldName='enableTooltips'
+        label='Show Tooltips'
+        updateField={updateEnableTooltips}
+      />
+      <TextField
+        value={config.sankey?.horizontalScrollWidth ?? ''}
+        type='number'
+        section='sankey'
+        fieldName='horizontalScrollWidth'
+        label='Horizontal Scroll Width'
+        updateField={updateHorizontalScrollWidth}
+      />
+    </PanelSection>
   )
 }
 

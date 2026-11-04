@@ -1,11 +1,4 @@
 import { useContext } from 'react'
-import {
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
-
 import Alert from '@cdc/core/components/Alert'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
@@ -14,6 +7,7 @@ import {
   PLAYBACK_SECONDS_PER_FRAME_OPTIONS
 } from '@cdc/core/components/PlaybackButton'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import PanelSection from '@cdc/core/components/panels/PanelSection'
 
 import ConfigContext from '../../../../../context'
 import {
@@ -105,82 +99,77 @@ const TimePlaybackPanel = () => {
     eligibility?.reason && eligibility.reason !== 'disabled' ? eligibilityMessages[eligibility.reason] : undefined
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Time Playback</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        <Select
-          value={settings?.column || ''}
-          fieldName='column'
-          label='Time Column'
-          options={columnOptions}
-          initial='- Select Time Column -'
-          section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
-            const column = String(value)
-            updateSettings({
-              column,
-              customOrder: settings?.order === 'custom' ? getOrderedTimeFrames(config.data, column).map(String) : []
-            })
-          }}
+    <PanelSection title='Time Playback'>
+      <Select
+        value={settings?.column || ''}
+        fieldName='column'
+        label='Time Column'
+        options={columnOptions}
+        initial='- Select Time Column -'
+        section='timePlayback'
+        updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
+          const column = String(value)
+          updateSettings({
+            column,
+            customOrder: settings?.order === 'custom' ? getOrderedTimeFrames(config.data, column).map(String) : []
+          })
+        }}
+      />
+
+      <TextField
+        type='textarea'
+        value={settings?.note ?? DEFAULT_TIME_PLAYBACK_NOTE}
+        fieldName='note'
+        label='Playback Note'
+        section='timePlayback'
+        updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
+          updateSettings({ note: value })
+        }
+      />
+
+      <label className='time-playback-settings__range' htmlFor='time-playback-seconds-per-frame'>
+        <span className='edit-label column-heading'>Seconds Per Step: {secondsPerFrame}</span>
+        <input
+          id='time-playback-seconds-per-frame'
+          name='timePlayback-secondsPerFrame'
+          type='range'
+          min={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
+          max={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[PLAYBACK_SECONDS_PER_FRAME_OPTIONS.length - 1]}
+          step={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[1] - PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
+          value={secondsPerFrame}
+          aria-valuetext={`${secondsPerFrame} seconds per step`}
+          onChange={event => updateSettings({ secondsPerFrame: Number(event.target.value) })}
         />
+      </label>
 
-        <TextField
-          type='textarea'
-          value={settings?.note ?? DEFAULT_TIME_PLAYBACK_NOTE}
-          fieldName='note'
-          label='Playback Note'
-          section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
-            updateSettings({ note: value })
-          }
+      <Select
+        value={settings?.order || 'ascending'}
+        fieldName='order'
+        label='Time Order'
+        options={[
+          { label: 'Ascending', value: 'ascending' },
+          { label: 'Custom', value: 'custom' }
+        ]}
+        section='timePlayback'
+        updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
+          updateOrder(value as TimePlaybackConfig['order'])
+        }
+      />
+
+      {settings?.order === 'custom' && settings.column && (
+        <CustomSortOrder
+          column={settings.column}
+          data={config.data}
+          customOrder={(settings.customOrder || []).map(String)}
+          updateField={updateField}
+          updateTarget={{ section: 'timePlayback', subsection: null, fieldName: 'customOrder' }}
+          droppableId='time_playback_order'
+          draggableIdPrefix='timePlaybackOrder'
         />
+      )}
 
-        <label className='time-playback-settings__range' htmlFor='time-playback-seconds-per-frame'>
-          <span className='edit-label column-heading'>Seconds Per Step: {secondsPerFrame}</span>
-          <input
-            id='time-playback-seconds-per-frame'
-            name='timePlayback-secondsPerFrame'
-            type='range'
-            min={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
-            max={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[PLAYBACK_SECONDS_PER_FRAME_OPTIONS.length - 1]}
-            step={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[1] - PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
-            value={secondsPerFrame}
-            aria-valuetext={`${secondsPerFrame} seconds per step`}
-            onChange={event => updateSettings({ secondsPerFrame: Number(event.target.value) })}
-          />
-        </label>
-
-        <Select
-          value={settings?.order || 'ascending'}
-          fieldName='order'
-          label='Time Order'
-          options={[
-            { label: 'Ascending', value: 'ascending' },
-            { label: 'Custom', value: 'custom' }
-          ]}
-          section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
-            updateOrder(value as TimePlaybackConfig['order'])
-          }
-        />
-
-        {settings?.order === 'custom' && settings.column && (
-          <CustomSortOrder
-            column={settings.column}
-            data={config.data}
-            customOrder={(settings.customOrder || []).map(String)}
-            updateField={updateField}
-            updateTarget={{ section: 'timePlayback', subsection: null, fieldName: 'customOrder' }}
-            droppableId='time_playback_order'
-            draggableIdPrefix='timePlaybackOrder'
-          />
-        )}
-
-        {alertMessage && <Alert type='info' message={alertMessage} showCloseButton={false} />}
-      </AccordionItemPanel>
-    </AccordionItem>
+      {alertMessage && <Alert type='info' message={alertMessage} showCloseButton={false} />}
+    </PanelSection>
   )
 }
 
