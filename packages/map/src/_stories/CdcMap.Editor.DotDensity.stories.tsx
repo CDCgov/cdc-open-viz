@@ -19,7 +19,7 @@ const fixture = createNewMapConfig({
     geoType: 'us-county',
     title: 'Simulated outbreaks — editor authoring',
     showStateDropdown: true,
-    showSidebar: false,
+    showSidebar: true,
     allowMapZoom: true,
     countyCensusYear: '2019'
   },
@@ -76,8 +76,13 @@ const meta: Meta<typeof EditorHarness> = {
   title: 'Components/Templates/Map/Editor Tests/Dot Density',
   component: EditorHarness,
   args: { config: fixture },
-  parameters: { layout: 'fullscreen' },
-  beforeEach: () => {
+  parameters: { layout: 'fullscreen', coveDeveloperMode: 'true' },
+  beforeEach: ({ parameters }) => {
+    const originalUrl = window.location.href
+    const url = new URL(originalUrl)
+    if (parameters.coveDeveloperMode === 'absent') url.searchParams.delete('isCoveDeveloper')
+    else url.searchParams.set('isCoveDeveloper', parameters.coveDeveloperMode)
+    window.history.replaceState({}, '', url)
     const original = globalThis.fetch
     globalThis.fetch = (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -88,6 +93,7 @@ const meta: Meta<typeof EditorHarness> = {
     }
     return () => {
       globalThis.fetch = original
+      window.history.replaceState({}, '', originalUrl)
     }
   }
 }
@@ -142,7 +148,7 @@ export const AuthorAndReload: Story = {
     )
     await performAndAssert(
       'Series labels reach the runtime legend',
-      () => Boolean(canvas.queryByRole('checkbox', { name: 'Measles cases' })),
+      () => Boolean(canvas.queryByRole('button', { name: 'Measles cases' })),
       async () => userEvent.type(canvas.getByLabelText('Series label 1'), 'Measles cases'),
       (_, after) => after
     )
@@ -167,7 +173,7 @@ export const AuthorAndReload: Story = {
     await performAndAssert(
       'Runtime legend toggles hide only the chosen series',
       () => readMap(canvasElement),
-      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Measles cases' })),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Measles cases' })),
       (before, after) => after.count === 230 && after.signature === before.signature
     )
   }
@@ -210,21 +216,12 @@ export const EditSettings: Story = {
       },
       (before, after) => after.signature !== before.signature && after.count === before.count
     )
-    await performAndAssert(
-      'Unit text appears in the rendered legend',
-      () => Boolean(canvas.queryByText(/1 dot = 5 infections/)),
-      async () => {
-        const input = canvas.getByLabelText('Unit label')
-        await userEvent.clear(input)
-        await userEvent.type(input, 'infections')
-      },
-      (_, after) => after
-    )
+    await openAccordion(canvas, 'Legend')
     await performAndAssert(
       'Legend title reaches the rendered legend',
       () => Boolean(canvas.queryByText('Outbreak density')),
       async () => {
-        const input = canvas.getByLabelText('Dot Density Legend Title')
+        const input = canvas.getByLabelText('Legend Title')
         await userEvent.clear(input)
         await userEvent.type(input, 'Outbreak density')
       },
@@ -232,8 +229,8 @@ export const EditSettings: Story = {
     )
     await performAndAssert(
       'Legend visibility affects the rendered legend',
-      () => Boolean(canvas.queryByRole('checkbox', { name: 'Measles' })),
-      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Show Dot Density Legend' })),
+      () => Boolean(canvas.queryByRole('button', { name: 'Measles' })),
+      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Show Legend' })),
       (before, after) => before && !after
     )
     const beforeSwitch = readMap(canvasElement)
@@ -244,7 +241,7 @@ export const EditSettings: Story = {
       async () => userEvent.selectOptions(canvas.getByLabelText(/Map Type/i, { selector: 'select' }), 'data'),
       (before, after) => before && !after
     )
-    expect(canvas.queryByRole('button', { name: 'Dot Density', exact: true })).toBeNull()
+    expect(canvas.queryByRole('button', { name: 'Dot Density' })).toBeNull()
     await performAndAssert(
       'Selecting Dot Density restores the same dots and placement',
       () => readMap(canvasElement),
@@ -254,8 +251,6 @@ export const EditSettings: Story = {
     await openAccordion(canvas, 'Dot Density')
     expect(canvas.getByLabelText('Dot radius')).toHaveValue(3)
     expect(canvas.getByLabelText('Placement seed')).toHaveValue(123)
-    expect(canvas.getByLabelText('Unit label')).toHaveValue('infections')
-    expect(canvas.getByLabelText('Dot Density Legend Title')).toHaveValue('Outbreak density')
     await performAndAssert(
       'Removing the last series reveals the count-column authoring requirement',
       () => Boolean(canvasElement.querySelector('canvas[data-drawn-dots]')),
@@ -316,6 +311,7 @@ export const ImportableSample: Story = {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
     await waitForPresence('canvas[data-drawn-dots="560"]', canvasElement)
+    expect(canvas.queryByText(/visible dots/)).toBeNull()
     await openAccordion(canvas, 'Type')
     expect(canvas.getByLabelText(/Map Type/i, { selector: 'select' })).toHaveValue('dot-density')
     await openAccordion(canvas, 'Dot Density')
@@ -354,7 +350,7 @@ export const CountyOnlyDiscovery: Story = {
       (before, after) => before && !after
     )
     expect(within(mapType()).queryByRole('option', { name: 'Dot Density' })).toBeNull()
-    expect(canvas.queryByRole('button', { name: 'Dot Density', exact: true })).toBeNull()
+    expect(canvas.queryByRole('button', { name: 'Dot Density' })).toBeNull()
     await performAndAssert(
       'Returning to county geography restores retained density',
       () => readMap(canvasElement),
@@ -368,7 +364,7 @@ export const CountyOnlyDiscovery: Story = {
       async () => userEvent.selectOptions(mapType(), 'us-geocode'),
       (before, after) => before && !after
     )
-    expect(canvas.queryByRole('button', { name: 'Dot Density', exact: true })).toBeNull()
+    expect(canvas.queryByRole('button', { name: 'Dot Density' })).toBeNull()
     await performAndAssert(
       'Selecting Dot Density from Geocode restores the authored layer',
       () => readMap(canvasElement),
@@ -380,4 +376,189 @@ export const CountyOnlyDiscovery: Story = {
     const saved = JSON.parse(canvas.getByLabelText('Saved Dot Density Config').textContent!)
     expect(saved.series).toEqual([{ id: 'retained-measles', column: 'measles', label: 'Measles', color: '#0072B2' }])
   }
+}
+
+export const SharedLegendControls: Story = {
+  args: {
+    config: {
+      ...fixture,
+      columns: { ...fixture.columns, primary: { ...fixture.columns.primary, name: '' } },
+      dotDensity: {
+        ...createDefaultDotDensityConfig(),
+        enabled: true,
+        dotValue: 5,
+        series: [{ id: 'shared-measles', column: 'measles', label: 'Measles', color: '#0072B2' }]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="101"]', canvasElement)
+    await openAccordion(canvas, 'Legend')
+    const legend = () => canvas.getByRole('region', { name: 'Legend' })
+    expect(within(legend()).queryByText(/1 dot =/)).toBeNull()
+    expect(canvas.queryByLabelText('Legend Type')).toBeNull()
+    expect(canvas.queryByLabelText('Number of Items')).toBeNull()
+    await performAndAssert(
+      'Shared legend title labels a density-only map',
+      () => within(legend()).queryByRole('heading', { name: 'Disease outbreaks' }) !== null,
+      async () => {
+        await userEvent.clear(canvas.getByLabelText('Legend Title'))
+        await userEvent.type(canvas.getByLabelText('Legend Title'), 'Disease outbreaks')
+      },
+      (_, after) => after
+    )
+    await performAndAssert(
+      'Shared legend description supplies the density explanation',
+      () => within(legend()).queryByText('Synthetic county counts') !== null,
+      async () => userEvent.type(canvas.getByLabelText('Legend Description'), 'Synthetic county counts'),
+      (_, after) => after
+    )
+    await performAndAssert(
+      'Shared position control moves the density legend',
+      () => legend().classList.contains('bottom'),
+      async () => userEvent.selectOptions(canvas.getByLabelText('Legend Position'), 'bottom'),
+      (_, after) => after
+    )
+    await performAndAssert(
+      'Shared single-row layout applies to density series',
+      () => canvas.getByRole('list', { name: 'Dot density legend items' }).classList.contains('single-row'),
+      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Single Row Legend' })),
+      (_, after) => after
+    )
+    await performAndAssert(
+      'Shared shape control changes density swatches',
+      () =>
+        canvas.getByRole('list', { name: 'Dot density legend items' }).querySelector<HTMLElement>('.legend-item')?.style
+          .borderRadius === '0px',
+      async () => userEvent.selectOptions(canvas.getByLabelText(/Legend Style/i, { selector: 'select' }), 'boxes'),
+      (_, after) => after
+    )
+    await performAndAssert(
+      'Shared border control applies to the density legend',
+      () => legend().classList.contains('no-border'),
+      async () => userEvent.click(canvas.getByRole('checkbox', { name: /Hide Legend Box/ })),
+      (before, after) => before && !after
+    )
+    const before = readMap(canvasElement)
+    await performAndAssert(
+      'Native legend buttons hide density dots',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Measles' })),
+      (_, after) => after.count === 0 && after.signature === before.signature
+    )
+    expect(canvas.getByRole('button', { name: 'Measles' })).toHaveAttribute('aria-pressed', 'false')
+    await performAndAssert(
+      'Native Show All restores density dots',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Show All' })),
+      (_, after) => after.count === before.count && after.signature === before.signature
+    )
+    await performAndAssert(
+      'Shared Show Legend hides the entire legend without changing density',
+      () => canvas.queryByRole('region', { name: 'Legend' }) !== null,
+      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Show Legend' })),
+      (before, after) => before && !after
+    )
+    expect(readMap(canvasElement).count).toBe(101)
+    await performAndAssert(
+      'Shared Show Legend restores the density key',
+      () => canvas.queryByRole('region', { name: 'Legend' }) !== null,
+      async () => userEvent.click(canvas.getByRole('checkbox', { name: 'Show Legend' })),
+      (_, after) => after
+    )
+    await userEvent.click(canvas.getByRole('button', { name: 'Save and Reload Map' }))
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="101"]', canvasElement)
+    expect(within(legend()).getByRole('heading', { name: 'Disease outbreaks' })).toBeVisible()
+    expect(within(legend()).getByText('Synthetic county counts')).toBeVisible()
+    expect(legend()).toHaveClass('bottom')
+    expect(canvas.getByRole('list', { name: 'Dot density legend items' })).toHaveClass('single-row')
+    expect(legend()).not.toHaveClass('no-border')
+    expect(JSON.parse(canvas.getByLabelText('Saved Dot Density Config').textContent!)).not.toHaveProperty('legend')
+  }
+}
+
+export const SparseCountData: Story = {
+  args: {
+    config: {
+      ...fixture,
+      columns: { ...fixture.columns, primary: { ...fixture.columns.primary, name: '' } },
+      data: [{ FIPS: '04001' }, { FIPS: '04013', Cases: 33 }],
+      dotDensity: {
+        ...createDefaultDotDensityConfig(),
+        enabled: true,
+        dotValue: 1.1,
+        series: [{ id: 'sparse-cases', column: 'Cases', label: 'Cases', color: '#0072B2' }]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="30"]', canvasElement)
+    expect(canvas.getByText('1 missing or invalid count values omitted.')).toBeVisible()
+    expect(canvas.queryByRole('button', { name: /Count Column/ })).toBeNull()
+    await openAccordion(canvas, 'Dot Density')
+    const column = canvas.getByLabelText('Count column 1')
+    expect(within(column).getByRole('option', { name: 'Cases' })).toHaveValue('Cases')
+    expect(within(column).queryByRole('option', { name: /missing/ })).toBeNull()
+    await userEvent.click(canvas.getByRole('button', { name: 'Save and Reload Map' }))
+    await waitForPresence('canvas[data-drawn-dots="30"]', canvasElement)
+  }
+}
+
+export const FocusMissingMappedSeries: Story = {
+  args: {
+    config: {
+      ...fixture,
+      dotDensity: {
+        ...createDefaultDotDensityConfig(),
+        enabled: true,
+        series: [
+          { id: 'blank-draft', column: '', label: '', color: '#0072B2' },
+          { id: 'missing-count', column: 'DeletedColumn', label: 'Cases', color: '#D55E00' }
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await performAndAssert(
+      'Required-field navigation focuses the missing mapped series ahead of a blank draft',
+      () => canvasElement.ownerDocument.activeElement === canvas.getByLabelText('Count column 2'),
+      async () => userEvent.click(canvas.getByRole('button', { name: /Count Column/ })),
+      (_, after) => after
+    )
+    await userEvent.selectOptions(canvas.getByLabelText('Count column 2'), 'measles')
+    await waitForPresence('canvas[data-drawn-dots]', canvasElement)
+    expect(canvas.queryByRole('button', { name: /Count Column/ })).toBeNull()
+    expect(canvas.getByLabelText('Count column 1')).toHaveValue('')
+  }
+}
+
+const assertDensityAuthoringHidden = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement)
+  await waitForEditor(canvas)
+  await waitForPresence('canvas[data-drawn-dots="560"]', canvasElement)
+  await openAccordion(canvas, 'Type')
+  const mapType = canvas.getByLabelText(/Map Type/i, { selector: 'select' })
+  expect(within(mapType).queryByRole('option', { name: 'Dot Density' })).toBeNull()
+  expect(mapType).toHaveValue('data')
+  expect(canvas.queryByRole('button', { name: 'Dot Density' })).toBeNull()
+  expect(canvas.queryByText(/Select "Dot Density"/)).toBeNull()
+}
+
+export const HiddenWithoutDeveloperFlag: Story = {
+  args: { config: importableDensitySample as unknown as MapConfig },
+  parameters: { coveDeveloperMode: 'absent' },
+  play: assertDensityAuthoringHidden
+}
+
+export const HiddenWithDeveloperFlagFalse: Story = {
+  args: { config: importableDensitySample as unknown as MapConfig },
+  parameters: { coveDeveloperMode: 'false' },
+  play: assertDensityAuthoringHidden
 }

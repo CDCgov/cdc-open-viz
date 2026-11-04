@@ -7,7 +7,7 @@
     "geoType": "us-county",
     "type": "data",
     "showTitle": true,
-    "showSidebar": false,
+    "showSidebar": true,
     "headerColor": "theme-blue",
     "showStateDropdown": true,
     "showNeighboringStates": false,
@@ -49,10 +49,6 @@
     "radius": 2,
     "seed": 42,
     "unit": "cases",
-    "legend": {
-      "show": true,
-      "title": "Disease cases (synthetic data)"
-    },
     "series": [
       {
         "id": "density-measles",
@@ -200,5 +196,10 @@
       "Salmonellosis": 190,
       "Pertussis": 30
     }
-  ]
+  ],
+  "legend": {
+    "title": "Disease cases (synthetic data)",
+    "position": "top",
+    "style": "circles"
+  }
 }

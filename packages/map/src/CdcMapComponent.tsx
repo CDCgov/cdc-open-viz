@@ -62,7 +62,7 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
-import { withDotDensityColumns } from './helpers/dotDensityConfig'
+import { normalizeDotDensityLegend, withDotDensityColumns } from './helpers/dotDensityConfig'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
 import {
   DEFAULT_TIME_PLAYBACK_NOTE,
@@ -138,7 +138,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
+  const normalizedConfig = normalizeDotDensityLegend(configObj)
+  const effectiveConfig = configIsPrepared ? normalizedConfig : applyConfigDefaults(normalizedConfig, defaults)
   const initialState = getInitialState(effectiveConfig)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
@@ -150,6 +151,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
     config,
     modal,
     accessibleStatus,
@@ -226,14 +228,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapConfig: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
+    const normalized = normalizeDotDensityLegend(newMapConfig)
+    dispatch({ type: 'SET_CONFIG', payload: normalized })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newMapConfig)
+      editorContext.setTempConfig(normalized)
     }
   }
 
   useEffect(() => {
-    const configClone = cloneConfig(configObj)
+    const configClone = normalizeDotDensityLegend(cloneConfig(configObj))
     const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
     const _newConfig = getInitialState(effectiveConfig).config
     if (configObj.data) {
@@ -697,6 +700,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
     scale,
     setConfig,
     setFilteredStateCountyCode,

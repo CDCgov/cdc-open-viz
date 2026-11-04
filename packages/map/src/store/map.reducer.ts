@@ -36,6 +36,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeFilters: [],
     runtimeLegend: [],
     runtimeBubbleLegend: [],
+    hiddenDensitySeries: [],
     statesToShow: []
   }
 }
@@ -61,6 +62,7 @@ export type MapState = {
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
   runtimeBubbleLegend: GeneratedLegend | GeneratedLegend[] | []
+  hiddenDensitySeries: string[]
   statesToShow: string[]
   dataUrl: string
 }
@@ -107,6 +109,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeLegend: action.payload }
     case 'SET_RUNTIME_BUBBLE_LEGEND':
       return { ...state, runtimeBubbleLegend: action.payload }
+    case 'SET_HIDDEN_DENSITY_SERIES':
+      return { ...state, hiddenDensitySeries: action.payload ?? [] }
     case 'SET_STATES_TO_SHOW':
       return { ...state, statesToShow: action.payload }
     default:

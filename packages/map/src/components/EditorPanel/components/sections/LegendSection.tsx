@@ -16,6 +16,7 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import ConfigContext from '../../../../context'
+import { getDotDensityConfig, isDotDensitySupported } from '../../../../helpers/dotDensityConfig'
 import { parseBreakpointString } from '../../../../helpers/breakpointHelpers'
 import { parseLegendNumber } from '../../../../helpers/legendNumberHelpers'
 import { useManualBreakpoints } from '../../../../hooks/useManualBreakpoints'
@@ -95,6 +96,9 @@ const CategoryList = ({ categoryValuesOrder }: CategoryListProps) => {
 const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) => {
   const { config, setConfig, runtimeFilters, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legend } = config
+  const densityOnly =
+    isDotDensitySupported(config) && getDotDensityConfig(config).enabled && !config.columns.primary.name
+  const legendStyle = densityOnly && legend.style === 'gradient' ? 'circles' : legend.style
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState<unknown[]>([0, 0])
   const updateField = updateFieldFactory(config, setConfig)
 
@@ -230,7 +234,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
     )
   })
 
-  const allowLegendSeparators = legend.style === 'gradient' && legend.subStyle === 'linear blocks'
+  const allowLegendSeparators = !densityOnly && legend.style === 'gradient' && legend.subStyle === 'linear blocks'
 
   if (config.general.type === 'navigation') return null
 
@@ -241,7 +245,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
         <AccordionItemButton>Legend</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type) && (
+        {!densityOnly && ['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type) && (
           <Select
             label='Legend Type'
             value={legend.type}
@@ -280,7 +284,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }}
           />
         )}
-        {legend.type === 'manual' && (
+        {!densityOnly && legend.type === 'manual' && (
           <ManualBreakpointsEditor
             inputs={breakpoints.inputs}
             items={breakpoints.items}
@@ -302,6 +306,8 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
         />
         <Select
           label='Legend Position'
+          fieldName='position'
+          section='legend'
           value={legend.position || ''}
           options={[
             { value: 'side', label: 'Side' },
@@ -310,7 +316,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
           ]}
           onChange={event => handleEditorChanges('sidebarPosition', event.target.value)}
         />
-        {(config.legend.position === 'side' || !config.legend.position) && config.legend.style === 'gradient' && (
+        {(config.legend.position === 'side' || !config.legend.position) && legendStyle === 'gradient' && (
           <span style={{ color: 'red', fontSize: '14px' }}>
             Position must be set to top or bottom to use gradient style.
           </span>
@@ -335,15 +341,17 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
               </Tooltip>
             </>
           }
-          value={legend.style || ''}
+          fieldName='style'
+          section='legend'
+          value={legendStyle || ''}
           options={[
             { value: 'circles', label: 'circles' },
             { value: 'boxes', label: 'boxes' },
-            ...(legend.position !== 'side' ? [{ value: 'gradient', label: 'gradient' }] : [])
+            ...(!densityOnly && legend.position !== 'side' ? [{ value: 'gradient', label: 'gradient' }] : [])
           ]}
           onChange={event => handleEditorChanges('legendStyle', event.target.value)}
         />
-        {config.legend.style === 'gradient' && (
+        {legendStyle === 'gradient' && (
           <Select
             label='Gradient Style'
             value={legend.subStyle || ''}
@@ -371,7 +379,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }
           />
         )}
-        {config.legend.style === 'gradient' && (
+        {legendStyle === 'gradient' && (
           <label>
             <span className='edit-label'>Tick Rotation (Degrees)</span>
             <input
@@ -421,7 +429,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }}
           />
         )}
-        {'side' !== legend.position && legend.style !== 'gradient' && (
+        {'side' !== legend.position && legendStyle !== 'gradient' && (
           <CheckBox
             value={legend.singleRow}
             section='legend'
@@ -438,7 +446,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }}
           />
         )}
-        {config.legend.type === 'category' && (
+        {!densityOnly && config.legend.type === 'category' && (
           <Select
             label='Legend Group By :'
             value={legend.groupBy || ''}
@@ -450,7 +458,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }}
           />
         )}
-        {config.legend.style !== 'gradient' && (
+        {legendStyle !== 'gradient' && (
           <CheckBox
             value={legend.verticalSorted}
             section='legend'
@@ -460,16 +468,18 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             updateField={updateField}
           />
         )}
-        <CheckBox
-          value={legend.showSpecialClassesLast}
-          section='legend'
-          subsection={null}
-          fieldName='showSpecialClassesLast'
-          label='Show Special Classes Last'
-          updateField={updateField}
-          onChange={event => handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)}
-        />
-        {['equalnumber', 'equalinterval', 'manual'].includes(legend.type) && (
+        {!densityOnly && (
+          <CheckBox
+            value={legend.showSpecialClassesLast}
+            section='legend'
+            subsection={null}
+            fieldName='showSpecialClassesLast'
+            label='Show Special Classes Last'
+            updateField={updateField}
+            onChange={event => handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)}
+          />
+        )}
+        {!densityOnly && ['equalnumber', 'equalinterval', 'manual'].includes(legend.type) && (
           <CheckBox
             value={legend.separateZero || false}
             section='legend'
@@ -500,7 +510,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             }
           />
         )}
-        {['equalnumber', 'equalinterval'].includes(legend.type) && (
+        {!densityOnly && ['equalnumber', 'equalinterval'].includes(legend.type) && (
           <Select
             label={
               <>
@@ -522,7 +532,7 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             onChange={event => handleEditorChanges('legendNumber', event.target.value)}
           />
         )}
-        {'category' === legend.type && (
+        {!densityOnly && 'category' === legend.type && (
           <>
             <CheckBox
               value={Boolean(legend.includeNonGeoDataInDomain)}
@@ -683,31 +693,33 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
             </Tooltip>
           </label>
         )}
-        <span className='d-flex mt-2'>
-          <CheckBox
-            value={legend.unified}
-            section='legend'
-            subsection={null}
-            fieldName='unified'
-            label='Unified Legend'
-            updateField={updateField}
-            onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
-          />
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon
-                display='question'
-                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-              />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                Check this option if you want the high and low values in the legend to be based on <em>all</em> mapped
-                values (useful for maps with filters or small multiples).
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
-        </span>
+        {!densityOnly && (
+          <span className='d-flex mt-2'>
+            <CheckBox
+              value={legend.unified}
+              section='legend'
+              subsection={null}
+              fieldName='unified'
+              label='Unified Legend'
+              updateField={updateField}
+              onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
+            />
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon
+                  display='question'
+                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Check this option if you want the high and low values in the legend to be based on <em>all</em> mapped
+                  values (useful for maps with filters or small multiples).
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   )

@@ -39,6 +39,7 @@ export type MapContext = {
   runtimeFilters: Function
   runtimeLegend
   runtimeBubbleLegend
+  hiddenDensitySeries?: string[]
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void

@@ -25,11 +25,14 @@ const REQUIRED_DATA_MAP_FIELDS: MissingRequiredMapField[] = [
   }
 ]
 
-const getAvailableColumns = (config: MapConfig, datasets?: Datasets): string[] => {
-  if (config.data?.[0]) return Object.keys(config.data[0])
-
-  const assignedDataset = config.dataKey ? datasets?.[config.dataKey] : undefined
-  return assignedDataset?.data?.[0] ? Object.keys(assignedDataset.data[0]) : []
+/** Sparse JSON rows may introduce columns after the first county. */
+export const getAvailableMapColumns = (rows: readonly unknown[]): string[] => {
+  const columns = new Set<string>()
+  for (const row of rows) {
+    if (!row || typeof row !== 'object') continue
+    for (const column of Object.keys(row)) columns.add(column)
+  }
+  return [...columns]
 }
 
 export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datasets): MissingRequiredMapField[] => {
@@ -41,7 +44,8 @@ export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datase
   )
     return []
 
-  const availableColumns = getAvailableColumns(config, datasets)
+  const assignedRows = config.dataKey ? datasets?.[config.dataKey]?.data : undefined
+  const availableColumns = getAvailableMapColumns(config.data?.length ? config.data : assignedRows ?? [])
   const hasAvailableColumns = availableColumns.length > 0
   const configuredColumns = {
     'map-geography': config.columns?.geo?.name || '',

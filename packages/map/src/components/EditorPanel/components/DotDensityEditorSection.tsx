@@ -6,10 +6,11 @@ import {
   AccordionItemHeading,
   AccordionItemPanel
 } from 'react-accessible-accordion'
-import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import ConfigContext from '../../../context'
 import { createDotDensitySeries, getDotDensityConfig, isDotDensitySupported } from '../../../helpers/dotDensityConfig'
@@ -18,11 +19,17 @@ import type { DotDensityConfig, DotDensitySeries } from '../../../types/MapConfi
 export default function DotDensityEditorSection({ columnNames }: { columnNames: string[] }) {
   const { config, setConfig } = useContext(ConfigContext)
   const density = getDotDensityConfig(config)
-  const unresolvedIndex = Math.max(
-    0,
-    density.series.findIndex(series => !series.column || !columnNames.includes(series.column))
+  const missingMappedIndex = density.series.findIndex(
+    series => Boolean(series.column) && !columnNames.includes(series.column)
   )
-  if (!isDotDensitySupported(config) || !density.enabled) return null
+  const unresolvedIndex =
+    missingMappedIndex >= 0
+      ? missingMappedIndex
+      : Math.max(
+          0,
+          density.series.findIndex(series => !series.column)
+        )
+  if (!isCoveDeveloperMode() || !isDotDensitySupported(config) || !density.enabled) return null
   const update = (changes: Partial<DotDensityConfig>) => {
     const next = cloneConfig(config)
     next.dotDensity = { ...density, ...changes }
@@ -48,9 +55,8 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
             </Tooltip.Target>
             <Tooltip.Content>
               <p>
-                Controls the approximate dot positions within each county. Keep the same seed and data to repeat the
-                same placement. Change the seed to move the dots without changing their counts or values. Dots do not
-                represent actual case locations. You can leave this at 42.
+                Changes dot positions within each county, not counts. The same seed and data repeat the same
+                arrangement. Dots are not actual case locations.
               </p>
             </Tooltip.Content>
           </Tooltip>
@@ -74,33 +80,6 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
         {numberField('dotValue', 'Value per dot', 0.001, 1)}
         {numberField('radius', 'Dot radius', 0.25, 0.25)}
         {numberField('seed', 'Placement seed', 0, 1)}
-        <TextField
-          label='Unit label'
-          value={density.unit}
-          fieldName='unit'
-          section='dotDensity'
-          updateField={(_section: unknown, _subsection: unknown, _field: unknown, unit: string) => update({ unit })}
-        />
-        <CheckBox
-          label='Show Dot Density Legend'
-          value={density.legend.show}
-          fieldName='show'
-          section='dotDensity'
-          subsection='legend'
-          updateField={(_section: unknown, _subsection: unknown, _field: unknown, show: boolean) =>
-            update({ legend: { ...density.legend, show } })
-          }
-        />
-        <TextField
-          label='Dot Density Legend Title'
-          value={density.legend.title}
-          fieldName='title'
-          section='dotDensity'
-          subsection='legend'
-          updateField={(_section: unknown, _subsection: unknown, _field: unknown, title: string) =>
-            update({ legend: { ...density.legend, title } })
-          }
-        />
         {density.series.length === 0 && <p>Choose Add Count Series, then select a count column.</p>}
         {density.series.map((series, index) => (
           <fieldset key={series.id} className='primary-fieldset edit-block'>

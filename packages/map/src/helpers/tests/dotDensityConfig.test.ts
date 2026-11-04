@@ -8,6 +8,7 @@ import {
   getConfiguredDotDensitySeries,
   getDotDensityConfig,
   isDotDensitySupported,
+  normalizeDotDensityLegend,
   withDotDensityColumns
 } from '../dotDensityConfig'
 import { getMissingRequiredMapFields } from '../getMissingRequiredMapFields'
@@ -53,6 +54,32 @@ describe('persisted dot density configuration', () => {
     expect(loaded.dotDensity.series[0].id).toBe('stable-series')
     expect(loaded.dotDensity).not.toHaveProperty('hiddenSeries')
     expect(loaded.dotDensity).not.toHaveProperty('dots')
+  })
+
+  it('consumes prototype legend settings once without mutating the imported config', () => {
+    const config = makeConfig()
+    const imported = {
+      ...config,
+      general: { ...config.general, showSidebar: false },
+      legend: { ...config.legend, title: '' },
+      dotDensity: { ...config.dotDensity!, legend: { show: true, title: 'Outbreaks' } }
+    }
+    const snapshot = JSON.stringify(imported)
+    const normalized = normalizeDotDensityLegend(imported)
+    expect(normalized.general.showSidebar).toBe(true)
+    expect(normalized.legend.title).toBe('Outbreaks')
+    expect(normalized.dotDensity).not.toHaveProperty('legend')
+    expect(JSON.stringify(imported)).toBe(snapshot)
+    expect(normalizeDotDensityLegend(normalized)).toBe(normalized)
+    const dormant = { ...imported, dotDensity: { ...imported.dotDensity, enabled: false } }
+    expect(normalizeDotDensityLegend(dormant)).toBe(dormant)
+    expect(
+      normalizeDotDensityLegend({
+        ...imported,
+        legend: { ...imported.legend, title: 'Shared title' },
+        dotDensity: { ...imported.dotDensity, legend: { show: false, title: 'Old title' } }
+      })
+    ).toMatchObject({ general: { showSidebar: false }, legend: { title: 'Shared title' } })
   })
 
   it('creates unique persisted identities even when a removed series is replaced', () => {

@@ -14,6 +14,7 @@ import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
@@ -57,6 +58,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
   const updateField = updateFieldFactory(config, setConfig)
   const general = config.general
   const density = getDotDensityConfig(config)
+  const densityAvailable = isCoveDeveloperMode() && general.geoType === 'us-county'
   const densityActive = isDotDensitySupported(config) && density.enabled
 
   useEffect(() => {
@@ -75,7 +77,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
   ]
 
   const handleMapTypeChange = (value: string) => {
-    if (value === 'dot-density' && general.geoType !== 'us-county') return
+    if (value === 'dot-density' && !densityAvailable) return
     const nextConfig = {
       ...config,
       ...(config.dotDensity || value === 'dot-density'
@@ -466,7 +468,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
                   <p>
                     Select "Data" to create a color-coded data map. To create a navigation-only map, select
                     "Navigation."
-                    {general.geoType === 'us-county' &&
+                    {densityAvailable &&
                       ' Select "Dot Density" to represent county counts with dots, then configure the Dot Density section.'}
                   </p>
                 </Tooltip.Content>
@@ -475,10 +477,10 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
           }
           fieldName='type'
           section='general'
-          value={densityActive ? 'dot-density' : general.type}
+          value={densityAvailable && densityActive ? 'dot-density' : general.type}
           options={[
             { value: 'data', label: 'Data' },
-            ...(general.geoType === 'us-county' ? [{ value: 'dot-density', label: 'Dot Density' }] : []),
+            ...(densityAvailable ? [{ value: 'dot-density', label: 'Dot Density' }] : []),
             ...(general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
             ...(general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
             ...(general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : [])

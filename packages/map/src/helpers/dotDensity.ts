@@ -7,7 +7,13 @@ export type DotPosition = [number, number]
 
 export const getDotCount = (value: number, dotValue: number): number => {
   if (!Number.isFinite(dotValue) || dotValue <= 0) throw new RangeError('Dot value must be positive and finite')
-  return Number.isFinite(value) && value > 0 ? Math.floor(value / dotValue) : 0
+  if (!Number.isFinite(value) || value <= 0) return 0
+  const quotient = value / dotValue
+  const nearestInteger = Math.round(quotient)
+  // Recover exact decimal multiples (33 / 1.1), while preserving real remainders.
+  // Cap the tolerance so large quotients cannot turn fractional dots into whole dots.
+  const tolerance = Math.min(2 * Number.EPSILON * quotient, 1e-9)
+  return Math.abs(quotient - nearestInteger) <= tolerance ? nearestInteger : Math.floor(quotient)
 }
 
 /** County identity makes placement independent of row order and which other counties are visible. */

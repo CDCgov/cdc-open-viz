@@ -182,7 +182,8 @@ export type DotDensityConfig = {
   radius: number
   seed: number
   unit: string
-  legend: { show: boolean; title: string }
+  /** @deprecated Read only when importing earlier density prototypes; use general.showSidebar and legend. */
+  legend?: { show: boolean; title: string }
   series: DotDensitySeries[]
 }
 

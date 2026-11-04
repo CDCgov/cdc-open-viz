@@ -44,6 +44,13 @@ import {
 } from '../../../helpers/bubbleSize'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
+import DotDensityLegend from '../../DotDensityLegend'
+import {
+  getDotDensityConfig,
+  getConfiguredDotDensitySeries,
+  isDotDensitySupported
+} from '../../../helpers/dotDensityConfig'
+import { CountyDotDensityContext } from '../../../context/CountyDotDensityContext'
 
 const LEGEND_PADDING = 30
 
@@ -113,12 +120,20 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     mapId,
     runtimeFilters,
     runtimeLegend,
-    runtimeBubbleLegend
+    runtimeBubbleLegend,
+    hiddenDensitySeries = []
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
+  const previewDensity = useContext(CountyDotDensityContext)
+  const density = getDotDensityConfig(config)
+  const densitySeries = getConfiguredDotDensitySeries(config)
+  const hasDensityLegend =
+    !previewDensity && isDotDensitySupported(config) && density.enabled && densitySeries.length > 0
+  const activeHiddenDensitySeries = hiddenDensitySeries.filter(id => densitySeries.some(series => series.id === id))
+  const hasDensityLegendToggles = hasDensityLegend && activeHiddenDensitySeries.length > 0
   const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
   const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
   const bubbleLayers = getConfiguredBubbleLayers(config)
@@ -132,7 +147,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     bubbleLegend => !Array.isArray(bubbleLegend) && Number(bubbleLegend.disabledAmt ?? 0) > 0
   )
   const hasMapLegend = Boolean(config.columns.primary.name && runtimeLegend?.items?.length)
-  const isLegendGradient = legend.style === 'gradient'
+  const isLegendGradient = legend.style === 'gradient' && !(hasDensityLegend && !hasMapLegend)
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
     (legend.position === 'left' || legend.position === 'right') &&
@@ -276,7 +291,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   }
   const legendListItems = legendList(isLegendGradient)
 
-  const { legendClasses } = useDataVizClasses(config, viewport)
+  const { legendClasses } = useDataVizClasses(
+    hasDensityLegend && !hasMapLegend ? { ...config, legend: { ...legend, style: 'circles' } } : config,
+    viewport
+  )
 
   const handleBubbleLegendToggle = (layerIndex: number, itemIndex: number, legendLabel: string) => {
     const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
@@ -327,6 +345,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         )
       })
     }
+
+    if (hasDensityLegendToggles) dispatch({ type: 'SET_HIDDEN_DENSITY_SERIES', payload: [] })
 
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
@@ -471,66 +491,67 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {hasMapLegend && (legend.title || legend.description || legend.dynamicDescription) && (
-              <div className='mb-3'>
-                {legend.title && (
-                  <h3 className={`${legendClasses.title.join(' ') || ''} cove-prose`.trim()}>
-                    {parse(
-                      config.enableMarkupVariables && config.markupVariables?.length > 0
-                        ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
-                            isEditor: false,
-                            filters: legendTitleFilters,
-                            locale: config.locale,
-                            dataMetadata: config.dataMetadata
-                          }).processedContent
-                        : legend.title
-                    )}
-                  </h3>
-                )}
-                {legend.dynamicDescription === false && legend.description && (
-                  <p className={`${legendClasses.description.join(' ') || ''} cove-prose`.trim()}>
-                    {parse(
-                      config.enableMarkupVariables && config.markupVariables?.length > 0
-                        ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
-                            isEditor: false,
-                            filters: config.filters || [],
-                            locale: config.locale,
-                            dataMetadata: config.dataMetadata
-                          }).processedContent
-                        : legend.description
-                    )}
-                  </p>
-                )}
-                {legend.dynamicDescription === true &&
-                  runtimeFilters.map((filter, idx) => {
-                    const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+            {(hasMapLegend || hasDensityLegend) &&
+              (legend.title || legend.description || legend.dynamicDescription) && (
+                <div className='mb-3'>
+                  {legend.title && (
+                    <h3 className={`${legendClasses.title.join(' ') || ''} cove-prose`.trim()}>
+                      {parse(
+                        config.enableMarkupVariables && config.markupVariables?.length > 0
+                          ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
+                              isEditor: false,
+                              filters: legendTitleFilters,
+                              locale: config.locale,
+                              dataMetadata: config.dataMetadata
+                            }).processedContent
+                          : legend.title
+                      )}
+                    </h3>
+                  )}
+                  {legend.dynamicDescription === false && legend.description && (
+                    <p className={`${legendClasses.description.join(' ') || ''} cove-prose`.trim()}>
+                      {parse(
+                        config.enableMarkupVariables && config.markupVariables?.length > 0
+                          ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
+                              isEditor: false,
+                              filters: config.filters || [],
+                              locale: config.locale,
+                              dataMetadata: config.dataMetadata
+                            }).processedContent
+                          : legend.description
+                      )}
+                    </p>
+                  )}
+                  {legend.dynamicDescription === true &&
+                    runtimeFilters.map((filter, idx) => {
+                      const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
-                    // Do we have a custom description for this?
-                    const desc = normalizeLegendDescription(legend.descriptions?.[lookupStr])
+                      // Do we have a custom description for this?
+                      const desc = normalizeLegendDescription(legend.descriptions?.[lookupStr])
 
-                    if (desc.length > 0) {
-                      return (
-                        <p
-                          key={`dynamic-description-${lookupStr}`}
-                          className={`dynamic-legend-description-${lookupStr} mt-2 cove-prose`}
-                        >
-                          {parse(
-                            config.enableMarkupVariables && config.markupVariables?.length > 0
-                              ? processMarkupVariables(desc, config.data || [], config.markupVariables, {
-                                  isEditor: false,
-                                  filters: runtimeFilters || [],
-                                  locale: config.locale,
-                                  dataMetadata: config.dataMetadata
-                                }).processedContent
-                              : desc
-                          )}
-                        </p>
-                      )
-                    }
-                    return true
-                  })}
-              </div>
-            )}
+                      if (desc.length > 0) {
+                        return (
+                          <p
+                            key={`dynamic-description-${lookupStr}`}
+                            className={`dynamic-legend-description-${lookupStr} mt-2 cove-prose`}
+                          >
+                            {parse(
+                              config.enableMarkupVariables && config.markupVariables?.length > 0
+                                ? processMarkupVariables(desc, config.data || [], config.markupVariables, {
+                                    isEditor: false,
+                                    filters: runtimeFilters || [],
+                                    locale: config.locale,
+                                    dataMetadata: config.dataMetadata
+                                  }).processedContent
+                                : desc
+                            )}
+                          </p>
+                        )
+                      }
+                      return true
+                    })}
+                </div>
+              )}
 
             {hasMapLegend && (
               <>
@@ -595,9 +616,26 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </Button>
             )}
 
+            {hasDensityLegend && (
+              <DotDensityLegend
+                config={config}
+                density={{ ...density, series: densitySeries }}
+                listClasses={legendClasses.ul}
+                hiddenSeries={activeHiddenDensitySeries}
+                onToggle={id =>
+                  dispatch({
+                    type: 'SET_HIDDEN_DENSITY_SERIES',
+                    payload: activeHiddenDensitySeries.includes(id)
+                      ? activeHiddenDensitySeries.filter(value => value !== id)
+                      : [...activeHiddenDensitySeries, id]
+                  })
+                }
+              />
+            )}
+
             {bubbleLegendNodes}
 
-            {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
+            {(hasBubbleLegendToggles || hasDensityLegendToggles) && !(hasMapLegend && hasMapLegendToggles) && (
               <Button size='sm' className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>

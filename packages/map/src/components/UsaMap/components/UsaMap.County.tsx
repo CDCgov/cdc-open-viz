@@ -19,7 +19,6 @@ import {
   getConfiguredDotDensitySeries,
   isDotDensitySupported
 } from '../../../helpers/dotDensityConfig'
-import DotDensityLegend from '../../DotDensityLegend'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
@@ -259,6 +258,7 @@ const CountyMap = () => {
     filteredStateCode,
     setFilteredStateCountyCode,
     filteredCountyCode,
+    hiddenDensitySeries = [],
     config,
     tooltipId,
     tooltipRef,
@@ -270,7 +270,6 @@ const CountyMap = () => {
     () => getConfiguredDotDensitySeries(config),
     [config.dotDensity, config.general.geoType, config.general.type]
   )
-  const [hiddenDensitySeries, setHiddenDensitySeries] = useState<string[]>([])
   const authoredSettings = useMemo(
     () =>
       isDotDensitySupported(config) && authoredDensity.enabled
@@ -1261,6 +1260,18 @@ const CountyMap = () => {
     previousDensityRef.current = Boolean(densityLayer)
   }, [densityLayer, runtimeLegend])
 
+  const densityStatus =
+    densityLayer && dotDensity
+      ? densityLayer.error ||
+        (!Number.isFinite(dotDensity.radius) || dotDensity.radius <= 0
+          ? 'Choose a positive, finite dot radius.'
+          : dotDensity.hiddenSeries.length === dotDensity.settings.series.length
+          ? previewDotDensity
+            ? 'No diseases selected.'
+            : 'No count series selected.'
+          : '')
+      : ''
+
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
   const showTopRightResetControl = showResetControl && config.general.type === 'us-geocode'
@@ -1268,37 +1279,7 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
-      {!previewDotDensity && authoredSettings && authoredDensity.legend.show && (
-        <DotDensityLegend
-          density={{ ...authoredDensity, series: authoredSeries }}
-          hiddenSeries={hiddenDensitySeries}
-          onToggle={id =>
-            setHiddenDensitySeries(previous =>
-              previous.includes(id) ? previous.filter(value => value !== id) : [...previous, id]
-            )
-          }
-        />
-      )}
-      {densityLayer && dotDensity && (
-        <p role='status'>
-          {densityLayer.error ||
-            (Number.isFinite(dotDensity.radius) && dotDensity.radius > 0
-              ? `${densityLayer.dots
-                  .filter(
-                    dot =>
-                      !dotDensity.hiddenSeries.includes(dot.seriesId) &&
-                      (!focus.id || config.general.showNeighboringStates || dot.countyId.startsWith(focus.id))
-                  )
-                  .length.toLocaleString()} visible dots${
-                  dotDensity.hiddenSeries.length === dotDensity.settings.series.length
-                    ? previewDotDensity
-                      ? ' · No diseases selected.'
-                      : ' · No count series selected.'
-                    : ''
-                }`
-              : 'Choose a positive, finite dot radius.')}
-        </p>
-      )}
+      {densityStatus && <p role='status'>{densityStatus}</p>}
       {densityLayer?.skippedValues > 0 && (
         <p role='status'>{densityLayer.skippedValues.toLocaleString()} missing or invalid count values omitted.</p>
       )}

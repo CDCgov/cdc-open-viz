@@ -54,6 +54,30 @@ describe('getMissingRequiredMapFields', () => {
     expect(fields(config, datasets)).toEqual(['Data Column'])
   })
 
+  it.each(['embedded', 'assigned'])('accepts sparse density counts in %s data', source => {
+    const rows = [{ FIPS: '04001' }, { FIPS: '04013', Cases: 32 }]
+    const config = {
+      ...makeConfig({ geo: 'FIPS', data: source === 'embedded' ? rows : [] }),
+      general: { type: 'data', geoType: 'us-county' },
+      dataKey: 'dashboardData',
+      dotDensity: {
+        enabled: true,
+        series: [{ id: 'cases', column: 'Cases', label: 'Cases', color: '#0072b2' }]
+      }
+    } as unknown as MapConfig
+    const datasets = { dashboardData: { data: rows } } as unknown as Datasets
+    expect(fields(config, datasets)).toEqual([])
+    expect(
+      fields(
+        {
+          ...config,
+          dotDensity: { ...config.dotDensity!, series: [{ ...config.dotDensity!.series[0], column: 'Missing' }] }
+        },
+        datasets
+      )
+    ).toEqual(['Count Column'])
+  })
+
   it.each(['us', 'us-county', 'us-region', 'world', 'single-state'])(
     'uses the same requirements for %s geography',
     geoType => {

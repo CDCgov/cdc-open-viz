@@ -6,6 +6,7 @@ import { type RuntimeData } from '../types/RuntimeData'
 import { type Modal } from '../types/Modal'
 
 // Action Types
+type SET_HIDDEN_DENSITY_SERIES = Action<'SET_HIDDEN_DENSITY_SERIES', string[]>
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
 type SET_CONFIG = Action<'SET_CONFIG', MapConfig>
 type SET_COVE_LOADED_HAS_RAN = Action<'SET_COVE_LOADED_HAS_RAN', boolean>
@@ -44,6 +45,7 @@ type MapActions =
   | SET_RUNTIME_DATA
   | SET_RUNTIME_FILTERS
   | SET_RUNTIME_LEGEND
+  | SET_HIDDEN_DENSITY_SERIES
   | SET_RUNTIME_BUBBLE_LEGEND
   | SET_SCALE
   | SET_STATES_TO_SHOW

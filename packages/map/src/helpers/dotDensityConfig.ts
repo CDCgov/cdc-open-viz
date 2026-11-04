@@ -7,12 +7,25 @@ export const createDefaultDotDensityConfig = (): DotDensityConfig => ({
   radius: 1.5,
   seed: 42,
   unit: 'cases',
-  legend: { show: true, title: 'Dot density' },
   series: []
 })
 
+/** Consume the prototype's separate legend settings once, before applying defaults. */
+export const normalizeDotDensityLegend = <T extends MapConfig>(config: T): T => {
+  const saved = config.dotDensity
+  if (!saved?.legend || saved.enabled !== true || !isDotDensitySupported(config)) return config
+  const legacy = saved.legend
+  const { legend: _legacyLegend, ...density } = saved
+  return {
+    ...config,
+    general: { ...config.general, showSidebar: legacy.show ?? config.general?.showSidebar },
+    legend: { ...config.legend, title: config.legend?.title || legacy.title || '' },
+    dotDensity: density
+  }
+}
+
 export const isDotDensitySupported = (config: MapConfig): boolean =>
-  config.general.geoType === 'us-county' && ['data', 'map'].includes(config.general.type as string)
+  config.general?.geoType === 'us-county' && ['data', 'map'].includes(config.general.type as string)
 
 export const getDotDensityConfig = (config: MapConfig): DotDensityConfig => {
   const defaults = createDefaultDotDensityConfig()
@@ -21,7 +34,6 @@ export const getDotDensityConfig = (config: MapConfig): DotDensityConfig => {
     ...defaults,
     ...saved,
     enabled: saved?.enabled === true,
-    legend: { ...defaults.legend, ...saved?.legend },
     series: Array.isArray(saved?.series)
       ? saved.series
           .filter(series => series && typeof series === 'object')

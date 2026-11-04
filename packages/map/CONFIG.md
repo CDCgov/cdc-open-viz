@@ -182,7 +182,7 @@ Playback requires one row per state and frame. Automatic ascending order initial
 
 ### `dotDensity`
 
-An optional dot density overlay for county data maps (`general.geoType: "us-county"`, `general.type: "data"`). In the editor, select **Type → Map Type → Dot Density** with **US County-Level** active, then configure the **Dot Density** section. The dropdown choice persists as `general.type: "data"` with `dotDensity.enabled: true`; selecting **Data** disables the layer while retaining its settings. It is inactive on other geographies and map types; stored settings are retained when changing geography.
+An optional dot density overlay for county data maps (`general.geoType: "us-county"`, `general.type: "data"`). Authoring is experimental and requires the `isCoveDeveloper=true` URL parameter; saved maps render without it. In the editor, select **Type → Map Type → Dot Density** with **US County-Level** active, then configure the **Dot Density** section. The dropdown choice persists as `general.type: "data"` with `dotDensity.enabled: true`; selecting **Data** disables the layer while retaining its settings. It is inactive on other geographies and map types; stored settings are retained when changing geography.
 
 | Field                        | Type      | Required         | Default          | Description                                                      | Allowed values / Notes                                                                                                            |
 | ---------------------------- | --------- | ---------------- | ---------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -190,18 +190,21 @@ An optional dot density overlay for county data maps (`general.geoType: "us-coun
 | `dotDensity.dotValue`        | `number`  | No               | `100`            | Quantity represented by each dot, shared across all series.      | Positive, finite number. Each county/series renders `floor(count / dotValue)` dots.                                               |
 | `dotDensity.radius`          | `number`  | No               | `1.5`            | Dot radius in Canvas pixels at default zoom.                     | Positive, finite number. Apparent radius stays constant during zoom.                                                              |
 | `dotDensity.seed`            | `number`  | No               | `42`             | Seed for reproducible approximate positions.                     | Use integers; the sampler coerces finite seeds to 32-bit integers.                                                                |
-| `dotDensity.unit`            | `string`  | No               | `cases`          | Quantity label displayed in the legend.                          | For example, `cases` or `people`.                                                                                                 |
-| `dotDensity.legend.show`     | `boolean` | No               | `true`           | Shows the quantity explanation and labeled series toggles.       | Legend visibility and series configuration are persisted; viewer toggle selections are not.                                       |
-| `dotDensity.legend.title`    | `string`  | No               | `Dot density`    | Heading for the dot density legend.                              | An empty value uses `Dot density`.                                                                                                |
 | `dotDensity.series`          | `array`   | Yes when enabled | `[]`             | Count fields displayed as distinct categories.                   | At least one mapped series is required. Blank count-column entries are incomplete drafts and do not draw.                         |
 | `dotDensity.series[].id`     | `string`  | Yes              | Editor-generated | Stable identity for placement and visibility.                    | Unique, nonempty ID. Preserve it across edits, exports, and data-column renames.                                                  |
 | `dotDensity.series[].column` | `string`  | Yes              | Empty            | Source count-column name.                                        | Must exist in the data. Use nonnegative finite counts or numeric strings.                                                         |
 | `dotDensity.series[].label`  | `string`  | No               | Column name      | Display label in the legend and generated tooltip/table columns. | Existing authored column metadata takes precedence when that source field is already mapped.                                      |
 | `dotDensity.series[].color`  | `string`  | No               | `#0072b2`        | Dot and legend-swatch color for the series.                      | CSS color string. The editor's color picker authors hex values and cycles initial colors from the shared colorblind-safe palette. |
 
+The standard **Legend** controls apply to density: `general.showSidebar`, `legend.title`, `legend.description`, position, border, row/column layout, and circles/boxes. Density-only maps use discrete series swatches; numeric class, breakpoint, and gradient controls apply to a configured base Data Column. All explanatory text, including any quantity-per-dot key, is authored through Legend Description. Series buttons and **Show All** change only runtime dot visibility.
+
+`dotDensity.unit` is retained for compatibility with earlier configs but has no rendered effect; author unit information in Legend Description.
+
+Earlier prototype configs with `dotDensity.legend.show` and `dotDensity.legend.title` are normalized into the shared fields when imported or activated as county density maps, and the old object is removed. Dormant legacy density settings do not alter the base map legend. An existing nonempty shared title takes precedence. New exports use the standard legend fields.
+
 Keep `columns.primary.name` empty for a neutral base map. A configured density series satisfies the editor's data-column requirement; the top-level geography mapping is still required. Setting a primary column retains the existing choropleth beneath the dots.
 
-Dots show approximate distribution within county geometry, not individual locations or population-adjusted risk. Remainders below one dot per county and series are omitted. Missing, negative, nonnumeric, and nonfinite counts contribute no dots and are reported as omitted values; the native tooltip/table preserves source values. Distinct count fields are added to those views at runtime without saving synthetic column mappings.
+Dots show approximate distribution within county geometry, not individual locations or population-adjusted risk. Remainders below one dot per county and series are omitted. Sparse count fields may first appear after the initial data row. Missing, negative, nonnumeric, and nonfinite counts contribute no dots and are reported as omitted values; the native tooltip/table preserves source values. Distinct count fields are added to those views at runtime without saving synthetic column mappings.
 
 The renderer rejects requests above 100,000 dots across matched runtime counties and all configured series, including hidden series and counties outside the selected state. It also rejects sampling shortfalls rather than showing a partial distribution. Increase `dotValue` to reduce the request. Dot density uses the normal county filters, focus, selection, and zoom; series toggles change drawing only and do not modify filters, source counts, or saved configuration.
 
@@ -213,7 +216,6 @@ The renderer rejects requests above 100,000 dots across matched runtime counties
     "radius": 1.5,
     "seed": 42,
     "unit": "cases",
-    "legend": { "show": true, "title": "Reported cases" },
     "series": [
       { "id": "measles-series", "column": "Measles", "label": "Measles", "color": "#0072b2" },
       { "id": "pertussis-series", "column": "Pertussis", "label": "Pertussis", "color": "#cc79a7" }

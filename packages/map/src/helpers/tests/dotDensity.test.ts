@@ -29,6 +29,15 @@ describe('dot density placement', () => {
     for (const dotValue of [0, -1, NaN, Infinity]) expect(() => getDotCount(100, dotValue)).toThrow(RangeError)
   })
 
+  it('corrects decimal division roundoff without rounding real remainders up', () => {
+    expect(getDotCount(33, 1.1)).toBe(30)
+    expect(getDotCount(0.3, 0.1)).toBe(3)
+    expect(getDotCount(33 - 1e-12, 1.1)).toBe(29)
+    expect(getDotCount(32.9, 1.1)).toBe(29)
+    expect(getDotCount(1e15 + 0.5, 1)).toBe(1e15)
+    expect(generate({ value: 33, dotValue: 1.1 }).points).toHaveLength(30)
+  })
+
   it('places the requested number inside the polygon and repeats exactly', () => {
     const result = generate()
     expect(result.complete).toBe(true)
