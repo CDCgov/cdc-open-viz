@@ -5,11 +5,11 @@ import ConfigContext from '../../../../../ConfigContext'
 import VisualPanel from './VisualPanel'
 
 vi.mock('@cdc/core/components/HeaderThemeSelector', () => ({ HeaderThemeSelector: () => <div>Header theme</div> }))
-vi.mock('@cdc/core/components/EditorPanel/sections/Tp5VisualSection', () => ({
-  Tp5VisualSection: () => <div>TP5 visual</div>
-}))
-vi.mock('@cdc/core/components/EditorPanel/sections/StyleTreatmentSection', () => ({
-  default: ({ onStyleTreatmentChange }) => <button onClick={() => onStyleTreatmentChange('tp5')}>Legacy visual</button>
+vi.mock('@cdc/core/components/panels/VisualPanel', () => ({
+  Tp5VisualSection: () => <div>TP5 visual</div>,
+  StyleTreatmentSection: ({ onStyleTreatmentChange }) => (
+    <button onClick={() => onStyleTreatmentChange('tp5')}>Legacy visual</button>
+  )
 }))
 
 describe('VisualPanel', () => {

@@ -1,4 +1,4 @@
-import { CheckBox, Select } from '../Inputs'
+import { CheckBox, Select } from '../../EditorPanel/Inputs'
 
 type StyleTreatmentValue = 'legacy' | 'tp5'
 

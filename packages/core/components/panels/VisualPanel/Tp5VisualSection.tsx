@@ -1,4 +1,4 @@
-import { CheckBox } from '../Inputs'
+import { CheckBox } from '../../EditorPanel/Inputs'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import { SharedTp5VisualOptions } from '../../../types/SharedTp5VisualOptions'
 

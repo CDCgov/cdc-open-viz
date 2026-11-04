@@ -1,8 +1,7 @@
 import { useContext } from 'react'
 
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
-import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
-import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import { Tp5VisualSection, VisualSection } from '@cdc/core/components/panels/VisualPanel'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import Context from '../../../../../context'

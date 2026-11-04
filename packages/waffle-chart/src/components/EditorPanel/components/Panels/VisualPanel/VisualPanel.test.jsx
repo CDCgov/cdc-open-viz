@@ -5,10 +5,8 @@ import ConfigContext from '../../../../../ConfigContext'
 import InitialState from '../../../../../data/initial-state'
 import VisualPanel from './VisualPanel'
 
-vi.mock('@cdc/core/components/EditorPanel/sections/Tp5VisualSection', () => ({
-  Tp5VisualSection: () => <div>TP5 visual controls</div>
-}))
-vi.mock('@cdc/core/components/EditorPanel/sections/VisualSection', () => ({
+vi.mock('@cdc/core/components/panels/VisualPanel', () => ({
+  Tp5VisualSection: () => <div>TP5 visual controls</div>,
   VisualSection: ({ beforeCheckboxes }) => <div>Standard visual controls{beforeCheckboxes}</div>
 }))
 

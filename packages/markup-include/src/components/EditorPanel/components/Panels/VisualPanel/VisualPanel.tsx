@@ -1,6 +1,5 @@
 import { useContext } from 'react'
-import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
-import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
+import { StyleTreatmentSection, Tp5VisualSection } from '@cdc/core/components/panels/VisualPanel'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import ConfigContext from '../../../../../ConfigContext'

@@ -5,10 +5,8 @@ import DefaultConfig from '../../../../../../examples/default.json'
 import Context from '../../../../../context'
 import VisualPanel from './VisualPanel'
 
-vi.mock('@cdc/core/components/EditorPanel/sections/Tp5VisualSection', () => ({
-  Tp5VisualSection: () => <div>TP5 visual controls</div>
-}))
-vi.mock('@cdc/core/components/EditorPanel/sections/VisualSection', () => ({
+vi.mock('@cdc/core/components/panels/VisualPanel', () => ({
+  Tp5VisualSection: () => <div>TP5 visual controls</div>,
   VisualSection: ({ beforeCheckboxes }: { beforeCheckboxes?: ReactNode }) => (
     <div>Standard visual controls{beforeCheckboxes}</div>
   )

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { CheckBox } from '../Inputs'
+import { CheckBox } from '../../EditorPanel/Inputs'
 import { HeaderThemeSelector } from '../../HeaderThemeSelector'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import { isCoveDeveloperMode } from '../../../helpers/queryStringUtils'
