@@ -92,10 +92,10 @@ Categorical bubble-size domains use renderable layer runtime rows by default. Wh
 
 Each layer chooses how to position its bubbles via `locationSource`:
 
-| `locationSource` | Required columns | How it works |
-|---|---|---|
-| `'data-column'` (default) | `columns.geo.name` | Bubble is placed at the centroid of the matching geography (state, country, etc.). Uses the same geo-lookup tables as the choropleth map. |
-| `'latitude-longitude'` | `columns.latitude.name` + `columns.longitude.name` | Bubble is placed at explicit coordinates read from each data row. The `columns.geo.name` column is used only for tooltip/table labels. |
+| `locationSource`          | Required columns                                   | How it works                                                                                                                              |
+| ------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `'data-column'` (default) | `columns.geo.name`                                 | Bubble is placed at the centroid of the matching geography (state, country, etc.). Uses the same geo-lookup tables as the choropleth map. |
+| `'latitude-longitude'`    | `columns.latitude.name` + `columns.longitude.name` | Bubble is placed at explicit coordinates read from each data row. The `columns.geo.name` column is used only for tooltip/table labels.    |
 
 Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{label}`) by `generateRuntimeData` because they do not correspond to a named geography.
 
@@ -103,24 +103,24 @@ Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{
 
 ## Key Files
 
-| File | Role |
-|---|---|
-| `packages/map/src/types/MapConfig.ts` | `BubbleLayer` and `BubbleConfig` type definitions |
-| `packages/map/src/helpers/bubbleLayers.ts` | All utility functions for reading and normalizing bubble config |
-| `packages/map/src/helpers/bubbleSize.ts` | Shared numeric/categorical bubble-size ordering and scaling helpers |
-| `packages/map/src/helpers/generateRuntimeData.ts` | UID assignment, filtering, numeric conversion, and layer-scoped runtime data for bubble columns |
-| `packages/map/src/hooks/useLegendMemo.ts` | Per-layer legend memo refs |
-| `packages/map/src/context/LegendMemoContext.tsx` | Carries bubble legend memos through context |
-| `packages/map/src/CdcMapComponent.tsx` | Dispatches `SET_RUNTIME_BUBBLE_LEGEND` after the choropleth legend |
-| `packages/map/src/components/BubbleList.tsx` | Renders bubbles for each configured layer |
-| `packages/map/src/components/Legend/components/BubbleLayerLegend.tsx` | Renders color/category legend for a single layer |
-| `packages/map/src/components/Legend/components/BubbleSizeLegend.tsx` | Renders proportional-circle size legend for a single layer |
-| `packages/map/src/components/Legend/components/LegendMarkupText.tsx` | Polymorphic text element with markup-variable support |
-| `packages/map/src/components/EditorPanel/components/BubbleEditorSection.tsx` | Top-level accordion item in the editor |
-| `packages/map/src/components/EditorPanel/components/BubbleLayerFields.tsx` | Per-layer column/sizing/palette fields |
-| `packages/map/src/components/EditorPanel/components/BubbleLegendFields.tsx` | Per-layer legend settings |
-| `packages/map/src/components/EditorPanel/components/BubbleSizeLegendFields.tsx` | Bubble-size sub-legend settings |
-| `packages/core/helpers/ver/4.26.7.ts` | Config migration that normalizes legacy bubble configs |
+| File                                                                                                     | Role                                                                                            |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `packages/map/src/types/MapConfig.ts`                                                                    | `BubbleLayer` and `BubbleConfig` type definitions                                               |
+| `packages/map/src/helpers/bubbleLayers.ts`                                                               | All utility functions for reading and normalizing bubble config                                 |
+| `packages/map/src/helpers/bubbleSize.ts`                                                                 | Shared numeric/categorical bubble-size ordering and scaling helpers                             |
+| `packages/map/src/helpers/generateRuntimeData.ts`                                                        | UID assignment, filtering, numeric conversion, and layer-scoped runtime data for bubble columns |
+| `packages/map/src/hooks/useLegendMemo.ts`                                                                | Per-layer legend memo refs                                                                      |
+| `packages/map/src/context/LegendMemoContext.tsx`                                                         | Carries bubble legend memos through context                                                     |
+| `packages/map/src/CdcMapComponent.tsx`                                                                   | Dispatches `SET_RUNTIME_BUBBLE_LEGEND` after the choropleth legend                              |
+| `packages/map/src/components/BubbleList.tsx`                                                             | Renders bubbles for each configured layer                                                       |
+| `packages/map/src/components/Legend/components/BubbleLayerLegend.tsx`                                    | Renders color/category legend for a single layer                                                |
+| `packages/map/src/components/Legend/components/BubbleSizeLegend.tsx`                                     | Renders proportional-circle size legend for a single layer                                      |
+| `packages/map/src/components/Legend/components/LegendMarkupText.tsx`                                     | Polymorphic text element with markup-variable support                                           |
+| `packages/map/src/components/EditorPanel/components/Panels/BubbleLayersPanel/BubbleLayersPanel.tsx`      | Top-level accordion item in the editor                                                          |
+| `packages/map/src/components/EditorPanel/components/Panels/BubbleLayersPanel/BubbleLayerFields.tsx`      | Per-layer column/sizing/palette fields                                                          |
+| `packages/map/src/components/EditorPanel/components/Panels/BubbleLayersPanel/BubbleLegendFields.tsx`     | Per-layer legend settings                                                                       |
+| `packages/map/src/components/EditorPanel/components/Panels/BubbleLayersPanel/BubbleSizeLegendFields.tsx` | Bubble-size sub-legend settings                                                                 |
+| `packages/core/helpers/ver/4.26.7.ts`                                                                    | Config migration that normalizes legacy bubble configs                                          |
 
 ---
 
@@ -128,17 +128,17 @@ Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{
 
 All layer reads go through this module. Do not read `config.bubble` directly.
 
-| Function | Purpose |
-|---|---|
-| `createDefaultBubbleLayer(overrides?)` | Returns a fully normalized layer populated with safe defaults. |
-| `normalizeBubbleLayer(layer?)` | Fills in any missing fields on an existing layer object. |
-| `getBubbleLayers(bubble?)` | Reads `bubble.layers[]` or falls back to a legacy flat shape; returns `BubbleLayer[]`. |
-| `hasConfiguredBubbleLayer(layer?)` | Returns `true` when the layer has a coloring or size column and a valid location source. |
-| `getConfiguredBubbleLayers(config)` | Returns only layers that pass `hasConfiguredBubbleLayer`. Use this for rendering. |
-| `getPrimaryBubbleLayer(config)` | First configured layer, or the first layer if none are fully configured yet. |
-| `isBubbleLayerUsingCoordinates(layer?)` | Returns `true` when `locationSource === 'latitude-longitude'`. |
-| `hasBubbleLayerCoordinateColumns(layer?)` | Returns `true` when both `columns.latitude.name` and `columns.longitude.name` are set. |
-| `mapConfigForBubbleLayer(config, layer)` | Synthesizes a one-off `MapConfig` that merges one bubble layer's columns, palette, and legend into the base config. Used to run `generateRuntimeLegend` and `buildTooltip` in layer scope. |
+| Function                                  | Purpose                                                                                                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `createDefaultBubbleLayer(overrides?)`    | Returns a fully normalized layer populated with safe defaults.                                                                                                                             |
+| `normalizeBubbleLayer(layer?)`            | Fills in any missing fields on an existing layer object.                                                                                                                                   |
+| `getBubbleLayers(bubble?)`                | Reads `bubble.layers[]` or falls back to a legacy flat shape; returns `BubbleLayer[]`.                                                                                                     |
+| `hasConfiguredBubbleLayer(layer?)`        | Returns `true` when the layer has a coloring or size column and a valid location source.                                                                                                   |
+| `getConfiguredBubbleLayers(config)`       | Returns only layers that pass `hasConfiguredBubbleLayer`. Use this for rendering.                                                                                                          |
+| `getPrimaryBubbleLayer(config)`           | First configured layer, or the first layer if none are fully configured yet.                                                                                                               |
+| `isBubbleLayerUsingCoordinates(layer?)`   | Returns `true` when `locationSource === 'latitude-longitude'`.                                                                                                                             |
+| `hasBubbleLayerCoordinateColumns(layer?)` | Returns `true` when both `columns.latitude.name` and `columns.longitude.name` are set.                                                                                                     |
+| `mapConfigForBubbleLayer(config, layer)`  | Synthesizes a one-off `MapConfig` that merges one bubble layer's columns, palette, and legend into the base config. Used to run `generateRuntimeLegend` and `buildTooltip` in layer scope. |
 
 ---
 
@@ -192,11 +192,11 @@ After migration, bubble-only maps have empty `config.columns.geo.name` and `conf
 
 The `4.26.7` migration handles three legacy shapes:
 
-| Legacy shape | What migration does |
-|---|---|
+| Legacy shape                                                        | What migration does                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `general.type === 'bubble'` with flat `config.visual` bubble fields | Moves `minBubbleSize`, `maxBubbleSize`, `extraBubbleBorder`, `showBubbleZeros` from `config.visual` into `config.bubble.layers[0]`. Sets `general.type` to `'data'`. Clears top-level `columns.geo.name` and `columns.primary.name` (moved into the layer). |
-| Flat `config.bubble` object with no `layers` array | Moves `bubble.columns` and other flat bubble fields into `config.bubble.layers[0]`. |
-| `config.bubble.layers[]` already present | Normalizes each layer with `normalizeBubbleLayer` to fill in any missing defaults. |
+| Flat `config.bubble` object with no `layers` array                  | Moves `bubble.columns` and other flat bubble fields into `config.bubble.layers[0]`.                                                                                                                                                                         |
+| `config.bubble.layers[]` already present                            | Normalizes each layer with `normalizeBubbleLayer` to fill in any missing defaults.                                                                                                                                                                          |
 
 The migration stamps `config.bubble.migratedToBubbleAccordion = true` for idempotency.
 
@@ -227,6 +227,7 @@ Migration tests: `packages/core/helpers/ver/tests/4.26.7.test.ts`
 Runtime data tests: `packages/map/src/helpers/tests/generateRuntimeData.test.ts`
 
 Stories for manual testing:
+
 - `packages/map/src/_stories/CdcMap.BubbleLegend.stories.tsx` — bubble legend variants
 - `packages/map/src/_stories/CdcMap.BubbleLocation.stories.tsx` — lat/lng location source
 - `packages/map/src/_stories/CdcMap.smoke.stories.tsx` — basic bubble smoke tests
