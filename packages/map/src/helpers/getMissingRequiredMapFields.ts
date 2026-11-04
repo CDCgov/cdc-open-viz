@@ -35,6 +35,15 @@ export const getAvailableMapColumns = (rows: readonly unknown[]): string[] => {
   return [...columns]
 }
 
+/** Dashboard config.data can already be filtered; retain source and transformed count fields. */
+export const getMapDensitySourceColumns = (
+  config: Pick<MapConfig, 'data' | 'dataKey'>,
+  datasets?: Datasets
+): string[] => {
+  const assignedRows = config.dataKey ? datasets?.[config.dataKey]?.data : undefined
+  return [...new Set([...getAvailableMapColumns(config.data ?? []), ...getAvailableMapColumns(assignedRows ?? [])])]
+}
+
 export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datasets): MissingRequiredMapField[] => {
   const mapType = config.general?.type as string
   if (!['data', 'map'].includes(mapType)) return []
@@ -58,9 +67,10 @@ export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datase
   })
   if (isDotDensitySupported(config) && config.dotDensity?.enabled === true) {
     const series = getConfiguredDotDensitySeries(config)
+    const densityColumns = new Set(getMapDensitySourceColumns(config, datasets))
     return [
       ...missing.filter(item => item.field === 'Geography'),
-      ...(!series.length || (hasAvailableColumns && series.some(item => !availableColumns.includes(item.column)))
+      ...(!series.length || (densityColumns.size > 0 && series.some(item => !densityColumns.has(item.column)))
         ? [
             {
               field: 'Count Column',

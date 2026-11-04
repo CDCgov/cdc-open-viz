@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { zoomTransform } from 'd3-zoom'
 import { expect, fireEvent, userEvent, within } from 'storybook/test'
 import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 import CountyDotDensityPrototype from './dotDensity/CountyDotDensityPrototype'
+import CountyDotDensityRuntimeHarness from './dotDensity/CountyDotDensityRuntimeHarness'
 import countyTopology from '../components/UsaMap/data/cb_2019_us_county_20m.json'
 import { diseaseSeries, outbreakCounts } from './dotDensity/outbreakData'
 
@@ -264,3 +266,65 @@ export const CountySelection: Story = {
 export const EmptyDiseaseOutbreaks: Story = { ...Empty, args: { ...outbreakArgs, empty: true } }
 export const NoOutbreakFixtureData: Story = { ...Empty, args: { ...outbreakArgs, geography: '06' } }
 export const OutbreakBudgetExceeded: Story = { ...BudgetExceeded, args: { ...outbreakArgs, dotValue: 0.01 } }
+
+export const DisabledDensityStaysDisabledAfterZoom: Story = {
+  render: () => <CountyDotDensityRuntimeHarness />,
+  play: async ({ canvasElement }) => {
+    const map = (await waitForPresence('canvas[data-drawn-dots="10"]', canvasElement)) as HTMLCanvasElement
+    const canvas = within(canvasElement)
+    const read = () => ({
+      signature: map.dataset.positionSignature,
+      scale: zoomTransform(map).k,
+      painted: map
+        .getContext('2d')!
+        .getImageData(0, 0, map.width, map.height)
+        .data.some(value => value !== 0)
+    })
+    await performAndAssert(
+      'Disabling a runtime density-only map clears its Canvas',
+      read,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Toggle runtime density' })),
+      (_, after) => after.signature === undefined && !after.painted
+    )
+    await performAndAssert(
+      'Button zoom does not restore disabled dots',
+      read,
+      async () => {
+        await userEvent.click(canvas.getByRole('button', { name: 'Zoom In' }))
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      },
+      (before, after) => after.scale > before.scale
+    )
+    expect(read().signature).toBeUndefined()
+    expect(read().painted).toBe(false)
+    await performAndAssert(
+      'Wheel zoom does not restore disabled dots',
+      read,
+      async () => {
+        fireEvent.wheel(map, { deltaY: -100, clientX: 200, clientY: 150 })
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      },
+      (before, after) => after.scale > before.scale
+    )
+    expect(read().signature).toBeUndefined()
+    expect(read().painted).toBe(false)
+    expect(canvasElement.querySelector('canvas')).toBe(map)
+  }
+}
+
+export const ExcludedCountyDoesNotConsumeDensityBudget: Story = {
+  render: () => (
+    <CountyDotDensityRuntimeHarness
+      rows={[
+        { FIPS: '04013', Cases: 50 },
+        { FIPS: '51620', Cases: 1000000 }
+      ]}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const map = (await waitForPresence('canvas[data-drawn-dots="10"]', canvasElement)) as HTMLCanvasElement
+    expect(map.dataset.densityError).toBe('')
+    expect(map.dataset.positionSignature).toContain('04013:cases:')
+    expect(map.dataset.positionSignature).not.toContain('51620:')
+  }
+}

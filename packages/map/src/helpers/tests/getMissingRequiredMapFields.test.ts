@@ -78,6 +78,45 @@ describe('getMissingRequiredMapFields', () => {
     ).toEqual(['Count Column'])
   })
 
+  it('keeps density mappings available after dashboard filters retain only sparse rows', () => {
+    const config = {
+      ...makeConfig({ geo: 'FIPS', data: [{ FIPS: '04013', a: 50, derived: 12 }] }),
+      general: { type: 'data', geoType: 'us-county' },
+      dataKey: 'dashboardData',
+      dotDensity: {
+        enabled: true,
+        series: [
+          { id: 'a', column: 'a', label: 'A', color: '#0072b2' },
+          { id: 'b', column: 'b', label: 'B', color: '#d55e00' },
+          { id: 'derived', column: 'derived', label: 'Derived', color: '#000000' }
+        ]
+      }
+    } as unknown as MapConfig
+    const datasets = {
+      dashboardData: {
+        data: [
+          { FIPS: '04013', a: 50 },
+          { FIPS: '04001', b: 25 }
+        ]
+      }
+    } as unknown as Datasets
+    expect(fields(config, datasets)).toEqual([])
+    expect(
+      fields(
+        {
+          ...config,
+          dotDensity: { ...config.dotDensity!, series: [{ ...config.dotDensity!.series[0], column: 'Missing' }] }
+        },
+        datasets
+      )
+    ).toEqual(['Count Column'])
+    expect(
+      fields({ ...config, columns: { ...config.columns, geo: { name: 'Raw FIPS' } } }, {
+        dashboardData: { data: [{ 'Raw FIPS': '04013', a: 50, b: 25 }] }
+      } as unknown as Datasets)
+    ).toEqual(['Geography'])
+  })
+
   it.each(['us', 'us-county', 'us-region', 'world', 'single-state'])(
     'uses the same requirements for %s geography',
     geoType => {

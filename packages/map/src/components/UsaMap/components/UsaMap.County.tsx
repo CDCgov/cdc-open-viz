@@ -12,13 +12,9 @@ import usExtendedGeography from '../data/us-extended-geography.json'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { CountyDotDensityContext } from '../../../context/CountyDotDensityContext'
-import { prepareCountyDotDensity, drawCountyDotDensity } from '../../../helpers/countyDotDensityLayer'
+import { drawCountyDotDensity } from '../../../helpers/countyDotDensityLayer'
 import type { DotDensityGeometry } from '../../../helpers/dotDensity'
-import {
-  getDotDensityConfig,
-  getConfiguredDotDensitySeries,
-  isDotDensitySupported
-} from '../../../helpers/dotDensityConfig'
+import useCountyDotDensity from '../../../hooks/useCountyDotDensity'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
@@ -259,37 +255,13 @@ const CountyMap = () => {
     setFilteredStateCountyCode,
     filteredCountyCode,
     hiddenDensitySeries = [],
+    densitySourceColumns,
     config,
     tooltipId,
     tooltipRef,
     interactionLabel
   } = useContext(ConfigContext)
 
-  const authoredDensity = useMemo(() => getDotDensityConfig(config), [config.dotDensity])
-  const authoredSeries = useMemo(
-    () => getConfiguredDotDensitySeries(config),
-    [config.dotDensity, config.general.geoType, config.general.type]
-  )
-  const authoredSettings = useMemo(
-    () =>
-      isDotDensitySupported(config) && authoredDensity.enabled
-        ? { dotValue: authoredDensity.dotValue, seed: authoredDensity.seed, series: authoredSeries }
-        : undefined,
-    [authoredDensity, authoredSeries, config.general.geoType, config.general.type]
-  )
-  const dotDensity = useMemo(
-    () =>
-      previewDotDensity ||
-      (authoredSettings
-        ? {
-            settings: authoredSettings,
-            radius: authoredDensity.radius,
-            hiddenSeries: hiddenDensitySeries.filter(id => authoredSeries.some(series => series.id === id))
-          }
-        : null),
-    [previewDotDensity, authoredSettings, authoredDensity.radius, hiddenDensitySeries, authoredSeries]
-  )
-  const densitySettings = dotDensity?.settings
   const initialStateCode = previewDotDensity?.initialStateCode
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
@@ -299,16 +271,13 @@ const CountyMap = () => {
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [topoData, setTopoData] = useState<TopoData>({} as TopoData)
-  const densityLayer = useMemo(
-    () =>
-      densitySettings
-        ? prepareCountyDotDensity(
-            (topoData.counties || []) as unknown as DotDensityGeometry[],
-            runtimeData as unknown as Record<string, Record<string, unknown>>,
-            densitySettings
-          )
-        : null,
-    [densitySettings, topoData.counties, runtimeData]
+  const { dotDensity, densityLayer } = useCountyDotDensity(
+    config,
+    runtimeData as unknown as Record<string, Record<string, unknown>>,
+    topoData.mapData as unknown as DotDensityGeometry[],
+    previewDotDensity,
+    hiddenDensitySeries,
+    densitySourceColumns
   )
   useEffect(() => {
     if (initialStateCode !== undefined)
@@ -943,9 +912,9 @@ const CountyMap = () => {
   // Sets up canvas dimensions and projection, rebuilds the Path2D cache only when geometry changes, then renders.
   // Called on data change, resize, focus change — NOT during zoom/pan.
   const drawCanvas = () => {
+    // Zoom listeners also need the latest closure when every layer is disabled.
+    renderFrameRef.current = renderFrame
     if (canvasRef.current && (runtimeLegend.items?.length > 0 || densityLayer)) {
-      // Zoom listeners can outlive the render that installed them.
-      renderFrameRef.current = renderFrame
       const canvas = canvasRef.current
       const canvasWidth = canvas.clientWidth
       if (canvasWidth <= 0) return

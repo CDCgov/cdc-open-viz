@@ -99,7 +99,11 @@ import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
-import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
+import {
+  getMissingRequiredMapFields,
+  getMapDensitySourceColumns,
+  type MissingRequiredMapField
+} from './helpers/getMissingRequiredMapFields'
 const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcMapComponent = {
@@ -678,6 +682,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
+  const densitySourceColumns = useMemo(
+    () => getMapDensitySourceColumns({ data: config.data, dataKey: config.dataKey }, datasets),
+    [config.data, config.dataKey, datasets]
+  )
+
   const mapProps = {
     setParentConfig,
     container,
@@ -701,6 +710,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     runtimeBubbleLegend,
     hiddenDensitySeries,
+    densitySourceColumns,
     scale,
     setConfig,
     setFilteredStateCountyCode,

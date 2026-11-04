@@ -55,6 +55,7 @@ describe('county dot density layer', () => {
     expect(result.skippedValues).toBe(2)
     expect(prepareCountyDotDensity([county], { '04013': { a: 0, b: '0' } }, settings).skippedValues).toBe(0)
     expect(prepareCountyDotDensity([county], { '04013': { a: 5 } }, settings).error).toContain('missing from the data')
+    expect(prepareCountyDotDensity([county], { '04013': {} }, settings).error).toContain('missing from the data')
     expect(prepareCountyDotDensity([county], {}, { ...settings, series: [] }).error).toContain('Choose at least')
     expect(
       prepareCountyDotDensity(
@@ -66,6 +67,21 @@ describe('county dot density layer', () => {
     expect(
       prepareCountyDotDensity([county], {}, { ...settings, series: [settings.series[0], settings.series[0]] }).error
     ).toContain('unique')
+  })
+
+  it('keeps valid counts when filtering removes every value of another existing source column', () => {
+    const result = prepareCountyDotDensity([county], { '04013': { a: 50 } }, settings, ['FIPS', 'a', 'b'])
+    expect(result.error).toBe('')
+    expect(result.dots).toHaveLength(10)
+    expect(result.dots.every(dot => dot.seriesId === 'a')).toBe(true)
+    expect(result.skippedValues).toBe(1)
+  })
+
+  it('validates source mappings independently of filtered rows', () => {
+    expect(prepareCountyDotDensity([county], {}, settings, ['FIPS', 'a', 'b']).error).toBe('')
+    expect(prepareCountyDotDensity([county], {}, settings, ['FIPS', 'a']).error).toContain(
+      'Count column "b" is missing from the data.'
+    )
   })
 
   it('draws through the supplied projection, respects county/category visibility, and scales radius with zoom', () => {

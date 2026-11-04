@@ -1,4 +1,5 @@
 import type { GeoProjection } from 'd3-geo'
+import { getAvailableMapColumns } from './getMissingRequiredMapFields'
 import chroma from 'chroma-js'
 import { generateDensityDots, getDotCount, type DotDensityGeometry, type DotPosition } from './dotDensity'
 
@@ -13,7 +14,8 @@ type Dot = { countyId: string; seriesId: string; color: string; position: DotPos
 export const prepareCountyDotDensity = (
   features: DotDensityGeometry[],
   runtimeData: Record<string, Record<string, unknown>>,
-  settings: CountyDotDensitySettings
+  settings: CountyDotDensitySettings,
+  sourceColumns?: readonly string[]
 ): { dots: Dot[]; error: string; signature: string; skippedValues: number } => {
   const { dotValue, seed, series } = settings
   const empty = (error: string) => ({ dots: [], error, signature: '', skippedValues: 0 })
@@ -30,11 +32,12 @@ export const prepareCountyDotDensity = (
     return empty('Dot density series must have unique, nonempty IDs.')
   }
   const rows = features.filter(feature => runtimeData[String(feature.id)])
-  const missing = series.find(
-    item =>
-      rows.length > 0 &&
-      !rows.some(feature => Object.prototype.hasOwnProperty.call(runtimeData[String(feature.id)], item.column))
+  // Filtering can omit every value of an existing column without removing its mapping.
+  const availableColumns = new Set(
+    sourceColumns ?? getAvailableMapColumns(rows.map(feature => runtimeData[String(feature.id)]))
   )
+  const hasSchema = sourceColumns !== undefined ? availableColumns.size > 0 : rows.length > 0
+  const missing = hasSchema && series.find(item => !availableColumns.has(item.column))
   if (missing) return empty(`Count column "${missing.column}" is missing from the data.`)
   let skippedValues = 0
   const values = new Map<string, number[]>()
