@@ -143,18 +143,34 @@ describe('useCountyDotDensity', () => {
   })
 })
 
-it('updates palette colors without changing geographic positions or counts', () => {
-  const { result, rerender } = renderHook(useLayer, { initialProps: config })
-  const before = result.current.densityLayer!
-  rerender({
+it.each([undefined, '#0072B2'])('handles palette edits with series color %s without moving dots', color => {
+  const paletteConfig = {
     ...config,
     general: {
       ...config.general,
+      palette: { name: 'qualitative_standard', version: '2.1', isReversed: false, customColorsOrdered: ['#123456'] }
+    },
+    dotDensity: {
+      ...config.dotDensity!,
+      series: config.dotDensity!.series.map(series => ({ ...series, color }))
+    }
+  }
+  const { result, rerender } = renderHook(useLayer, { initialProps: paletteConfig })
+  const before = result.current.densityLayer!
+  expect(before.dots.map(dot => dot.color)).toEqual(Array(10).fill(color ?? '#123456'))
+  rerender({
+    ...paletteConfig,
+    general: {
+      ...paletteConfig.general,
       palette: { name: 'qualitative_standard', version: '2.1', isReversed: false, customColorsOrdered: ['#abcdef'] }
     }
   })
   const after = result.current.densityLayer!
-  expect(after).not.toBe(before)
-  expect(after.dots.map(dot => dot.color)).toEqual(Array(10).fill('#abcdef'))
+  if (color) {
+    expect(after).toBe(before)
+  } else {
+    expect(after).not.toBe(before)
+  }
+  expect(after.dots.map(dot => dot.color)).toEqual(Array(10).fill(color ?? '#abcdef'))
   expect(after.dots.map(dot => dot.position)).toEqual(before.dots.map(dot => dot.position))
 })
