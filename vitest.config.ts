@@ -47,6 +47,17 @@ export default defineConfig({
             headless: true
           }
         },
+        optimizeDeps: {
+          include: [
+            '@hello-pangea/dnd',
+            'react-accessible-accordion',
+            'lodash/keys',
+            'use-debounce',
+            'lodash/flatten',
+            'prop-types',
+            'json-edit-react'
+          ]
+        },
         plugins: [storybookTest()]
       }
     ]

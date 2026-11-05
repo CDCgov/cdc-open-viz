@@ -25,4 +25,27 @@ describe('4.25.3 Area Chart subtype migration', () => {
     const chart = update({ type: 'chart', general: { showDownloadButton: true } })
     expect(chart.table.download).toBe(true)
   })
+
+  it.each([
+    [false, true],
+    [true, false],
+    [false, false]
+  ])('preserves chart download availability for table=%s and legacy=%s', (download, showDownloadButton) => {
+    const config = { type: 'chart', general: { showDownloadButton }, table: { download } }
+    const result = update(config)
+
+    expect(result.table.download).toBe(download || showDownloadButton)
+    expect(result.general).not.toHaveProperty('showDownloadButton')
+    expect(config.general.showDownloadButton).toBe(showDownloadButton)
+  })
+
+  it('moves map download settings inside dashboards', () => {
+    const result = update({
+      type: 'dashboard',
+      visualizations: { map: { type: 'map', general: { showDownloadButton: false }, table: { download: true } } }
+    })
+
+    expect(result.visualizations.map.table.download).toBe(false)
+    expect(result.visualizations.map.general).not.toHaveProperty('showDownloadButton')
+  })
 })

@@ -693,6 +693,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
       resizeObserver.observe(node)
+    } else {
+      resizeObserver.disconnect()
     }
     dispatch({ type: 'SET_CONTAINER', payload: node })
   }, []) // eslint-disable-line

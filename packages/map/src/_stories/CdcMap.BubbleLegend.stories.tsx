@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
-import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
+import {
+  assertVisualizationRendered,
+  performAndAssert,
+  waitForEditor,
+  waitForPresence
+} from '@cdc/core/helpers/testing'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import CdcMap from '../CdcMap'
 import worldBubbleDiseaseType from './_mock/world-bubble-disease-type.json'
@@ -630,5 +635,51 @@ export const Bubble_Layer_Static_Color_Developer_Input: Story = {
 
     expect(canvasElement).not.toHaveTextContent('Something went wrong with component UsaMap.')
     window.history.replaceState({}, '', window.location.pathname)
+  }
+}
+
+export const Independent_Legend_Visibility: Story = {
+  args: {
+    config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const bubbles = () =>
+      Array.from(canvasElement.querySelectorAll('circle.bubble')).map(bubble =>
+        ['class', 'r', 'fill', 'fill-opacity'].map(attribute => bubble.getAttribute(attribute))
+      )
+    await waitForPresence('circle.bubble', canvasElement)
+    const before = bubbles()
+    await userEvent.click(canvas.getByRole('button', { name: 'Bubble Layers', exact: true }))
+    await userEvent.click(canvas.getByRole('button', { name: /^Layer 1:/ }))
+    const layer = canvas.getByRole('button', { name: /^Layer 1:/ }).closest('.series-item') as HTMLElement
+    await userEvent.click(within(layer).getByRole('button', { name: 'Legend', exact: true }))
+    const color = canvas.getByRole('checkbox', { name: 'Show Color Legend for Layer 1' })
+    const size = canvas.getByRole('checkbox', { name: 'Show Size Legend for Layer 1' })
+    const legends = () => [
+      Boolean(canvasElement.querySelector('ul[aria-label="Bubble legend items"]')),
+      Boolean(canvasElement.querySelector('ul[aria-label="Bubble size legend items"]'))
+    ]
+    expect(legends()).toEqual([true, true])
+    for (const [control, expected] of [
+      [color, [false, true]],
+      [size, [false, false]],
+      [color, [true, false]],
+      [size, [true, true]]
+    ] as const) {
+      await performAndAssert(
+        'Independent legend visibility',
+        legends,
+        () => userEvent.click(control),
+        (_before, after) => after[0] === expected[0] && after[1] === expected[1]
+      )
+      expect(bubbles()).toEqual(before)
+    }
   }
 }

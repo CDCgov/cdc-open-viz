@@ -2,6 +2,7 @@ import BubbleLayers from './BubbleLayersPanel'
 import Columns from './ColumnsPanel'
 import CustomMapLayers from './CustomMapLayersPanel'
 import DataTable from './DataTablePanel'
+import DotDensity from '../DotDensityEditorSection'
 import Filters from './FiltersPanel'
 import Footnotes from './FootnotesPanel'
 import General from './GeneralPanel'
@@ -20,6 +21,7 @@ const Panels = {
   Columns,
   CustomMapLayers,
   DataTable,
+  DotDensity,
   Filters,
   Footnotes,
   General,

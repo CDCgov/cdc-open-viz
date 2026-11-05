@@ -575,29 +575,38 @@ const ColumnsPanel = ({ columnNames }: ColumnsPanelProps) => {
         </>
       }
 
-      <label className='edit-block navigate column-heading'>
-        <span className='edit-label column-heading'>
-          Navigation
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                To provide end users with navigation functionality, select the source column containing the navigation
-                URLs.
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
-        </span>
-        <Select
-          value={config.columns.navigate ? config.columns.navigate.name : ''}
-          options={columnsOptions.map(c => c.key)}
-          onChange={event => {
-            editColumn('navigate', 'name', event.target.value)
-          }}
-        />
-      </label>
+      {config.general.type !== 'data' && (
+        <label className='edit-block navigate column-heading'>
+          <span className='edit-label column-heading'>
+            Navigation
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  To provide end users with navigation functionality, select the source column containing the navigation
+                  URLs.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
+          <Select
+            fieldName={config.general.type === 'navigation' ? 'navigationUrlColumn' : undefined}
+            aria-label={config.general.type === 'navigation' ? 'Navigation' : undefined}
+            data-required-field-control={config.general.type === 'navigation' ? 'map-url-column' : undefined}
+            value={config.columns.navigate ? config.columns.navigate.name : ''}
+            options={
+              config.general.type === 'navigation'
+                ? columnsOptions.map(c => ({ value: c.props.value, label: c.props.children }))
+                : columnsOptions.map(c => c.key)
+            }
+            onChange={event => {
+              editColumn('navigate', 'name', event.target.value)
+            }}
+          />
+        </label>
+      )}
       {'navigation' !== config.general.type && (
         <fieldset className='primary-fieldset edit-block'>
           <label>

@@ -12,10 +12,11 @@ import {
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from './bubbleLayers'
-import { isCategoricalBubbleSize } from './bubbleSize'
+import { isCategoricalBubbleSize, shouldIncludeNonGeoDataInBubbleSizeDomain } from './bubbleSize'
 import type { BubbleLayer } from '../types/MapConfig'
 
 type GenerateRuntimeDataOptions = {
+  preserveRows?: boolean
   useCoordinateBubbleUIDs?: boolean
 }
 
@@ -167,9 +168,10 @@ const generateRuntimeData = (
 
       // Filters
       if (!rowMatchesRuntimeFilters(row, filters)) return false
-      // Don't add additional rows with same UID
-      if (result[row.uid] === undefined) {
-        result[row.uid] = row
+      // Size domains retain repeated geographies; ordinary runtime rows stay deduplicated.
+      const key = options.preserveRows ? `size-domain-${rowIndex}` : row.uid
+      if (result[key] === undefined) {
+        result[key] = row
       }
     })
     return result
@@ -183,7 +185,8 @@ export const generateBubbleLayerRuntimeData = (
   layer: BubbleLayer,
   filters: VizFilter[],
   hash: number,
-  keepNoUidRows = false
+  keepNoUidRows = false,
+  options: GenerateRuntimeDataOptions = {}
 ) => {
   const layerConfig = mapConfigForBubbleLayer(
     {
@@ -195,8 +198,23 @@ export const generateBubbleLayerRuntimeData = (
   const layerLegendType = layerConfig.legend?.type ?? configObj.legend?.type
 
   return generateRuntimeData(layerConfig, filters, hash, layerLegendType === 'category', keepNoUidRows, {
+    ...options,
     useCoordinateBubbleUIDs: true
   })
+}
+
+/** Unfiltered size-domain rows, preserving repeated geographies across tabs. */
+export const generateBubbleSizeDomainData = (config: MapConfig, layer: BubbleLayer): DataRow[] => {
+  const runtimeData = generateBubbleLayerRuntimeData(
+    config,
+    layer,
+    [],
+    0,
+    shouldIncludeNonGeoDataInBubbleSizeDomain(layer),
+    { preserveRows: true }
+  )
+  const rows = Object.values(runtimeData ?? {}) as DataRow[]
+  return isBubbleLayerUsingCoordinates(layer) ? rows.filter(row => hasValidBubbleCoordinates(row, layer)) : rows
 }
 
 export default generateRuntimeData

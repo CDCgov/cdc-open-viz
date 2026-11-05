@@ -25,6 +25,36 @@ describe('VisualizationContent', () => {
     expect(screen.getByText('Inner content')).toBeInTheDocument()
   })
 
+  it('places structural slots before content and after supporting sections as direct body-wrap children', () => {
+    const { container } = render(
+      <VisualizationContent
+        message='Intro'
+        filters='Filters'
+        beforeContent={<section data-testid='before-content'>Before</section>}
+        beforeFooter={<section data-testid='before-footer'>Before footer</section>}
+        bodySubtext='Supporting text'
+        bodyAnnotations='Annotations'
+        bodyFooter='Footer'
+      >
+        Map
+      </VisualizationContent>
+    )
+
+    const bodyWrap = container.querySelector('.cove-visualization__body-wrap')!
+    expect(Array.from(bodyWrap.children).map(child => child.textContent)).toEqual([
+      'Intro',
+      'Filters',
+      'Before',
+      'Map',
+      'Supporting text',
+      'Annotations',
+      'Before footer',
+      'Footer'
+    ])
+    expect(screen.getByTestId('before-content').parentElement).toBe(bodyWrap)
+    expect(screen.getByTestId('before-footer').parentElement).toBe(bodyWrap)
+  })
+
   it('renders header and footer outside the body wrapper', () => {
     const { container } = render(
       <VisualizationContent
@@ -181,7 +211,10 @@ describe('VisualizationContent', () => {
     const innerRef = React.createRef<HTMLDivElement>()
 
     const { container } = render(
-      <VisualizationContent innerClassName='inner-extra' innerProps={{ 'aria-label': 'Visualization content', ref: innerRef }}>
+      <VisualizationContent
+        innerClassName='inner-extra'
+        innerProps={{ 'aria-label': 'Visualization content', ref: innerRef }}
+      >
         <div>Inner content</div>
       </VisualizationContent>
     )

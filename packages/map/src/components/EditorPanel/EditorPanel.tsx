@@ -18,6 +18,8 @@ import { MapContext } from '../../types/MapContext.js'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './EditorPanel.styles.css'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { getAvailableMapColumns } from '../../helpers/getMissingRequiredMapFields'
+import { getConfiguredDotDensitySeries } from '../../helpers/dotDensityConfig'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -26,27 +28,9 @@ type MapEditorPanelProps = {
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { setParentConfig, isDashboard, setConfig, config } = useContext<MapContext>(ConfigContext)
 
-  // Get columns from data with fallback to datasets (for dashboard context)
-  const columnsInData = useMemo(() => {
-    // First try config.data
-    if (config?.data?.[0]) {
-      return Object.keys(config.data[0])
-    }
-
-    // Fallback to datasets using config.dataKey (for dashboard visualizations)
-    if (datasets && config?.dataKey) {
-      const assignedDataset = datasets[config.dataKey]
-      if (assignedDataset?.data?.[0]) {
-        return Object.keys(assignedDataset.data[0])
-      }
-    }
-
-    return []
-  }, [
-    config?.data?.length > 0 ? JSON.stringify(Object.keys(config.data[0])) : null,
-    datasets?.[config?.dataKey as string]?.data?.length,
-    config?.dataKey
-  ])
+  // Use the same sparse-row column discovery as required-field validation.
+  const sourceRows = config.data?.length ? config.data : datasets?.[config.dataKey]?.data
+  const columnsInData = useMemo(() => getAvailableMapColumns(sourceRows ?? []), [sourceRows])
 
   const numberOfItemsLimit = 8
 
@@ -57,7 +41,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     // Strip ref
     delete strippedState['']
 
-    if (strippedState.columns.geo.name && strippedState.columns.primary.name) {
+    if (
+      strippedState.columns.geo.name &&
+      (strippedState.columns.primary.name || getConfiguredDotDensitySeries(strippedState).length > 0)
+    ) {
       delete strippedState.newViz
     }
 
@@ -96,12 +83,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <Panels.Type columnNames={columnsInData} />
               <Panels.General />
               <Panels.Columns columnNames={columnsInData} />
+              <Panels.DotDensity columnNames={columnsInData} />
               <Panels.Legend columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
               <Panels.Filters />
               <Panels.Footnotes datasets={datasets} />
               <Panels.TimePlayback />
               <Panels.DataTable />
-              <Panels.Interactivity />
+              <Panels.Interactivity columnNames={columnsInData} />
               <Panels.Visual columnNames={columnsInData} />
               {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
                 <Panels.BubbleLayers columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />

@@ -18,6 +18,7 @@ import './PatternSettingsPanel.styles.css'
 import Alert from '@cdc/core/components/Alert'
 import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { isAutomaticPatternColor } from '@cdc/core/helpers/patternColors'
 import { unwrapJsonModule } from '../../../../../helpers/unwrapJsonModule'
 
 // topojson helpers for checking color contrasts
@@ -112,6 +113,11 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
     patternIndex: number,
     color: string
   ) => {
+    if (isAutomaticPatternColor(color)) {
+      updatedPatterns[patternIndex].contrastCheck = true
+      return
+    }
+
     // For county maps, use geo.id (FIPS code), for state maps use geo.properties.iso
     const geoKey = config.general.geoType === 'us-county' ? geo.id : geo.properties.iso
     const legendColors = getGeoLegendColors(geoKey, runtimeData)
@@ -150,7 +156,9 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
   }
 
   const checkPatternContrasts = () => {
-    return config.map.patterns.every(pattern => pattern.contrastCheck !== false)
+    return config.map.patterns.every(
+      pattern => isAutomaticPatternColor(pattern.color) || pattern.contrastCheck !== false
+    )
   }
 
   const reviewColorContrast = (_newConfig, patternIndex) => {
@@ -166,7 +174,9 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
     })
 
     // Update error message
-    _newConfig.runtime.editorErrorMessage = _newConfig.map.patterns.some(p => p.contrastCheck === false)
+    _newConfig.runtime.editorErrorMessage = _newConfig.map.patterns.some(
+      p => !isAutomaticPatternColor(p.color) && p.contrastCheck === false
+    )
       ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
       : ''
   }
@@ -215,7 +225,7 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
                         Remove Pattern
                       </Button>
                     </div>
-                    {pattern.contrastCheck ?? true ? (
+                    {isAutomaticPatternColor(pattern.color) || (pattern.contrastCheck ?? true) ? (
                       <Alert type='success' message='This pattern passes contrast checks' />
                     ) : (
                       <Alert

@@ -9,6 +9,7 @@ import MultiSelect from '@cdc/core/components/MultiSelect'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import countyDefaultConfig from '../../../../../../examples/default-county.json'
@@ -18,6 +19,7 @@ import ConfigContext, { MapDispatchContext } from '../../../../../context'
 import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../../../data/continent-bounding-boxes'
 import { supportedCountries, supportedStatesFipsCodes } from '../../../../../data/supported-geos'
 import { addUIDs } from '../../../../../helpers/addUIDs'
+import { getDotDensityConfig, isDotDensitySupported } from '../../../../../helpers/dotDensityConfig'
 import { getSupportedCountryOptions } from '../../../../../helpers/getCountriesPicked'
 import generateRuntimeData from '../../../../../helpers/generateRuntimeData'
 import type { MapConfig } from '../../../../../types/MapConfig'
@@ -49,6 +51,9 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const updateField = updateFieldFactory(config, setConfig)
   const general = config.general
+  const density = getDotDensityConfig(config)
+  const densityAvailable = isCoveDeveloperMode() && general.geoType === 'us-county'
+  const densityActive = isDotDensitySupported(config) && density.enabled
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
@@ -66,11 +71,18 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
   ]
 
   const handleMapTypeChange = (value: string) => {
+    if (value === 'dot-density' && !densityAvailable) return
+    const nextConfig = {
+      ...config,
+      ...(config.dotDensity || value === 'dot-density'
+        ? { dotDensity: { ...density, enabled: value === 'dot-density' } }
+        : {})
+    }
     switch (value) {
       case 'us-geocode':
       case 'world-geocode':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             type: value
@@ -78,8 +90,9 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
         })
         break
       case 'data':
+      case 'dot-density':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             showSidebar: true,
@@ -89,7 +102,7 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
         break
       case 'navigation':
         setConfig({
-          ...config,
+          ...nextConfig,
           general: {
             ...config.general,
             showSidebar: false,
@@ -139,7 +152,7 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
           general: {
             ...config.general,
             geoType: 'us',
-            type: config.type === 'us-geocode' ? 'data' : config.type
+            type: config.general.type === 'us-geocode' ? 'data' : config.general.type
           },
           table: {
             ...config.table,
@@ -269,6 +282,8 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
       {(general.geoType === 'us' || general.geoType === 'us-county') && (
         <Select
           label='Geography Subtype'
+          fieldName='geoType'
+          section='general'
           value={general.geoType}
           options={[
             { value: 'us', label: 'US State-Level' },
@@ -440,14 +455,19 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
               <Tooltip.Content>
                 <p>
                   Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."
+                  {densityAvailable &&
+                    ' Select "Dot Density" to represent county counts with dots, then configure the Dot Density section.'}
                 </p>
               </Tooltip.Content>
             </Tooltip>
           </>
         }
-        value={general.type}
+        fieldName='type'
+        section='general'
+        value={densityAvailable && densityActive ? 'dot-density' : general.type}
         options={[
           { value: 'data', label: 'Data' },
+          ...(densityAvailable ? [{ value: 'dot-density', label: 'Dot Density' }] : []),
           ...(general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
           ...(general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
           ...(general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : [])
@@ -455,7 +475,7 @@ const TypePanel = ({ columnNames }: TypePanelProps) => {
         onChange={event => handleMapTypeChange(event.target.value)}
       />
 
-      {(general.type === 'navigation' || general.type === 'data') && (
+      {general.type === 'navigation' && (
         <Select
           label='Navigation Behavior'
           value={general.navigationTarget}

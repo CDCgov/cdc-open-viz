@@ -1,3 +1,5 @@
+import { createDefaultDotDensityConfig } from '../helpers/dotDensityConfig'
+
 const createInitialState = () => {
   const paletteDefaults = {
     isReversed: false,
@@ -6,7 +8,24 @@ const createInitialState = () => {
   }
 
   return {
+    dotDensity: createDefaultDotDensityConfig(),
     annotations: [],
+    locationLinks: {
+      enableMapNavigation: false,
+      enableDataTableLinks: true
+    },
+    locationHighlighter: {
+      enabled: false,
+      position: 'above',
+      highlightSelectedLocation: true,
+      note: '',
+      showResetButton: true,
+      resetButtonLabel: 'Reset',
+      details: '',
+      dropdownLabel: 'Select a location for more information',
+      placeholder: '- Select -',
+      filterColumn: ''
+    },
     general: {
       navigationTarget: '_self',
       noDataMessage: 'No State Selected',
@@ -128,28 +147,7 @@ const createInitialState = () => {
       geoCodeCircleSize: 8
     },
     bubble: {
-      layers: [
-        {
-          label: '',
-          locationSource: 'data-column',
-          minBubbleSize: 12,
-          maxBubbleSize: 20,
-          extraBubbleBorder: true,
-          showBubbleZeros: false,
-          legend: {
-            show: true,
-            size: {
-              show: true
-            }
-          },
-          columns: {
-            geo: { name: '' },
-            latitude: { name: '' },
-            longitude: { name: '' },
-            primary: { name: '' }
-          }
-        }
-      ]
+      layers: []
     },
     mapPosition: { coordinates: [0, 30], zoom: 1 },
     map: {
