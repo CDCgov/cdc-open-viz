@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { mapColorPalettes } from '@cdc/core/data/colorPalettes'
 import type { MapConfig } from '../../types/MapConfig'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { createNewMapConfig } from '../createNewMapConfig'
@@ -7,6 +8,8 @@ import {
   createDotDensitySeries,
   getConfiguredDotDensitySeries,
   getDotDensityConfig,
+  getActiveHiddenDensitySeries,
+  isolateDotDensitySeries,
   isDotDensitySupported,
   normalizeDotDensityLegend,
   withDotDensityColumns
@@ -139,4 +142,83 @@ describe('persisted dot density configuration', () => {
     expect(getDotDensityConfig(config).series).toEqual([])
     expect(getConfiguredDotDensitySeries(config)).toEqual([])
   })
+})
+
+describe('dot density map palettes', () => {
+  const paletteConfig = (name = 'qualitative_standard', version = '2.0') => {
+    const config = makeConfig()
+    config.general.palette = { name, version, isReversed: name.endsWith('reverse') }
+    config.dotDensity!.series = [
+      { id: 'draft', column: '', label: '' },
+      ...['A', 'B', 'C'].map(id => ({ id, column: id, label: id, color: '#123456' }))
+    ] as any
+    return config
+  }
+
+  it('uses the selected map palette instead of legacy colors without consuming draft colors', () => {
+    const config = paletteConfig()
+    const before = JSON.stringify(config)
+    expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(
+      mapColorPalettes.v2.qualitative_standard.slice(0, 3)
+    )
+    expect(JSON.stringify(config)).toBe(before)
+    expect(createDotDensitySeries([])).not.toHaveProperty('color')
+  })
+
+  it('follows palette 2.1 distribution and reversal, independently of base numeric bins', () => {
+    const config = paletteConfig('qualitative_standard', '2.1')
+    config.legend = { ...config.legend, type: 'equalinterval', numberOfItems: 8 }
+    expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(
+      [0, 4, 6].map(index => mapColorPalettes.v2.qualitative_standard[index])
+    )
+    const reversed = paletteConfig('qualitative_standardreverse', '2.1')
+    expect(getConfiguredDotDensitySeries(reversed).map(series => series.color)).toEqual(
+      [...getConfiguredDotDensitySeries(config)].reverse().map(series => series.color)
+    )
+  })
+
+  it('honors ordered custom colors before regular custom colors', () => {
+    const config = paletteConfig()
+    config.general.palette.customColors = ['#111111', '#222222', '#333333']
+    config.general.palette.customColorsOrdered = ['#abcdef', '#fedcba']
+    expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(['#abcdef', '#fedcba', '#fedcba'])
+  })
+
+  it('reuses available catalog colors when series outnumber the palette', () => {
+    const config = paletteConfig()
+    config.dotDensity!.series = Array.from({ length: 12 }, (_, index) => ({
+      id: String(index),
+      column: String(index),
+      label: ''
+    })) as any
+    const colors = getConfiguredDotDensitySeries(config).map(series => series.color)
+    expect(colors.slice(0, 9)).toEqual(mapColorPalettes.v2.qualitative_standard)
+    expect(colors.slice(9)).toEqual(colors.slice(0, 3))
+  })
+})
+
+it('isolates, switches, restores, and recovers when the selected category disappears', () => {
+  const series = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+  expect(isolateDotDensitySeries(series, [], 'a')).toEqual(['b', 'c'])
+  expect(isolateDotDensitySeries(series, ['b', 'c'], 'b')).toEqual(['a', 'c'])
+  expect(isolateDotDensitySeries(series, ['a', 'c'], 'b')).toEqual([])
+  expect(isolateDotDensitySeries([{ id: 'a' }], [], 'a')).toEqual([])
+  expect(getActiveHiddenDensitySeries(series.slice(1), ['b', 'c'])).toEqual([])
+  expect(getActiveHiddenDensitySeries(series, ['deleted', 'b', 'b'])).toEqual(['b'])
+})
+
+it('preserves legacy map palette versions and regular custom palette precedence', () => {
+  const config = makeConfig()
+  config.dotDensity!.series = ['a', 'b', 'c'].map(id => ({ id, column: id, label: id }))
+  config.general.palette = { name: 'colorblindsafe', version: '1.0', isReversed: false }
+  expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(
+    [1, 3, 5].map(index => mapColorPalettes.v1.colorblindsafe[index])
+  )
+  config.general.palette = {
+    name: 'qualitative_standard',
+    version: '2.0',
+    isReversed: false,
+    customColors: ['#101010', '#202020', '#303030']
+  }
+  expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(['#101010', '#202020', '#303030'])
 })

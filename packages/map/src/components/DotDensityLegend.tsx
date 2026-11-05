@@ -1,5 +1,6 @@
 import LegendShape from '@cdc/core/components/LegendShape'
 import type { DotDensityConfig, MapConfig } from '../types/MapConfig'
+import type { ResolvedDotDensitySeries } from '../helpers/dotDensityConfig'
 
 /** Density content inside the standard map legend's header, layout, and visibility controls. */
 export default function DotDensityLegend({
@@ -10,7 +11,7 @@ export default function DotDensityLegend({
   onToggle
 }: {
   config: MapConfig
-  density: DotDensityConfig
+  density: Omit<DotDensityConfig, 'series'> & { series: ResolvedDotDensitySeries[] }
   listClasses: string[]
   hiddenSeries: readonly string[]
   onToggle: (id: string) => void

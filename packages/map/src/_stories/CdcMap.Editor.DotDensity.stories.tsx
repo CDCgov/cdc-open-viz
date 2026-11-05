@@ -7,6 +7,7 @@ import { stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
 import CdcMap from '../CdcMap'
 import { createNewMapConfig } from '../helpers/createNewMapConfig'
 import { createDefaultDotDensityConfig } from '../helpers/dotDensityConfig'
+import { mapColorPalettes } from '@cdc/core/data/colorPalettes'
 import type { DotDensityConfig, MapConfig } from '../types/MapConfig'
 import countyTopology from '../components/UsaMap/data/cb_2019_us_county_20m.json'
 import { outbreakCounts, diseaseSeries } from './dotDensity/outbreakData'
@@ -42,6 +43,7 @@ function EditorHarness({ config }: { config: MapConfig }) {
   const [loaded, setLoaded] = useState(config)
   const [generation, setGeneration] = useState(0)
   const [saved, setSaved] = useState('')
+  const [savedPalette, setSavedPalette] = useState('')
   const editor = useMemo(
     () => ({
       ...parent,
@@ -58,6 +60,7 @@ function EditorHarness({ config }: { config: MapConfig }) {
         onClick={() => {
           const next = JSON.parse(JSON.stringify(stripConfig(latest.current)))
           setSaved(JSON.stringify(next.dotDensity))
+          setSavedPalette(JSON.stringify(next.general.palette))
           setLoaded(next)
           setGeneration(value => value + 1)
         }}
@@ -65,6 +68,7 @@ function EditorHarness({ config }: { config: MapConfig }) {
         Save and Reload Map
       </button>
       <output aria-label='Saved Dot Density Config'>{saved}</output>
+      <output aria-label='Saved Map Palette'>{savedPalette}</output>
       <EditorContext.Provider value={editor}>
         <CdcMap key={generation} config={loaded} isEditor navigationHandler={() => {}} setConfig={() => {}} />
       </EditorContext.Provider>
@@ -142,14 +146,16 @@ export const AuthorAndReload: Story = {
       async () => userEvent.selectOptions(canvas.getByLabelText('Count column 2'), 'salmonellosis'),
       (_, after) => after.count === 331
     )
+    expect(canvas.queryByLabelText('Series color 1')).toBeNull()
+    await openAccordion(canvas, 'Visual')
     await performAndAssert(
-      'Changing a series color changes the rendered Canvas',
+      'Selecting an available palette changes rendered dots without moving them',
       () => readMap(canvasElement),
-      async () => {
-        fireEvent.change(canvas.getByLabelText('Series color 1'), { target: { value: '#008000' } })
-      },
-      (before, after) => after.pixels !== before.pixels && after.count === before.count
+      async () => userEvent.click(canvas.getByTitle('qualitative_standard')),
+      (before, after) =>
+        after.pixels !== before.pixels && after.count === before.count && after.signature === before.signature
     )
+    await openAccordion(canvas, 'Dot Density')
     await performAndAssert(
       'Series labels reach the runtime legend',
       () => Boolean(canvas.queryByRole('button', { name: 'Measles cases' })),
@@ -163,22 +169,29 @@ export const AuthorAndReload: Story = {
       'Saved JSON reloads the layer without changing positions or count',
       () => readMap(canvasElement),
       async () => {},
-      (_, after) => after.count === beforeReload.count && after.signature === beforeReload.signature
+      (_, after) =>
+        after.count === beforeReload.count &&
+        after.signature === beforeReload.signature &&
+        after.pixels === beforeReload.pixels
     )
     await openAccordion(canvas, 'Type')
     expect(canvas.getByLabelText(/Map Type/i, { selector: 'select' })).toHaveValue('dot-density')
     const saved = JSON.parse(canvas.getByLabelText('Saved Dot Density Config').textContent!) as DotDensityConfig
     expect(saved.enabled).toBe(true)
     expect(saved.dotValue).toBe(5)
-    expect(saved.series[0]).toMatchObject({ column: 'measles', label: 'Measles cases', color: '#008000' })
+    expect(saved.series[0]).toMatchObject({ column: 'measles', label: 'Measles cases' })
+    expect(saved.series[0]).not.toHaveProperty('color')
+    expect(JSON.parse(canvas.getByLabelText('Saved Map Palette').textContent!)).toMatchObject({
+      name: 'qualitative_standard'
+    })
     expect(saved.series[1].column).toBe('salmonellosis')
     expect(new Set(saved.series.map(series => series.id)).size).toBe(2)
     expect(saved).not.toHaveProperty('hiddenSeries')
     await performAndAssert(
-      'Runtime legend toggles hide only the chosen series',
+      'Runtime legend selection isolates the chosen series',
       () => readMap(canvasElement),
       async () => userEvent.click(canvas.getByRole('button', { name: 'Measles cases' })),
-      (before, after) => after.count === 230 && after.signature === before.signature
+      (before, after) => after.count === 101 && after.signature === before.signature
     )
   }
 }
@@ -210,6 +223,8 @@ export const EditSettings: Story = {
       },
       (before, after) => after.pixels !== before.pixels && after.signature === before.signature
     )
+    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
+    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
     await performAndAssert(
       'Changing seed changes positions but preserves represented counts',
       () => readMap(canvasElement),
@@ -254,6 +269,7 @@ export const EditSettings: Story = {
     )
     await openAccordion(canvas, 'Dot Density')
     expect(canvas.getByLabelText('Dot radius')).toHaveValue(3)
+    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
     expect(canvas.getByLabelText('Placement seed')).toHaveValue(123)
     await performAndAssert(
       'Removing the last series reveals the count-column authoring requirement',
@@ -446,19 +462,10 @@ export const SharedLegendControls: Story = {
       (before, after) => before && !after
     )
     const before = readMap(canvasElement)
-    await performAndAssert(
-      'Native legend buttons hide density dots',
-      () => readMap(canvasElement),
-      async () => userEvent.click(canvas.getByRole('button', { name: 'Measles' })),
-      (_, after) => after.count === 0 && after.signature === before.signature
-    )
-    expect(canvas.getByRole('button', { name: 'Measles' })).toHaveAttribute('aria-pressed', 'false')
-    await performAndAssert(
-      'Native Show All restores density dots',
-      () => readMap(canvasElement),
-      async () => userEvent.click(canvas.getByRole('button', { name: 'Show All' })),
-      (_, after) => after.count === before.count && after.signature === before.signature
-    )
+    await userEvent.click(canvas.getByRole('button', { name: 'Measles' }))
+    expect(readMap(canvasElement).count).toBe(before.count)
+    expect(canvas.getByRole('button', { name: 'Measles' })).toHaveAttribute('aria-pressed', 'true')
+    expect(canvas.queryByRole('button', { name: 'Show All' })).toBeNull()
     await performAndAssert(
       'Shared Show Legend hides the entire legend without changing density',
       () => canvas.queryByRole('region', { name: 'Legend' }) !== null,
@@ -565,4 +572,124 @@ export const HiddenWithDeveloperFlagFalse: Story = {
   args: { config: importableDensitySample as unknown as MapConfig },
   parameters: { coveDeveloperMode: 'false' },
   play: assertDensityAuthoringHidden
+}
+
+export const IsolateDensityCategory: Story = {
+  ...MultipleDiseases,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="560"]', canvasElement)
+    const original = readMap(canvasElement)
+    await performAndAssert(
+      'Selecting Measles isolates its dots',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Measles', exact: true })),
+      (_, after) => after.count === 101 && after.signature === original.signature
+    )
+    expect(canvas.getByRole('button', { name: 'Measles', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    expect(canvas.getByRole('button', { name: 'Salmonellosis', exact: true })).toHaveAttribute('aria-pressed', 'false')
+    await performAndAssert(
+      'Selecting Salmonellosis switches isolation',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Salmonellosis', exact: true })),
+      (_, after) => after.count === 230 && after.signature === original.signature
+    )
+    await performAndAssert(
+      'Repeated category selection restores all dots',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Salmonellosis', exact: true })),
+      (_, after) => after.count === original.count
+    )
+    await userEvent.click(canvas.getByRole('button', { name: 'Pertussis', exact: true }))
+    await performAndAssert(
+      'Show All clears isolation',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Show All', exact: true })),
+      (_, after) => after.count === original.count
+    )
+  }
+}
+
+export const AdvancedPlacementSeed: Story = {
+  ...EditSettings,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="101"]', canvasElement)
+    await openAccordion(canvas, 'Dot Density')
+    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
+    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
+    expect(canvas.getByRole('spinbutton', { name: 'Placement seed' })).toHaveValue(42)
+    const original = readMap(canvasElement)
+    await performAndAssert(
+      'Advanced seed changes positions while retaining counts',
+      () => readMap(canvasElement),
+      async () => {
+        await userEvent.clear(canvas.getByLabelText('Placement seed'))
+        await userEvent.type(canvas.getByLabelText('Placement seed'), '123')
+      },
+      (_, after) => after.signature !== original.signature && after.count === original.count
+    )
+    await userEvent.click(canvas.getByRole('button', { name: 'Save and Reload Map' }))
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Dot Density')
+    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
+    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
+    expect(canvas.getByRole('spinbutton', { name: 'Placement seed' })).toHaveValue(123)
+  }
+}
+
+export const PaletteColorsMatchDensityLegend: Story = {
+  ...MultipleDiseases,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('canvas[data-drawn-dots="560"]', canvasElement)
+    const original = readMap(canvasElement)
+    await userEvent.selectOptions(canvas.getByRole('combobox', { name: /Select Location/ }), '04')
+    await openAccordion(canvas, 'Visual')
+    await performAndAssert(
+      'Selected catalog palette redraws density colors',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByTitle('qualitative_standard')),
+      (before, after) =>
+        after.pixels !== before.pixels && after.signature === original.signature && after.count === original.count
+    )
+    const assertColors = (colors: string[]) => {
+      const map = canvasElement.querySelector<HTMLCanvasElement>('canvas.county-map-canvas')!
+      const pixels = map.getContext('2d')!.getImageData(0, 0, map.width, map.height).data
+      for (const [index, label] of ['Measles', 'Salmonellosis', 'Pertussis'].entries()) {
+        const rgb = [1, 3, 5].map(offset => parseInt(colors[index].slice(offset, offset + 2), 16))
+        const color = `rgb(${rgb.join(', ')})`
+        const button = canvas.getByRole('button', { name: label, exact: true })
+        expect(button.querySelector<HTMLElement>('.legend-item')!.style.backgroundColor).toBe(color)
+        let matches = 0
+        for (let i = 0; i < pixels.length; i += 4)
+          if (rgb.every((value, channel) => pixels[i + channel] === value)) matches++
+        expect(matches).toBeGreaterThan(0)
+      }
+    }
+    const colors = [0, 4, 6].map(index => mapColorPalettes.v2.qualitative_standard[index])
+    assertColors(colors)
+    await performAndAssert(
+      'Palette reverse changes dots and matching swatches',
+      () => readMap(canvasElement),
+      async () =>
+        userEvent.click(
+          canvasElement.querySelector<HTMLInputElement>('input[name="general-palette-isReversed"]')!.parentElement!
+        ),
+      (before, after) =>
+        after.pixels !== before.pixels && after.signature === original.signature && after.count === original.count
+    )
+    assertColors([...colors].reverse())
+    await userEvent.click(canvas.getByRole('button', { name: 'Measles', exact: true }))
+    await performAndAssert(
+      'Changing palettes preserves category isolation',
+      () => readMap(canvasElement),
+      async () => userEvent.click(canvas.getByTitle('sequential_orangereverse')),
+      (before, after) => after.count === 101 && after.signature === before.signature && after.pixels !== before.pixels
+    )
+    expect(canvas.getByRole('button', { name: 'Measles', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  }
 }

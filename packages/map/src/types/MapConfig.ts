@@ -173,7 +173,8 @@ export type DotDensitySeries = {
   id: string
   column: string
   label: string
-  color: string
+  /** @deprecated Preserved on import; rendered colors come from general.palette. */
+  color?: string
 }
 
 export type DotDensityConfig = {
