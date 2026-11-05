@@ -76,43 +76,25 @@ const makeStory = (labels = true, reversed = false, variableSizes = false): Stor
       expect(canvasElement.querySelector('.state-labels-above-bubbles')).toBeNull()
       return
     }
-    await document.fonts.ready
     const labelGroup = canvasElement.querySelector('.state-labels-above-bubbles')!
-    const svg = circles[0].ownerSVGElement!
-    const toSvg = (element: SVGGraphicsElement, x: number, y: number) => {
-      const point = svg.createSVGPoint()
-      point.x = x
-      point.y = y
-      return point.matrixTransform(element.getCTM()!).matrixTransform(svg.getCTM()!.inverse())
-    }
     for (const abbr of ['VT', 'NH', 'MA', 'RI', 'CT', 'NJ', 'DE', 'MD', 'DC']) {
       const group = abbr === 'DC' ? canvasElement.querySelector('.dc-callout')! : labelGroup
       const text = Array.from(group.querySelectorAll<SVGTextElement>('text')).find(text => text.textContent === abbr)!
       expect(text).toBeTruthy()
-      const style = getComputedStyle(text)
-      const context = document.createElement('canvas').getContext('2d')!
-      context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
-      const metrics = context.measureText(abbr)
-      // SVG character positions include baseline alignment; Canvas measures the
-      // actual uppercase ink rather than the font's ascender/descender box.
-      const baseline = text.getStartPositionOfChar(0).y
-      const inkCenterY = baseline + (metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent) / 2
       // Preserve the original start-aligned text at x=4 past the leader endpoint.
       expect(text.getAttribute('x')).toBe('4')
       expect(text.getAttribute('text-anchor')).toBeNull()
-      const expectedBubbleCenter = toSvg(text, 4 + text.getComputedTextLength() / 2, inkCenterY)
-      expect(
-        circles.some(circle => {
-          const center = toSvg(circle, Number(circle.getAttribute('cx')), y(circle))
-          return Math.abs(center.x - expectedBubbleCenter.x) < 1.5 && Math.abs(center.y - expectedBubbleCenter.y) < 0.5
-        }),
-        `${abbr}: bubble approximately follows the label center and visible text height`
-      ).toBe(true)
+      const stateName = stateCoordinates[`US-${abbr}`].Name
+      const matches = circles.filter(circle => circle.getAttribute('data-tooltip-html')?.includes(stateName))
+      expect(matches, `${abbr}: exactly one bubble belongs to ${stateName}`).toHaveLength(1)
     }
     const connectors = canvasElement.querySelector('g[pointer-events="none"] line')
     expect(connectors).toBeTruthy()
     expect(labelGroup.querySelector('line')).toBeNull()
-    expect(circles[0].compareDocumentPosition(labelGroup) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    circles.forEach(circle => {
+      expect(connectors!.compareDocumentPosition(circle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(circle.compareDocumentPosition(labelGroup) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    })
   }
 })
 

@@ -49,6 +49,16 @@ const patternUsage = (config: any, runtimeData: Record<string, any>, filteredSta
 ]
 
 describe('overlay legend visibility', () => {
+  it.each([
+    {},
+    { map: { patterns: [] }, bubble: { layers: [] } },
+    { bubble: { layers: [createDefaultBubbleLayer()] } }
+  ])('skips geography calculations for incomplete configs without configured overlays: %j', config => {
+    const result = getOverlayLegendVisibility({ config: config as any })
+    expect(result.patternIndexes.size).toBe(0)
+    expect(result.bubbleLayerIndexes.size).toBe(0)
+  })
+
   it('collects only winning patterns and restores entries across tabs without changing radius domains', () => {
     const config = build()
     const firstRadius = candidates(config)[0].radius

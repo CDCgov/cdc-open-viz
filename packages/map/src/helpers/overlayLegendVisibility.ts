@@ -1,5 +1,6 @@
 import generateRuntimeData from './generateRuntimeData'
 import { prepareBubbleCandidates } from './bubbleRenderData'
+import { getConfiguredBubbleLayers } from './bubbleLayers'
 import {
   getBubbleLocation,
   getBubbleProjection,
@@ -63,6 +64,11 @@ export const getOverlayLegendVisibility = ({
 }: VisibilityInput) => {
   const patternIndexes = new Set<number>()
   const bubbleLayerIndexes = new Set<number>()
+
+  // Maps without overlays do not need geography or projection calculations.
+  if (!config.map?.patterns?.length && !getConfiguredBubbleLayers(config).length) {
+    return { patternIndexes, bubbleLayerIndexes }
+  }
 
   const smallMultiples = config.smallMultiples
   const views = smallMultiples?.mode
