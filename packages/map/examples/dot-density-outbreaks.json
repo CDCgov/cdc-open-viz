@@ -14,7 +14,7 @@
     "allowMapZoom": true,
     "countyCensusYear": "2019",
     "palette": {
-      "name": "sequential_blue",
+      "name": "qualitative_standard",
       "version": "2.1",
       "isReversed": false
     }
@@ -53,20 +53,17 @@
       {
         "id": "density-measles",
         "column": "Measles",
-        "label": "Measles",
-        "color": "#0072B2"
+        "label": "Measles"
       },
       {
         "id": "density-salmonellosis",
         "column": "Salmonellosis",
-        "label": "Salmonellosis",
-        "color": "#D55E00"
+        "label": "Salmonellosis"
       },
       {
         "id": "density-pertussis",
         "column": "Pertussis",
-        "label": "Pertussis",
-        "color": "#8B4789"
+        "label": "Pertussis"
       }
     ]
   },

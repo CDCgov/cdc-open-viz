@@ -48,6 +48,8 @@ import BubbleSizeLegend from './BubbleSizeLegend'
 import DotDensityLegend from '../../DotDensityLegend'
 import {
   getDotDensityConfig,
+  getActiveHiddenDensitySeries,
+  isolateDotDensitySeries,
   getConfiguredDotDensitySeries,
   isDotDensitySupported
 } from '../../../helpers/dotDensityConfig'
@@ -135,7 +137,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const densitySeries = getConfiguredDotDensitySeries(config)
   const hasDensityLegend =
     !previewDensity && isDotDensitySupported(config) && density.enabled && densitySeries.length > 0
-  const activeHiddenDensitySeries = hiddenDensitySeries.filter(id => densitySeries.some(series => series.id === id))
+  const activeHiddenDensitySeries = getActiveHiddenDensitySeries(densitySeries, hiddenDensitySeries)
   const hasDensityLegendToggles = hasDensityLegend && activeHiddenDensitySeries.length > 0
   const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
   const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
@@ -632,9 +634,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 onToggle={id =>
                   dispatch({
                     type: 'SET_HIDDEN_DENSITY_SERIES',
-                    payload: activeHiddenDensitySeries.includes(id)
-                      ? activeHiddenDensitySeries.filter(value => value !== id)
-                      : [...activeHiddenDensitySeries, id]
+                    payload: isolateDotDensitySeries(densitySeries, activeHiddenDensitySeries, id)
                   })
                 }
               />

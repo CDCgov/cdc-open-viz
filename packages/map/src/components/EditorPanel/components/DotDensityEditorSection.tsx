@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import chroma from 'chroma-js'
 import {
   AccordionItem,
   AccordionItemButton,
@@ -79,7 +78,7 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
         </p>
         {numberField('dotValue', 'Value per dot', 0.001, 1)}
         {numberField('radius', 'Dot radius', 0.25, 0.25)}
-        {numberField('seed', 'Placement seed', 0, 1)}
+        <p>Choose series colors in Visual → Map Color Palette.</p>
         {density.series.length === 0 && <p>Choose Add Count Series, then select a count column.</p>}
         {density.series.map((series, index) => (
           <fieldset key={series.id} className='primary-fieldset edit-block'>
@@ -113,15 +112,6 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
                 updateSeries(series.id, { label })
               }
             />
-            <label className='d-block mb-2'>
-              Series color {index + 1}
-              <input
-                className='d-block'
-                type='color'
-                value={chroma.valid(series.color) ? chroma(series.color).hex() : '#0072b2'}
-                onChange={event => updateSeries(series.id, { color: event.target.value })}
-              />
-            </label>
             <Button
               type='button'
               variant='danger'
@@ -140,6 +130,10 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
         >
           Add Count Series
         </Button>
+        <details className='mt-3'>
+          <summary>Advanced</summary>
+          {numberField('seed', 'Placement seed', 0, 1)}
+        </details>
       </AccordionItemPanel>
     </AccordionItem>
   )
