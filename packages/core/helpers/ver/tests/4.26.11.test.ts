@@ -53,7 +53,7 @@ describe('update_4_26_11', () => {
   it.each([{}, { general: {} }, { general: null }])('preserves missing and null fields: %j', fields => {
     const result = update_4_26_11({ type: 'map', ...fields })
     const { version, ...repaired } = result
-    expect(repaired).toEqual({ type: 'map', ...fields, legend: { hideUnusedPatternAndBubbleLegends: false } })
+    expect(repaired).toEqual({ type: 'map', ...fields })
   })
 
   it.each([{}, { general: {} }, { general: { type: undefined } }])(
@@ -95,9 +95,6 @@ describe('update_4_26_11', () => {
 
     expect(result.visualizations.map.general.type).toBe('data')
     expect(result.multiDashboards.map(child => child.visualizations.map.general.type)).toEqual(['data', 'data', 'map'])
-    expect(
-      result.multiDashboards.map(child => child.visualizations.map.legend?.hideUnusedPatternAndBubbleLegends)
-    ).toEqual([false, false, undefined])
     expect(config).toEqual(original)
   })
 
@@ -113,26 +110,5 @@ describe('update_4_26_11', () => {
 
     expect(result.multiDashboards[0].visualizations.map.general.type).toBe('data')
     expect(result.multiDashboards[1].visualizations.map.general.type).toBe('map')
-  })
-})
-
-describe('unused overlay legend compatibility', () => {
-  it.each([undefined, true, false])('preserves saved %s and backfills absence before defaults', value => {
-    const map = { type: 'map', version: '4.26.10', legend: { hideUnusedPatternAndBubbleLegends: value } }
-    const migrated = coveUpdateWorker(map)
-    expect(applyConfigDefaults(migrated, mapDefaults).legend.hideUnusedPatternAndBubbleLegends).toBe(value ?? false)
-    expect(map.legend.hideUnusedPatternAndBubbleLegends).toBe(value)
-    const dashboard = update_4_26_11({
-      type: 'dashboard',
-      visualizations: {
-        nested: {
-          type: 'dashboard',
-          visualizations: { map }
-        }
-      }
-    })
-    expect(dashboard.visualizations.nested.visualizations.map.legend.hideUnusedPatternAndBubbleLegends).toBe(
-      value ?? false
-    )
   })
 })

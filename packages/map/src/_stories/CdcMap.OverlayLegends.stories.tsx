@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import {
@@ -8,19 +7,17 @@ import {
   waitForEditor,
   waitForPresence
 } from '@cdc/core/helpers/testing'
-import EditorContext from '@cdc/core/contexts/EditorContext'
 import CdcMap from '../CdcMap'
 import { createNewMapConfig } from '../helpers/createNewMapConfig'
 import numericFixture from './_mock/bubble-tabbed-numeric.json'
 
 export default { title: 'Components/Templates/Map/Overlay Legends', component: CdcMap } as Meta<typeof CdcMap>
 type Story = StoryObj<typeof CdcMap>
-const label = 'Hide unused pattern/bubble legends'
 const config = createNewMapConfig({
   ...numericFixture,
   columns: { ...numericFixture.columns, geo: { name: 'State' }, primary: { name: 'Cases' } },
   data: numericFixture.data.map(row => ({ ...row, Cases: row.Tab === 'Earlier' ? 0 : row.Cases, Status: row.Tab })),
-  legend: { ...numericFixture.legend, style: 'boxes', unified: true, hideUnusedPatternAndBubbleLegends: true },
+  legend: { ...numericFixture.legend, style: 'boxes', unified: true },
   map: {
     patterns: [
       { dataKey: 'Status', dataValue: 'Earlier', label: 'Earlier overlay', pattern: 'circles', size: 'medium' },
@@ -29,53 +26,14 @@ const config = createNewMapConfig({
   }
 } as any)
 
-const Reloadable = ({ config }) => {
-  const [saved, setSaved] = useState(config)
-  const [loaded, setLoaded] = useState(config)
-  const [revision, setRevision] = useState(0)
-  return (
-    <EditorContext.Provider value={{ setTempConfig: setSaved } as any}>
-      <button
-        onClick={() => {
-          setLoaded(JSON.parse(JSON.stringify(saved)))
-          setRevision(revision + 1)
-        }}
-      >
-        Reload saved map
-      </button>
-      <output data-testid='saved-setting'>{String(saved.legend.hideUnusedPatternAndBubbleLegends)}</output>
-      <CdcMap key={revision} config={loaded} isEditor />
-    </EditorContext.Provider>
-  )
-}
-
-export const Filtered_Usage_And_Save: Story = {
+export const Filtered_Usage: Story = {
   args: { config, isEditor: true },
-  render: args => <Reloadable config={args.config} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await assertVisualizationRendered(canvasElement)
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Legend')
-    const control = canvas.getByRole('checkbox', { name: label })
-    expect(control).toBeChecked()
-    const tooltipTarget = control.closest('.d-flex')!.querySelector('.cove-tooltip--target')!
-    await performAndAssert(
-      'Explain unused overlay legends in the tooltip',
-      () => Boolean(canvas.queryByRole('tooltip')),
-      () => userEvent.hover(tooltipTarget),
-      (_before, after) => after
-    )
-    expect(
-      await canvas.findByText(
-        'Hide pattern and bubble legends when their overlays are unused in the current filtered view. Bubble sizes and colors stay consistent across filters.'
-      )
-    ).toBeVisible()
-    await userEvent.unhover(tooltipTarget)
-    expect(
-      canvas.getByRole('checkbox', { name: 'Unified Legend', exact: true }).compareDocumentPosition(control) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
+    expect(canvas.queryByRole('checkbox', { name: 'Hide unused pattern/bubble legends' })).not.toBeInTheDocument()
     const legend = () => canvasElement.querySelector('aside[aria-label="Legend"]')!
     const sizeKey = () => legend().querySelector('ul[aria-label="Bubble size legend items"]')?.textContent
     const beforeKey = sizeKey()
@@ -96,19 +54,6 @@ export const Filtered_Usage_And_Save: Story = {
     expect(legend().textContent).toContain('Earlier overlay')
     expect(legend().textContent).not.toContain('Later overlay')
     await performAndAssert(
-      'Disabling the setting preserves existing legends',
-      () => sizeKey(),
-      () => userEvent.click(control),
-      (_before, after) => after === beforeKey
-    )
-    expect(legend().textContent).toContain('Later overlay')
-    await userEvent.click(canvas.getByRole('button', { name: 'Reload saved map' }))
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Legend')
-    expect(canvas.getByRole('checkbox', { name: label })).not.toBeChecked()
-    expect(canvas.getByTestId('saved-setting').textContent).toBe('false')
-    await userEvent.click(canvas.getByRole('checkbox', { name: label }))
-    await performAndAssert(
       'Restore later overlay legends',
       () => sizeKey(),
       () => userEvent.click(canvas.getByRole('button', { name: 'Later', exact: true })),
@@ -123,32 +68,12 @@ export const Filtered_Usage_And_Save: Story = {
   }
 }
 
-export const Draft_Layer_Control: Story = {
+// Old saved values cannot opt out of automatic filtering.
+export const Legacy_Setting_Ignored: Story = {
+  ...Filtered_Usage,
   args: {
-    config: createNewMapConfig({ ...numericFixture, bubble: { layers: [] }, map: { patterns: [] } } as any),
+    config: { ...config, legend: { ...config.legend, hideUnusedPatternAndBubbleLegends: false } } as any,
     isEditor: true
-  },
-  render: args => <Reloadable config={args.config} />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Legend')
-    expect(canvas.queryByRole('checkbox', { name: label })).not.toBeInTheDocument()
-    await openAccordion(canvas, 'Bubble Layers')
-    await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
-    await openAccordion(canvas, 'Legend')
-    expect(canvas.getByRole('checkbox', { name: label })).toBeChecked()
-    await userEvent.click(canvas.getByRole('checkbox', { name: label }))
-    await openAccordion(canvas, 'Bubble Layers')
-    await userEvent.click(canvas.getByRole('button', { name: 'Layer 1', exact: true }))
-    await userEvent.click(canvas.getByRole('button', { name: 'Remove Layer' }))
-    await openAccordion(canvas, 'Legend')
-    expect(canvas.queryByRole('checkbox', { name: label })).not.toBeInTheDocument()
-    expect(canvas.getByTestId('saved-setting').textContent).toBe('false')
-    await openAccordion(canvas, 'Bubble Layers')
-    await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
-    await openAccordion(canvas, 'Legend')
-    expect(canvas.getByRole('checkbox', { name: label })).not.toBeChecked()
   }
 }
 

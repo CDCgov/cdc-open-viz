@@ -269,11 +269,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (config.map.patterns) {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
-        if (
-          legend.hideUnusedPatternAndBubbleLegends === true &&
-          !overlayVisibility.patternIndexes.has(patternDataIndex)
-        )
-          return
+        if (!overlayVisibility.patternIndexes.has(patternDataIndex)) return
         const { pattern, dataKey, size, color } = patternData
         const patternColor = resolvePatternColor(color, '#FFFFFF')
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
@@ -440,8 +436,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
 
   const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
-    if (legend.hideUnusedPatternAndBubbleLegends === true && !overlayVisibility.bubbleLayerIndexes.has(layerIndex))
-      return null
+    if (!overlayVisibility.bubbleLayerIndexes.has(layerIndex)) return null
     const bubbleLegendConfig = layer.legend ?? {}
     const showBubbleLegend = bubbleLegendConfig.show !== false
     const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]

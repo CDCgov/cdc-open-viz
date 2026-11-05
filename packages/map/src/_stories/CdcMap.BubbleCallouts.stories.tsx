@@ -158,7 +158,7 @@ export const Without_Bubbles: Story = {
   }
 }
 
-const placementLabel = 'Position small-state bubbles over labels'
+const placementLabel = 'Bubbles over small-state labels'
 const darkBubble = '#023F91'
 const defaultConfig = {
   ...Equal_Size.args!.config,

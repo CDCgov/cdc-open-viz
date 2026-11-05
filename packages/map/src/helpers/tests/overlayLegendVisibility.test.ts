@@ -64,9 +64,13 @@ describe('overlay legend visibility', () => {
     expect([...usage(config).patternIndexes]).toEqual([0])
   })
 
-  it.each([false, undefined])('requires explicitly enabled setting (%s)', setting => {
+  it.each([false, true, undefined])('always calculates usage regardless of obsolete saved setting (%s)', setting => {
     const config = build()
     config.legend.hideUnusedPatternAndBubbleLegends = setting
+    expect([...usage(config).patternIndexes]).toEqual([1])
+    expect([...usage(config).bubbleLayerIndexes]).toEqual([0])
+    config.data[0].Size = 0
+    config.map.patterns = []
     expect(usage(config).patternIndexes.size).toBe(0)
     expect(usage(config).bubbleLayerIndexes.size).toBe(0)
   })

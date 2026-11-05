@@ -433,7 +433,7 @@ const BubbleLayerFields = ({
           <CheckBox
             value={layer.placeOverLabels === true}
             fieldName='placeOverLabels'
-            label='Position small-state bubbles over labels'
+            label='Bubbles over small-state labels'
             updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
             section='bubble'
             subsection={`layer-${index}`}

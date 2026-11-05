@@ -63,7 +63,6 @@ export const getOverlayLegendVisibility = ({
 }: VisibilityInput) => {
   const patternIndexes = new Set<number>()
   const bubbleLayerIndexes = new Set<number>()
-  if (config.legend.hideUnusedPatternAndBubbleLegends !== true) return { patternIndexes, bubbleLayerIndexes }
 
   const smallMultiples = config.smallMultiples
   const views = smallMultiples?.mode

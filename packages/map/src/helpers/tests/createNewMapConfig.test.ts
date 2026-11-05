@@ -27,7 +27,6 @@ describe('createNewMapConfig', () => {
         }
       },
       legend: {
-        hideUnusedPatternAndBubbleLegends: true,
         position: 'top',
         style: 'gradient',
         singleRow: false,

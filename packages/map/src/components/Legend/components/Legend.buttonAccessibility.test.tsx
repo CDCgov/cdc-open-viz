@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import Legend from './Legend'
+import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 beforeAll(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
@@ -19,7 +20,7 @@ const baseRuntimeLegend = {
 
 const baseConfig = {
   type: 'map',
-  data: [{ Region: 'North', Rate: '10 - 20', State: 'Alabama' }],
+  data: [{ Region: 'North', Rate: '10 - 20', State: 'Alabama', Size: 10 }],
   columns: {
     geo: { name: 'State' },
     primary: { name: 'Rate' }
@@ -63,6 +64,7 @@ const renderLegend = ({
           mapId: 'legend-button-accessibility-test',
           runtimeBubbleLegend,
           runtimeFilters,
+          runtimeData: generateRuntimeData(config, runtimeFilters, 0),
           runtimeLegend
         } as any
       }
@@ -121,7 +123,8 @@ describe('legend item buttons', () => {
             {
               columns: {
                 geo: { name: 'State' },
-                primary: { name: 'Rate' }
+                primary: { name: 'Rate' },
+                size: { name: 'Size' }
               },
               legend: { show: true, size: { show: false } },
               locationSource: 'data-column',
@@ -179,10 +182,15 @@ describe('single-item size labels across filters', () => {
       runtimeLegend: { items: [], disabledAmt: 0 },
       runtimeFilters: [{ columnName: 'Year', active: year, values: ['2024', '2025'] }] as any
     })
-    const list = container.querySelector('.bubble-size-legend')!
-    expect(Array.from(list.querySelectorAll('li')).map(item => item.textContent)).toEqual(
+    const list = container.querySelector('.bubble-size-legend')
+    if (!multiple && year === '2025') {
+      expect(list).not.toBeInTheDocument()
+      return
+    }
+    expect(list).toBeInTheDocument()
+    expect(Array.from(list!.querySelectorAll('li')).map(item => item.textContent)).toEqual(
       multiple ? ['1', '2'] : ['Recent cases']
     )
-    expect(list.classList.contains('bubble-size-legend--single-item-label')).toBe(!multiple)
+    expect(list!.classList.contains('bubble-size-legend--single-item-label')).toBe(!multiple)
   })
 })

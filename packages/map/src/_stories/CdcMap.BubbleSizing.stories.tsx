@@ -62,8 +62,7 @@ const singleItemStory = (label: string): Story => ({
       legend: {
         ...categoryFixture.legend,
         style: 'gradient',
-        position: 'top',
-        hideUnusedPatternAndBubbleLegends: false
+        position: 'top'
       },
       data: categoryFixture.data.map(row => ({
         ...row,
@@ -85,21 +84,23 @@ const singleItemStory = (label: string): Story => ({
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     const canvas = within(canvasElement)
+    const earlierTab = await canvas.findByRole('button', { name: 'Earlier', exact: true })
     const selector = '.bubble-size-legend--single-item-label'
+    // The saved active tab has no markers, so its unused size legend is hidden.
+    expect(canvasElement.querySelector(selector)).not.toBeInTheDocument()
+    expect(canvasElement.querySelectorAll('circle.bubble')).toHaveLength(0)
+    await performAndAssert(
+      'Show the single-item legend on a tab with a marker',
+      () => canvasElement.querySelectorAll('circle.bubble').length,
+      () => userEvent.click(earlierTab),
+      (_before, after) => after === 1
+    )
     await waitForPresence(selector, canvasElement)
     const list = canvasElement.querySelector(selector)!
     const text = list.querySelector('span')!
     expect(text.textContent).toBe(label)
     expect(getComputedStyle(text).fontSize).toBe(getComputedStyle(list).fontSize)
     expect(getComputedStyle(list.querySelector('li')!).whiteSpace).toBe('normal')
-    // The saved active tab has no markers, but retains the shared legend.
-    expect(canvasElement.querySelectorAll('circle.bubble')).toHaveLength(0)
-    await performAndAssert(
-      'Single-item label survives filtering to a year with a marker',
-      () => canvasElement.querySelectorAll('circle.bubble').length,
-      () => userEvent.click(canvas.getByRole('button', { name: 'Earlier', exact: true })),
-      (_before, after) => after === 1
-    )
     expect(canvasElement.querySelector(selector)?.textContent).toBe(label)
   }
 })
