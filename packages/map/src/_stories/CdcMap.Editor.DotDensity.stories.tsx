@@ -223,18 +223,6 @@ export const EditSettings: Story = {
       },
       (before, after) => after.pixels !== before.pixels && after.signature === before.signature
     )
-    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
-    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
-    await performAndAssert(
-      'Changing seed changes positions but preserves represented counts',
-      () => readMap(canvasElement),
-      async () => {
-        const input = canvas.getByLabelText('Placement seed')
-        await userEvent.clear(input)
-        await userEvent.type(input, '123')
-      },
-      (before, after) => after.signature !== before.signature && after.count === before.count
-    )
     await openAccordion(canvas, 'Legend')
     await performAndAssert(
       'Legend title reaches the rendered legend',
@@ -269,8 +257,6 @@ export const EditSettings: Story = {
     )
     await openAccordion(canvas, 'Dot Density')
     expect(canvas.getByLabelText('Dot radius')).toHaveValue(3)
-    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
-    expect(canvas.getByLabelText('Placement seed')).toHaveValue(123)
     await performAndAssert(
       'Removing the last series reveals the count-column authoring requirement',
       () => Boolean(canvasElement.querySelector('canvas[data-drawn-dots]')),
@@ -613,30 +599,55 @@ export const IsolateDensityCategory: Story = {
 
 export const AdvancedPlacementSeed: Story = {
   ...EditSettings,
+  args: {
+    config: {
+      ...fixture,
+      general: { ...fixture.general, showSidebar: false },
+      dotDensity: {
+        ...createDefaultDotDensityConfig(),
+        enabled: true,
+        dotValue: 5,
+        seed: 123,
+        series: [{ id: 'advanced-measles', column: 'measles', label: 'Measles' }]
+      }
+    }
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
     await waitForPresence('canvas[data-drawn-dots="101"]', canvasElement)
     await openAccordion(canvas, 'Dot Density')
-    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
-    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
-    expect(canvas.getByRole('spinbutton', { name: 'Placement seed' })).toHaveValue(42)
-    const original = readMap(canvasElement)
+    expect(canvas.queryByLabelText('Placement seed')).toBeNull()
+    expect(canvas.queryByText('Advanced', { selector: 'summary' })).toBeNull()
+    await userEvent.click(canvas.getByText('Advanced Options', { exact: true }))
+    const editor = await waitForPresence('.advanced-json-editor', canvasElement)
+    expect(within(editor).getByText('seed', { exact: true })).toBeVisible()
+    expect(within(editor).getByText('123', { exact: true })).toBeVisible()
+    expect(canvas.queryByRole('button', { name: 'Measles', exact: true })).toBeNull()
     await performAndAssert(
-      'Advanced seed changes positions while retaining counts',
+      'Advanced Options applies the seed without changing counts or legend visibility',
       () => readMap(canvasElement),
       async () => {
-        await userEvent.clear(canvas.getByLabelText('Placement seed'))
-        await userEvent.type(canvas.getByLabelText('Placement seed'), '123')
+        await userEvent.dblClick(within(editor).getByText('123', { exact: true }))
+        const input = within(editor).getByDisplayValue('123')
+        await userEvent.clear(input)
+        await userEvent.type(input, '456{Enter}')
+        await userEvent.click(canvas.getByRole('button', { name: 'Apply Configuration Changes' }))
       },
-      (_, after) => after.signature !== original.signature && after.count === original.count
+      (before, after) => after.signature !== before.signature && after.count === before.count
     )
+    expect(canvas.queryByRole('button', { name: 'Measles', exact: true })).toBeNull()
+    const applied = readMap(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Save and Reload Map' }))
+    const saved = JSON.parse(canvas.getByLabelText('Saved Dot Density Config').textContent!)
+    expect(saved.seed).toBe(456)
     await waitForEditor(canvas)
-    await openAccordion(canvas, 'Dot Density')
-    expect(canvas.getByLabelText('Placement seed')).not.toBeVisible()
-    await userEvent.click(canvas.getByText('Advanced', { selector: 'summary' }))
-    expect(canvas.getByRole('spinbutton', { name: 'Placement seed' })).toHaveValue(123)
+    await waitForPresence('canvas[data-drawn-dots="101"]', canvasElement)
+    expect(readMap(canvasElement).signature).toBe(applied.signature)
+    await userEvent.click(canvas.getByText('Advanced Options', { exact: true }))
+    const reloaded = await waitForPresence('.advanced-json-editor', canvasElement)
+    expect(within(reloaded).getByText('seed', { exact: true })).toBeVisible()
+    expect(within(reloaded).getByText('456', { exact: true })).toBeVisible()
   }
 }
 
