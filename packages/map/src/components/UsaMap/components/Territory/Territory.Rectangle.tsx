@@ -1,9 +1,9 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 import { useContext } from 'react'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
 import { patternSizes } from '../../helpers/patternSizes'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
@@ -86,7 +86,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           }
 
           const { pattern: patternData, patternIndex, matchedDataKey } = matchedPattern
-          const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
+          const patternColor = resolvePatternColor(patternData.color, backgroundColor)
           const sanitizedTerritory = sanitizeToSvgId(territory || label)
           const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
           const patternId = `${mapId}--territory-${sanitizedTerritory}-${sanitizedDataKey}--${patternIndex}`

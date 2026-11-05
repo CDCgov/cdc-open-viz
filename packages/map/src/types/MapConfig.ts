@@ -53,6 +53,8 @@ type MapVisualSettings = {
 export type BubbleLayer = {
   /** Chooses whether bubbles are positioned by geography lookup or explicit coordinates. */
   locationSource?: 'data-column' | 'latitude-longitude'
+  /** Positions small-state bubbles over visible outside labels when explicitly enabled. */
+  placeOverLabels?: boolean
   /** Chooses whether the size column is interpreted as numeric values or categories. */
   sizeType?: 'numeric' | 'category'
   /** Custom category order for categorical bubble sizing; empty means automatic sorting. */
@@ -79,6 +81,7 @@ export type BubbleLayer = {
     description?: string
     style?: 'circles' | 'boxes' | 'gradient'
     size?: {
+      singleItemLabel?: string
       show?: boolean
       title?: string
       description?: string

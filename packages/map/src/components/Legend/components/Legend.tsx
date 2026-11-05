@@ -1,3 +1,4 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 //TODO: Move legends to core
 import { Fragment, forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
@@ -34,14 +35,14 @@ import {
   getBubbleSizeLegendItems,
   getConfiguredBubbleLayers
 } from '../../../helpers/bubbleLayers'
-import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { generateBubbleSizeDomainData } from '../../../helpers/generateRuntimeData'
 import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
 import {
   createCategoricalBubbleSizeScale,
   getOrderedBubbleSizeCategories,
-  isCategoricalBubbleSize,
-  shouldIncludeNonGeoDataInBubbleSizeDomain
+  isCategoricalBubbleSize
 } from '../../../helpers/bubbleSize'
+import { getOverlayLegendVisibility } from '../../../helpers/overlayLegendVisibility'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 import DotDensityLegend from '../../DotDensityLegend'
@@ -121,7 +122,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
-    hiddenDensitySeries = []
+    hiddenDensitySeries = [],
+    filteredStateCode,
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -137,6 +140,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
   const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
   const bubbleLayers = getConfiguredBubbleLayers(config)
+  const overlayVisibility = useMemo(
+    () =>
+      getOverlayLegendVisibility({
+        config,
+        runtimeData: runtimeData as any,
+        runtimeFilters: runtimeFilters as any,
+        filteredStateCode
+      }),
+    [config, runtimeData, runtimeFilters, filteredStateCode]
+  )
   const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
     ? runtimeBubbleLegend
     : runtimeBubbleLegend?.items
@@ -256,8 +269,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (config.map.patterns) {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
+        if (!overlayVisibility.patternIndexes.has(patternDataIndex)) return
         const { pattern, dataKey, size, color } = patternData
-        const patternColor = color || 'black'
+        const patternColor = resolvePatternColor(color, '#FFFFFF')
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
         const patternId = `${mapId}--${sanitizedDataKey}--${patternDataIndex}`
 
@@ -385,15 +399,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
 
       const usesCategoricalSize = isCategoricalBubbleSize(layer)
-      const includeNonGeoDataInSizeDomain = shouldIncludeNonGeoDataInBubbleSizeDomain(layer)
-      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
-        config,
-        layer,
-        [],
-        runtimeFilters?.fromHash ?? 0,
-        includeNonGeoDataInSizeDomain
-      )
-      const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
+      const layerScaleDataRows = generateBubbleSizeDomainData(config, layer)
       const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
 
       if (!usesCategoricalSize) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
@@ -430,6 +436,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
 
   const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
+    if (!overlayVisibility.bubbleLayerIndexes.has(layerIndex)) return null
     const bubbleLegendConfig = layer.legend ?? {}
     const showBubbleLegend = bubbleLegendConfig.show !== false
     const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]

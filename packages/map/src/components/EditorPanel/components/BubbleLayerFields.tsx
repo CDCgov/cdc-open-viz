@@ -18,8 +18,8 @@ import {
   getEffectiveBubbleLayerPalette,
   getFiniteBubbleNumber
 } from '../../../helpers/bubbleLayers'
-import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
-import { getOrderedBubbleSizeCategories, shouldIncludeNonGeoDataInBubbleSizeDomain } from '../../../helpers/bubbleSize'
+import { generateBubbleSizeDomainData } from '../../../helpers/generateRuntimeData'
+import { getOrderedBubbleSizeCategories } from '../../../helpers/bubbleSize'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 
 type BubbleLayerFieldsProps = {
@@ -94,17 +94,8 @@ const BubbleLayerFields = ({
       if (value === null || value === undefined || String(value).trim() === '') return false
       return getFiniteBubbleNumber(value) === null
     })
-  const getBubbleSizeCategoryRows = (categoryLayer: BubbleLayer = layer) => {
-    const runtimeData = generateBubbleLayerRuntimeData(
-      config,
-      categoryLayer,
-      [],
-      0,
-      shouldIncludeNonGeoDataInBubbleSizeDomain(categoryLayer)
-    )
-
-    return Object.values(runtimeData ?? {}) as any[]
-  }
+  const getBubbleSizeCategoryRows = (categoryLayer: BubbleLayer = layer) =>
+    generateBubbleSizeDomainData(config, categoryLayer)
   const getBubbleSizeCategoryValuesOrder = (categoryLayer: BubbleLayer = layer) =>
     getOrderedBubbleSizeCategories(
       getBubbleSizeCategoryRows(categoryLayer),
@@ -435,6 +426,19 @@ const BubbleLayerFields = ({
 
   return (
     <>
+      {config.general.geoType === 'us' &&
+        !config.general.displayAsHex &&
+        config.general.displayStateLabels &&
+        !usesLatLong && (
+          <CheckBox
+            value={layer.placeOverLabels === true}
+            fieldName='placeOverLabels'
+            label='Bubbles over small-state labels'
+            updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+            section='bubble'
+            subsection={`layer-${index}`}
+          />
+        )}
       <CheckBox
         value={layer.showBubbleZeros ?? false}
         fieldName='showBubbleZeros'

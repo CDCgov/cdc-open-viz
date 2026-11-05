@@ -33,10 +33,11 @@ const BubbleLegendFields = ({
       <CheckBox
         value={bubbleLegend.show !== false}
         fieldName='show'
-        label='Show Legend'
+        label='Show Color Legend'
+        aria-label={`Show Color Legend for Layer ${index + 1}`}
         updateField={() => {}}
         section='bubble'
-        subsection='legend'
+        subsection={`layer-${index}-legend`}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           updateLayerLegend(index, legend => {
             legend.show = event.target.checked

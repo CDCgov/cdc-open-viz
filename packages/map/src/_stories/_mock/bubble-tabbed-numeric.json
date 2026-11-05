@@ -1,0 +1,134 @@
+{
+  "defaultData": true,
+  "general": {
+    "title": "Synthetic tabbed bubble sizes",
+    "subtext": "",
+    "type": "data",
+    "geoType": "us",
+    "headerColor": "theme-blue",
+    "geoBorderColor": "darkGray",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": true,
+    "displayStateLabels": false
+  },
+  "color": "redreverse",
+  "columns": {
+    "geo": {
+      "name": "",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "",
+      "label": "Total Confirmed Cases",
+      "prefix": "",
+      "suffix": "",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "navigate": {
+      "name": "Link",
+      "tooltip": false,
+      "dataTable": false
+    }
+  },
+  "legend": {
+    "numberOfItems": 1,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text"
+  },
+  "data": [
+    {
+      "State": "Alabama",
+      "Tab": "Earlier",
+      "Cases": "",
+      "Size Category": ""
+    },
+    {
+      "State": "California",
+      "Tab": "Earlier",
+      "Cases": 10,
+      "Size Category": "1-10"
+    },
+    {
+      "State": "Texas",
+      "Tab": "Earlier",
+      "Cases": 0,
+      "Size Category": "0"
+    },
+    {
+      "State": "Alabama",
+      "Tab": "Later",
+      "Cases": 100,
+      "Size Category": "51-100"
+    },
+    {
+      "State": "California",
+      "Tab": "Later",
+      "Cases": 50,
+      "Size Category": "11-50"
+    },
+    {
+      "State": "Texas",
+      "Tab": "Later",
+      "Cases": null,
+      "Size Category": null
+    },
+    {
+      "State": "Unmatched",
+      "Tab": "Later",
+      "Cases": 1000,
+      "Size Category": "101+"
+    }
+  ],
+  "bubble": {
+    "layers": [
+      {
+        "locationSource": "data-column",
+        "minBubbleSize": 4,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "type": "equalinterval",
+          "numberOfItems": 2,
+          "title": "Color legend",
+          "size": {
+            "show": true,
+            "title": "Size legend"
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": "State"
+          },
+          "primary": {
+            "name": "Cases"
+          },
+          "size": {
+            "name": "Cases"
+          }
+        },
+        "sizeType": "numeric"
+      }
+    ]
+  },
+  "version": "4.26.10",
+  "filters": [
+    {
+      "label": "Period",
+      "columnName": "Tab",
+      "values": [
+        "Earlier",
+        "Later"
+      ],
+      "active": "Later",
+      "filterStyle": "tab-simple"
+    }
+  ]
+}
