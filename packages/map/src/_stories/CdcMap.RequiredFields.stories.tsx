@@ -186,7 +186,7 @@ export const SwitchesRequiredFieldsWithMapType: Story = {
     await waitForEditor(canvas)
     expectRequiredAlerts(canvasElement, ['Geography', 'Data Column'])
     await userEvent.click(canvas.getByRole('button', { name: 'Type', exact: true }))
-    const mapType = canvasElement.querySelector('select[name="editorMapType"]') as HTMLSelectElement
+    const mapType = canvasElement.querySelector('select[name="type"]') as HTMLSelectElement
     await performAndAssert(
       'Switch Data to Navigation requirements',
       () =>

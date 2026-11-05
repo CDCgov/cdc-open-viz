@@ -457,7 +457,6 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
         )}
 
         <Select
-          fieldName='editorMapType'
           label={
             <>
               Map Type
