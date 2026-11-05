@@ -1,3 +1,6 @@
+import useMapHighlight from '../../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../../helpers/mapHighlight'
+import { canNavigateMap } from '../../helpers/locationLinks'
 import { memo, useContext, useState, useEffect, useRef } from 'react'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
@@ -40,6 +43,7 @@ const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
+    selectedLocationId,
     runtimeFilters,
     filteredCountryCode,
     position: mapPosition,
@@ -49,6 +53,7 @@ const WorldMap = () => {
     interactionLabel
   } = useContext(ConfigContext)
 
+  const { isDimmed } = useMapHighlight()
   const a11y = handleMapAriaLabels(config)
 
   const position = mapPosition
@@ -249,6 +254,8 @@ const WorldMap = () => {
   }
 
   const constructGeoJsx = geographies => {
+    // Use the same zoom-adjusted width for country borders and the topmost outline.
+    const strokeWidth = 0.9 / (position?.zoom || 1)
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       // Use ISO code for lookups since runtimeData is keyed by UIDs (ISO codes)
       // Check state first for US territories that might appear in world maps
@@ -275,7 +282,9 @@ const WorldMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoStrokeColor = getGeoStrokeColor(config)
+      const isHighlightedLocation = selectedLocationId === geo.properties.iso
+      const geoStrokeWidth = isHighlightedLocation ? 2 / (position?.zoom || 1) : strokeWidth
+      const geoStrokeColor = isHighlightedLocation ? '#000000' : getGeoStrokeColor(config)
       const geoFillColor = getGeoFillColor(config)
 
       // Check if this country should be greyed out for multi-country selection
@@ -307,14 +316,9 @@ const WorldMap = () => {
 
       let styles: Record<string, string | Record<string, string>> = {
         fill: geoFillColor,
+        opacity: isDimmed(geo.properties.iso) ? String(MAP_DIMMED_OPACITY) : '1',
         cursor: 'default'
       }
-
-      // Scale stroke width inversely with zoom level to maintain consistent visual thickness
-      // At zoom=1, use base width of 0.9; at zoom=4, use 0.225; etc.
-      const baseStrokeWidth = 0.9
-      const currentZoom = position?.zoom || 1
-      const strokeWidth = baseStrokeWidth / currentZoom
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
@@ -334,7 +338,7 @@ const WorldMap = () => {
 
         // When to add pointer cursor
         if (
-          (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+          (canNavigateMap(config) && config.columns.navigate && geoData[config.columns.navigate.name]) ||
           config.tooltips.appearanceType === 'click'
         ) {
           styles.cursor = 'pointer'
@@ -348,7 +352,7 @@ const WorldMap = () => {
             styles={styles}
             path={path}
             stroke={geoStrokeColor}
-            strokeWidth={strokeWidth}
+            strokeWidth={geoStrokeWidth}
             className={geoClassName}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
             onMouseEnter={() => {
@@ -379,7 +383,7 @@ const WorldMap = () => {
           geodata={JSON.stringify(geoData)}
           key={i + '-geo'}
           stroke={geoStrokeColor}
-          strokeWidth={strokeWidth}
+          strokeWidth={geoStrokeWidth}
           styles={styles}
           path={path}
           className={geoClassName}
@@ -402,6 +406,27 @@ const WorldMap = () => {
         />
       )
     })
+
+    // Redraw every part of the selected country above neighboring borders.
+    if (selectedLocationId) {
+      geographies.forEach(({ feature: geo, path }, index) => {
+        if (geo.properties.iso !== selectedLocationId) return
+        geosJsx.push(
+          <path
+            key={`selected-location-outline-${index}`}
+            className='selected-location-outline'
+            d={path}
+            fill='none'
+            stroke='#000000'
+            strokeWidth={2 / (position?.zoom || 1)}
+            strokeLinejoin='round'
+            strokeLinecap='round'
+            pointerEvents='none'
+            aria-hidden='true'
+          />
+        )
+      })
+    }
 
     // Cities
     geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} />)

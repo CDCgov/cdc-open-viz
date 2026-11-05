@@ -10,6 +10,22 @@ const createInitialState = () => {
   return {
     dotDensity: createDefaultDotDensityConfig(),
     annotations: [],
+    locationLinks: {
+      enableMapNavigation: false,
+      enableDataTableLinks: true
+    },
+    locationHighlighter: {
+      enabled: false,
+      position: 'above',
+      highlightSelectedLocation: true,
+      note: '',
+      showResetButton: true,
+      resetButtonLabel: 'Reset',
+      details: '',
+      dropdownLabel: 'Select a location for more information',
+      placeholder: '- Select -',
+      filterColumn: ''
+    },
     general: {
       navigationTarget: '_self',
       noDataMessage: 'No State Selected',

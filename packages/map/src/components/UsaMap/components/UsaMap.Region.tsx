@@ -1,3 +1,4 @@
+import { canNavigateMap } from '../../../helpers/locationLinks'
 import React, { memo, useContext, useEffect, useState } from 'react'
 
 // 3rd party
@@ -103,7 +104,7 @@ const UsaRegionMap = () => {
 
       // If we need to add a pointer cursor
       if (
-        (config.columns.navigate && territoryData[config.columns.navigate.name]) ||
+        (canNavigateMap(config) && config.columns.navigate && territoryData[config.columns.navigate.name]) ||
         tooltipInteractionType === 'click'
       ) {
         needsPointer = true
@@ -165,7 +166,10 @@ const UsaRegionMap = () => {
         }
 
         // When to add pointer cursor
-        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || tooltipInteractionType === 'click') {
+        if (
+          (canNavigateMap(config) && config.columns.navigate && geoData[config.columns.navigate.name]) ||
+          tooltipInteractionType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 

@@ -488,7 +488,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
           onChange={event => handleMapTypeChange(event.target.value)}
         />
 
-        {(general.type === 'navigation' || general.type === 'data') && (
+        {general.type === 'navigation' && (
           <Select
             label='Navigation Behavior'
             value={general.navigationTarget}

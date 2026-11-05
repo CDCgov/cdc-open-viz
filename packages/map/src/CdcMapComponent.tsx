@@ -1,3 +1,8 @@
+import {
+  getLocationHighlighter,
+  isLocationHighlighterEligible,
+  buildLocationOptions
+} from './helpers/locationHighlighter'
 // Vendor
 import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
@@ -77,9 +82,12 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
+import LocationHighlighter from './components/LocationHighlighter'
+import { getLocationLinks, hasLocationLinkColumn } from './helpers/locationLinks'
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
+import { useLocationHighlighterData } from './hooks/useLocationHighlighterData'
 import useResizeObserver from './hooks/useResizeObserver'
 import useLegendMemo from './hooks/useLegendMemo'
 import usePrefersReducedMotion from '@cdc/core/hooks/usePrefersReducedMotion'
@@ -184,6 +192,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         playbackFrames.findIndex(frame => String(frame) === String(timePlaybackEligibility.initialFrame))
       )
     : 0
+  const [selectedLocationId, setSelectedLocationId] = useState('')
   const [timeFrameIndex, setTimeFrameIndex] = useState<number | null>(null)
   const [isTimePlaybackPlaying, setIsTimePlaybackPlaying] = useState(false)
   const [hasTimePlaybackStarted, setHasTimePlaybackStarted] = useState(false)
@@ -687,7 +696,29 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     [config.data, config.dataKey, datasets]
   )
 
+  const locationLinks = getLocationLinks(config)
+  const highlighterSettings = getLocationHighlighter(config)
+  const locationHighlighterData = useLocationHighlighterData({
+    config,
+    runtimeData,
+    sourceData: playbackFrameData ?? [],
+    runtimeFilters: timePlaybackEligibility.eligible
+      ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+      : runtimeFilters
+  })
+  const highlightedLocationId =
+    isLocationHighlighterEligible(config) &&
+    highlighterSettings.enabled &&
+    highlighterSettings.highlightSelectedLocation &&
+    locationHighlighterData &&
+    buildLocationOptions(locationHighlighterData.config, locationHighlighterData.runtimeData).some(
+      option => option.id === selectedLocationId
+    )
+      ? selectedLocationId
+      : ''
+
   const mapProps = {
+    selectedLocationId: highlightedLocationId,
     setParentConfig,
     container,
     content: modal,
@@ -823,6 +854,20 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const showLocationHighlighter = isLocationHighlighterEligible(config) && highlighterSettings.enabled
+
+  const locationHighlighter =
+    showLocationHighlighter && locationHighlighterData ? (
+      <LocationHighlighter
+        config={locationHighlighterData.config}
+        runtimeData={locationHighlighterData.runtimeData}
+        sourceData={locationHighlighterData.sourceData}
+        runtimeFilters={locationHighlighterData.runtimeFilters}
+        isEditor={isEditor}
+        onSelectionChange={setSelectedLocationId}
+      />
+    ) : null
+
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
 
@@ -840,9 +885,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 
       window.requestAnimationFrame(() => {
-        const subsectionButton = container?.querySelector<HTMLElement>(
-          `[data-required-field-subsection='${subsectionTarget}']`
-        )
+        const subsectionButton = subsectionTarget
+          ? container?.querySelector<HTMLElement>(`[data-required-field-subsection='${subsectionTarget}']`)
+          : null
         if (subsectionButton?.getAttribute('aria-expanded') !== 'true') subsectionButton?.click()
 
         window.requestAnimationFrame(() => {
@@ -939,6 +984,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
+                beforeContent={highlighterSettings.position === 'above' ? locationHighlighter : null}
+                beforeFooter={highlighterSettings.position === 'below' ? locationHighlighter : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,
@@ -972,6 +1019,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 bodySubtext={
                   processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
                 }
+                bodyAnnotations={config.annotations?.length > 0 ? <Annotation.Dropdown /> : null}
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -980,6 +1028,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {mapDataTableIsRendered ? (
                       <DataTable
+                        mapLinkSettings={
+                          general.type === 'data'
+                            ? {
+                                enabled: hasLocationLinkColumn(config) && locationLinks.enableDataTableLinks,
+                                target: general.navigationTarget
+                              }
+                            : undefined
+                        }
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
@@ -1041,8 +1097,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         </div>
                       )
                     )}
-
-                    {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                     {processedFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>

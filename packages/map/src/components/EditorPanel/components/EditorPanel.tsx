@@ -104,7 +104,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <FootnotesSection datasets={datasets} />
               <TimePlaybackEditorSection />
               <DataTableSection />
-              <InteractivitySection />
+              <InteractivitySection columnNames={columnsInData} />
               <VisualSection columnNames={columnsInData} />
               {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
                 <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />

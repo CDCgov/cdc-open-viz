@@ -115,3 +115,105 @@ export const RuntimeModeDoesNotShowAuthoringAlerts: Story = {
 }
 
 export default meta
+
+const incompleteNavigationMap = cloneConfig(incompleteDataMap)
+incompleteNavigationMap.general.type = 'navigation'
+incompleteNavigationMap.columns.navigate.name = ''
+incompleteNavigationMap.data = incompleteNavigationMap.data.map(row => ({ ...row, URL: '/location' }))
+
+export const CompletesRequiredNavigationColumns: Story = {
+  args: { config: incompleteNavigationMap, isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('.map-required-fields-alerts', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Geography', 'Navigation'])
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+    expect(canvasElement.querySelector('.cove-visualization__body')).toBeNull()
+    expect(canvasElement.querySelector('.navigation-menu')).toBeNull()
+    await userEvent.click(canvas.getByTitle('Collapse Editor'))
+    await performAndAssert(
+      'Navigation Geography alert reveals the editor and focuses its field',
+      () => ({
+        focused: document.activeElement?.getAttribute('data-required-field-control'),
+        collapsed: !!canvasElement.querySelector('.editor-panel__toggle.collapsed')
+      }),
+      () => userEvent.click(canvas.getByRole('button', { name: 'Open Columns and focus Geography' })),
+      (_, after) => after.focused === 'map-geography' && !after.collapsed
+    )
+    await userEvent.selectOptions(
+      canvasElement.querySelector('[data-required-field-control="map-geography"]')!,
+      'STATE'
+    )
+    await waitForAbsence('.map-required-fields-alerts .alert-info:first-child + .alert-info', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Navigation'])
+    await userEvent.click(canvas.getByRole('button', { name: 'Columns', exact: true }))
+    await userEvent.click(canvas.getByTitle('Collapse Editor'))
+    await performAndAssert(
+      'URL alert reveals Columns and focuses the URL field',
+      () => ({
+        focused: document.activeElement?.getAttribute('data-required-field-control'),
+        collapsed: !!canvasElement.querySelector('.editor-panel__toggle.collapsed')
+      }),
+      () => userEvent.click(canvas.getByRole('button', { name: 'Open Columns and focus Navigation' })),
+      (_, after) => after.focused === 'map-url-column' && !after.collapsed
+    )
+    await userEvent.selectOptions(canvas.getByLabelText('Navigation'), 'URL')
+    await waitForAbsence('.map-required-fields-alerts', canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.navigation-menu', canvasElement)
+    await userEvent.selectOptions(canvas.getByLabelText('Navigation'), '')
+    await waitForPresence('.map-required-fields-alerts', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Navigation'])
+    expect(canvasElement.querySelector('.navigation-menu')).toBeNull()
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+  }
+}
+
+export const SwitchesRequiredFieldsWithMapType: Story = {
+  args: {
+    config: {
+      ...cloneConfig(incompleteDataMap),
+      columns: {
+        ...cloneConfig(incompleteDataMap.columns),
+        navigate: { name: '' }
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    expectRequiredAlerts(canvasElement, ['Geography', 'Data Column'])
+    await userEvent.click(canvas.getByRole('button', { name: 'Type', exact: true }))
+    const mapType = canvasElement.querySelector('select[name="type"]') as HTMLSelectElement
+    await performAndAssert(
+      'Switch Data to Navigation requirements',
+      () =>
+        getAlerts(canvasElement)
+          .map(alert => alert.textContent)
+          .join(' '),
+      () => userEvent.selectOptions(mapType, 'navigation'),
+      (_, after) => after.includes('Navigation') && !after.includes('Data Column')
+    )
+    expectRequiredAlerts(canvasElement, ['Geography', 'Navigation'])
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+    await performAndAssert(
+      'Switch Navigation to Data requirements',
+      () =>
+        getAlerts(canvasElement)
+          .map(alert => alert.textContent)
+          .join(' '),
+      () => userEvent.selectOptions(mapType, 'data'),
+      (_, after) => after.includes('Data Column') && !after.includes('Navigation')
+    )
+    expectRequiredAlerts(canvasElement, ['Geography', 'Data Column'])
+  }
+}
+
+export const NavigationRuntimeDoesNotShowAuthoringAlerts: Story = {
+  args: { config: incompleteNavigationMap, isEditor: false },
+  play: async ({ canvasElement }) => {
+    expect(canvasElement.querySelector('.map-required-fields-alerts')).toBeNull()
+  }
+}

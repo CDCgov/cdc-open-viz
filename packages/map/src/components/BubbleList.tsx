@@ -1,3 +1,5 @@
+import useMapHighlight from '../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../helpers/mapHighlight'
 import React, { useContext } from 'react'
 import { countryCoordinates } from '../data/country-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
@@ -110,6 +112,7 @@ const BubbleList: React.FC<BubbleListProps> = ({
 }) => {
   const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
+  const { isDimmed } = useMapHighlight()
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
     useLegendMemoContext()
 
@@ -223,7 +226,18 @@ const BubbleList: React.FC<BubbleListProps> = ({
         })
 
         return (
-          <g key={`group-${markerKey}`} tabIndex={-1}>
+          <g
+            key={`group-${markerKey}`}
+            tabIndex={-1}
+            style={{
+              opacity: isDimmed(
+                location.usesExplicitCoordinates ? undefined : bubbleRow.uid,
+                runtimeData?.[bubbleRow.uid]?.[config.columns.geo.name] ?? bubbleRow.sourceRow[config.columns.geo.name]
+              )
+                ? MAP_DIMMED_OPACITY
+                : 1
+            }}
+          >
             {circle}
           </g>
         )
