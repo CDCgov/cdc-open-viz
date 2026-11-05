@@ -489,8 +489,13 @@ export const NavigationCompatibility: Story = {
     expect(canvasElement.querySelector('.map-location-highlighter')).toBeNull()
     await openAccordion(canvas, 'Type')
     expect(canvas.getByText('Navigation Behavior')).toBeVisible()
-    await openAccordion(canvas, 'Columns')
-    expect(canvasElement.querySelector('.navigate select')).toBeVisible()
+    await performAndAssert(
+      'Open Columns to show the Navigation control',
+      () => canvas.queryByRole('combobox', { name: 'Navigation', exact: true }) !== null,
+      () => openAccordion(canvas, 'Columns'),
+      (_, after) => after
+    )
+    expect(canvas.getByRole('combobox', { name: 'Navigation', exact: true })).toBeVisible()
     const original = window.open
     const open = fn(() => null)
     window.open = open
