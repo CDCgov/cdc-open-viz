@@ -9,6 +9,7 @@ import {
 } from '@cdc/core/helpers/testing'
 import CdcMap from '../CdcMap'
 import CdcMapComponent from '../CdcMapComponent'
+import { createDefaultBubbleLayer } from '../helpers/bubbleLayers'
 import { createNewMapConfig } from '../helpers/createNewMapConfig'
 import base from './_mock/equal-number.json'
 
@@ -1045,5 +1046,103 @@ export const BelowYearFilterSelection: Story = {
       config.locationSelector.position = 'below'
       return config
     })()
+  }
+}
+
+export const HighlightOverlays: Story = {
+  args: {
+    config: (() => {
+      const c = makeConfig()
+      c.locationSelector.highlightSelectedLocation = true
+      c.general.displayStateLabels = true
+      c.data.push({ STATE: 'New York City', Rate: 15, URL: '' }, { STATE: 'PR', Rate: 15, URL: '' })
+      c.data = c.data.map(row => ({ ...row, Latitude: 40.7, Longitude: -74 }))
+      c.bubble.layers = [
+        createDefaultBubbleLayer({
+          columns: { geo: { name: 'STATE' }, primary: { name: 'Rate' } },
+          opacity: 0.8,
+          extraBubbleBorder: true
+        }),
+        createDefaultBubbleLayer({
+          locationSource: 'latitude-longitude',
+          columns: {
+            geo: { name: 'STATE' },
+            primary: { name: 'Rate' },
+            latitude: { name: 'Latitude' },
+            longitude: { name: 'Longitude' }
+          },
+          opacity: 0.6,
+          extraBubbleBorder: true
+        })
+      ]
+      const topology = {
+        type: 'Topology',
+        objects: {
+          overlay: {
+            type: 'GeometryCollection',
+            geometries: [{ type: 'LineString', arcs: [0], properties: { name: 'Test overlay' } }]
+          }
+        },
+        arcs: [
+          [
+            [-100, 30],
+            [-90, 40]
+          ]
+        ]
+      }
+      c.map.layers = [
+        {
+          namespace: 'overlay',
+          url: `data:application/json,${encodeURIComponent(JSON.stringify(topology))}`,
+          stroke: '#000000',
+          strokeWidth: 2,
+          fillOpacity: 0.7
+        }
+      ]
+      return c
+    })()
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.geo-point', canvasElement)
+    await waitForPresence('.bubble--coordinate', canvasElement)
+    await waitForPresence('.custom-map-layer', canvasElement)
+    const select = within(canvasElement).getByLabelText('Select a location for more information')
+    const city = canvasElement.querySelector('.geo-point')!
+    const overlay = canvasElement.querySelector('.custom-map-layer')!.parentElement!
+    const stateBubble = canvasElement.querySelector('circle.bubble[data-bubble-layer-index="0"]')!
+    const coordinateBubble = canvasElement.querySelector('.bubble--coordinate')!
+    const territory = canvasElement.querySelector('g[data-geo-id="US-PR"]')!
+    const territoryBubble = territory.querySelector('.territory-bubble')!
+    await performAndAssert(
+      'Fade city and overlays with a state selection',
+      () => getComputedStyle(city).opacity,
+      () => userEvent.selectOptions(select, 'US-AL'),
+      (_, after) => after === '0.5'
+    )
+    expect(getComputedStyle(overlay).opacity).toBe('0.5')
+    expect(getComputedStyle(coordinateBubble.parentElement!).opacity).toBe('0.5')
+    expect(coordinateBubble).toHaveAttribute('fill-opacity', '0.6')
+    expect(stateBubble).toHaveAttribute('fill-opacity', '0.8')
+    const selectedBubble = canvasElement.querySelector('g[data-geo-id="US-AL"]')
+    expect(getComputedStyle(selectedBubble!).opacity).toBe('1')
+    // Territory markers inherit their container fade, without an additional marker fade.
+    expect(getComputedStyle(territory).opacity).toBe('0.5')
+    expect(getComputedStyle(territoryBubble).opacity).toBe('1')
+    expect(territoryBubble).toHaveAttribute('fill-opacity', '0.8')
+    for (const bubble of canvasElement.querySelectorAll('circle.bubble[data-bubble-layer-index="0"]')) {
+      if (bubble.classList.contains('territory-bubble')) continue
+      const html = bubble.getAttribute('data-tooltip-html') || ''
+      expect(getComputedStyle(bubble.parentElement!).opacity).toBe(html.includes('Alabama') ? '1' : '0.5')
+    }
+    await performAndAssert(
+      'Restore overlay opacity when the selection clears',
+      () => getComputedStyle(city).opacity,
+      () => userEvent.selectOptions(select, ''),
+      (_, after) => after === '1'
+    )
+    expect(getComputedStyle(overlay).opacity).toBe('1')
+    expect(getComputedStyle(coordinateBubble.parentElement!).opacity).toBe('1')
+    expect(getComputedStyle(territory).opacity).toBe('1')
   }
 }

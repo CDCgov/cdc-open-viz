@@ -1,3 +1,5 @@
+import useMapHighlight from '../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../helpers/mapHighlight'
 import { canNavigateMap } from '../helpers/locationLinks'
 import { useContext, useMemo } from 'react'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
@@ -13,14 +15,13 @@ import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
 
 type CityListProps = {
-  setSharedFilterValue: string
-  isFilterValueSupported: boolean
   tooltipId: string
   projection: any
 }
 
-const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
+const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
   const { config, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
+  const { isDimmed, isHighlighted } = useMapHighlight()
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -150,14 +151,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const styles = {
       fill: legendColors[0],
-      opacity: !isFilterValueSupported || (isFilterValueSupported && city === setSharedFilterValue) ? 1 : 0.5,
-      stroke:
-        setSharedFilterValue &&
-        isFilterValueSupported &&
-        runtimeData[city] &&
-        runtimeData[city][config.columns.geo.name] === setSharedFilterValue
-          ? 'rgba(0, 0, 0, 1)'
-          : 'rgba(0, 0, 0, 0.4)',
+      // Cities are independent locations, not children of the selected state/country.
+      opacity: isDimmed(undefined, geoData[geoColumnName]) ? MAP_DIMMED_OPACITY : 1,
+      stroke: isHighlighted(undefined, geoData[geoColumnName]) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0

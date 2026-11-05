@@ -1,3 +1,5 @@
+import useMapHighlight from '../../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../../helpers/mapHighlight'
 import { canNavigateMap } from '../../helpers/locationLinks'
 import { memo, useContext, useState, useEffect, useRef } from 'react'
 import { geoMercator } from 'd3-geo'
@@ -51,6 +53,7 @@ const WorldMap = () => {
     interactionLabel
   } = useContext(ConfigContext)
 
+  const { isDimmed } = useMapHighlight()
   const a11y = handleMapAriaLabels(config)
 
   const position = mapPosition
@@ -313,7 +316,7 @@ const WorldMap = () => {
 
       let styles: Record<string, string | Record<string, string>> = {
         fill: geoFillColor,
-        opacity: selectedLocationId && !isHighlightedLocation ? '0.5' : '1',
+        opacity: isDimmed(geo.properties.iso) ? String(MAP_DIMMED_OPACITY) : '1',
         cursor: 'default'
       }
 

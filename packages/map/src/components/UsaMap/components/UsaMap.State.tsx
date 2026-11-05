@@ -1,4 +1,6 @@
 import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
+import useMapHighlight from '../../../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../../../helpers/mapHighlight'
 import { canNavigateMap } from '../../../helpers/locationLinks'
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react'
 
@@ -17,7 +19,7 @@ import { feature as topoFeature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
-import { supportedCities, supportedStates } from '../../../data/supported-geos'
+import { supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
@@ -88,7 +90,6 @@ const UsaMap = () => {
   const {
     runtimeData,
     selectedLocationId,
-    setSharedFilterValue,
     config,
     setConfig,
     tooltipId,
@@ -114,7 +115,6 @@ const UsaMap = () => {
 
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
-  let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
   const bubbleLayers = getConfiguredBubbleLayers(config)
@@ -125,25 +125,6 @@ const UsaMap = () => {
 
   const handleDragStateChange = (dragState: any) => {
     dispatch({ type: 'SET_IS_DRAGGING_ANNOTATION', payload: dragState })
-  }
-
-  if (setSharedFilterValue) {
-    Object.keys(supportedStates).forEach(supportedState => {
-      if (supportedStates[supportedState].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
-        isFilterValueSupported = true
-      }
-    })
-
-    Object.keys(supportedTerritories).forEach(supportedTerritory => {
-      if (supportedTerritories[supportedTerritory].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
-        isFilterValueSupported = true
-      }
-    })
-    Object.keys(supportedCities).forEach(supportedCity => {
-      if (supportedCity === setSharedFilterValue.toUpperCase()) {
-        isFilterValueSupported = true
-      }
-    })
   }
 
   // "Choose State" options
@@ -199,26 +180,14 @@ const UsaMap = () => {
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
 
-  const hasSelectorHighlight = Boolean(selectedLocationId)
-  const hasDashboardHighlight = Boolean(setSharedFilterValue && isFilterValueSupported)
+  const { isDimmed, isHighlighted } = useMapHighlight()
   const getLocationHighlightStyles = (
     locationId: string,
     geoData: Record<string, any> | undefined = runtimeData?.[locationId]
-  ) => {
-    const isHighlightedLocation = selectedLocationId === locationId
-    // An active selector highlight takes precedence over dashboard highlighting.
-    // Fade unselected shapes even when the current data has no row for them.
-    const dashboardHighlightApplies = !hasSelectorHighlight && hasDashboardHighlight
-    const isDashboardSelectedLocation =
-      dashboardHighlightApplies && setSharedFilterValue === geoData?.[columns.geo.name]
-    const isDimmed =
-      (hasSelectorHighlight && !isHighlightedLocation) || (dashboardHighlightApplies && !isDashboardSelectedLocation)
-
-    return {
-      opacity: isDimmed ? 0.5 : 1,
-      stroke: isHighlightedLocation || isDashboardSelectedLocation ? 'rgba(0, 0, 0, 1)' : geoStrokeColor
-    }
-  }
+  ) => ({
+    opacity: isDimmed(locationId, geoData?.[columns.geo.name]) ? MAP_DIMMED_OPACITY : 1,
+    stroke: isHighlighted(locationId, geoData?.[columns.geo.name]) ? 'rgba(0, 0, 0, 1)' : geoStrokeColor
+  })
   const mapBubbleScale =
     Number.isFinite(Number(bubbleLegendScale)) && Number(bubbleLegendScale) > 0 ? Number(bubbleLegendScale) : 1
   const territoryRenderedSvgWidth = isMobileTerritoryViewport(vizViewport)
@@ -701,10 +670,8 @@ const UsaMap = () => {
         applyLegendToRow={applyLegendToRow}
         applyTooltipsToGeo={applyTooltipsToGeo}
         geoClickHandler={geoClickHandler}
-        isFilterValueSupported={isFilterValueSupported}
         key='cities'
         projection={projection}
-        setSharedFilterValue={setSharedFilterValue}
         titleCase={titleCase}
         tooltipId={tooltipId}
       />
@@ -746,7 +713,11 @@ const UsaMap = () => {
 
     if (pathArray.length > 0) {
       pathArray.map(layer => {
-        return geosJsx.push(layer)
+        return geosJsx.push(
+          <g key={layer.key} style={{ opacity: isDimmed() ? MAP_DIMMED_OPACITY : 1 }}>
+            {layer}
+          </g>
+        )
       })
     }
     return geosJsx
