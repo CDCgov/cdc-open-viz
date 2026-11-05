@@ -118,7 +118,7 @@ export const AuthorAndReload: Story = {
     await userEvent.selectOptions(canvas.getByLabelText(/Map Type/i, { selector: 'select' }), 'dot-density')
     await performAndAssert(
       'Required-field navigation focuses Add Count Series',
-      () => canvasElement.ownerDocument.activeElement === canvas.getByRole('button', { name: 'Add Count Series' }),
+      () => canvasElement.ownerDocument.activeElement === canvas.queryByRole('button', { name: 'Add Count Series' }),
       async () => userEvent.click(canvas.getByRole('button', { name: /Count Column/ })),
       (_, after) => after
     )
