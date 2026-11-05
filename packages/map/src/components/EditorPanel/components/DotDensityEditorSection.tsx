@@ -7,8 +7,6 @@ import {
 } from 'react-accessible-accordion'
 import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
-import Icon from '@cdc/core/components/ui/Icon'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import ConfigContext from '../../../context'
@@ -36,7 +34,7 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
   }
   const updateSeries = (id: string, changes: Partial<DotDensitySeries>) =>
     update({ series: density.series.map(item => (item.id === id ? { ...item, ...changes } : item)) })
-  const numberField = (key: 'dotValue' | 'radius' | 'seed', label: string, min: number, step: number) => (
+  const numberField = (key: 'dotValue' | 'radius', label: string, min: number, step: number) => (
     <TextField
       label={label}
       aria-label={label}
@@ -46,21 +44,6 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
       section='dotDensity'
       min={min}
       step={step}
-      tooltip={
-        key === 'seed' ? (
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                Changes dot positions within each county, not counts. The same seed and data repeat the same
-                arrangement. Dots are not actual case locations.
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
-        ) : undefined
-      }
       updateField={(_section: unknown, _subsection: unknown, _field: unknown, value: string) =>
         update({ [key]: Number(value) })
       }
@@ -130,10 +113,6 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
         >
           Add Count Series
         </Button>
-        <details className='mt-3'>
-          <summary>Advanced</summary>
-          {numberField('seed', 'Placement seed', 0, 1)}
-        </details>
       </AccordionItemPanel>
     </AccordionItem>
   )

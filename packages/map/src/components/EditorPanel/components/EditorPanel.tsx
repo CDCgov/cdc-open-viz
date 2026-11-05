@@ -73,10 +73,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
 
-    // Remove tooltips if they're active in the editor
+    // Preserve authored display settings when editing the advanced JSON configuration.
     strippedState.general = cloneDeep(config.general)
-
-    strippedState.general.showSidebar = 'hidden'
 
     return strippedState
   }
