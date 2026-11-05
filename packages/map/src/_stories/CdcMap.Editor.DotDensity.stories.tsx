@@ -653,6 +653,20 @@ export const AdvancedPlacementSeed: Story = {
 
 export const PaletteColorsMatchDensityLegend: Story = {
   ...MultipleDiseases,
+  args: {
+    config: {
+      ...MultipleDiseases.args!.config,
+      dotDensity: {
+        ...MultipleDiseases.args!.config.dotDensity!,
+        // New palette-driven series omit the legacy per-series color override.
+        series: diseaseSeries.map(disease => ({
+          id: `outbreak-${disease.id}`,
+          column: disease.id,
+          label: disease.label
+        }))
+      }
+    }
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
