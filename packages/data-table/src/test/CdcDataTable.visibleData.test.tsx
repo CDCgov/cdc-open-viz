@@ -34,7 +34,7 @@ vi.mock('@cdc/core/components/Layout', () => ({
   VisualizationContent: ({ children }) => <div>{children}</div>
 }))
 
-vi.mock('../components/EditorPanel', () => ({
+vi.mock('../panels', () => ({
   default: () => <div data-testid='mock-editor-panel' />
 }))
 
