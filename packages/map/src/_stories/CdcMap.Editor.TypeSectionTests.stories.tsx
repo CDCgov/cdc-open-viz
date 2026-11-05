@@ -18,7 +18,12 @@ export default mapMeta
 
 const DEFAULT_ARGS = {
   isEditor: true,
-  config: usaStateGradientConfig
+  config: {
+    ...usaStateGradientConfig,
+    columns: { ...usaStateGradientConfig.columns, navigate: { name: 'URL' } },
+    data: usaStateGradientConfig.data.map(row => ({ ...row, URL: '/location' })),
+    locationLinks: { enableMapNavigation: false }
+  }
 }
 
 export const TypeSectionTests: Story = {

@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { Accordion } from 'react-accessible-accordion'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import ConfigContext from '../../../../context'
-import PatternSettings from './Panel.PatternSettings'
+import PatternSettings from './PatternSettingsPanel/PatternSettingsPanel'
 
 // Unit tests do not transform SVG imports into React icon components.
 vi.mock('@cdc/core/components/ui/Icon', () => ({ default: () => null }))

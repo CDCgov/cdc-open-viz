@@ -82,6 +82,11 @@
     }
   }
 
+  & .visualization-container.data .single-geo {
+    /* Data-map geography groups own their interactive cursor state. */
+    cursor: inherit;
+  }
+
   .svg-container,
   .county,
   .state-path,

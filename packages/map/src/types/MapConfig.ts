@@ -216,8 +216,28 @@ export type TimePlaybackConfig = {
   customOrder?: Array<string | number>
 }
 
+export type LocationLinks = {
+  enableMapNavigation?: boolean
+  enableDataTableLinks?: boolean
+}
+
+export type LocationHighlighter = {
+  note?: string
+  showResetButton?: boolean
+  resetButtonLabel?: string
+  enabled?: boolean
+  position?: 'above' | 'below'
+  highlightSelectedLocation?: boolean
+  details?: string
+  dropdownLabel?: string
+  placeholder?: string
+  filterColumn?: string
+}
+
 export type MapConfig = Visualization & {
   dotDensity?: DotDensityConfig
+  locationHighlighter?: LocationHighlighter
+  locationLinks?: LocationLinks
   altText?: AltTextConfig
   annotations: Annotation[]
   // map color palette

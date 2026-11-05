@@ -112,3 +112,74 @@ describe('update_4_26_11', () => {
     expect(result.multiDashboards[1].visualizations.map.general.type).toBe('map')
   })
 })
+
+const map = (name: any = 'URL', extra = {}) => ({
+  type: 'map',
+  version: '4.26.10',
+  general: { type: 'data' },
+  columns: { navigate: { name } },
+  data: [],
+  ...extra
+})
+
+describe('4.26.11 location link compatibility', () => {
+  it('preserves location links after repairing a legacy map interaction type', () => {
+    const input = map('URL', { general: { type: 'map' } })
+    const result = coveUpdateWorker(input as any)
+
+    expect(result.general.type).toBe('data')
+    expect(result.locationLinks).toEqual({ enableMapNavigation: true, enableDataTableLinks: true })
+    expect(input.general.type).toBe('map')
+    expect(input).not.toHaveProperty('locationLinks')
+    expect(update_4_26_11(result)).toEqual(result)
+  })
+
+  it.each([{ data: [] }, { data: [{ State: 'Alabama' }] }])(
+    'uses configured columns independently of data: %j',
+    ({ data }) => {
+      const input = map('URL', { data })
+      const result = coveUpdateWorker(input as any)
+      expect(result.locationLinks).toEqual({ enableMapNavigation: true, enableDataTableLinks: true })
+      expect(input).not.toHaveProperty('locationLinks')
+      expect(update_4_26_11(result)).toEqual(result)
+    }
+  )
+  it.each([undefined, null, '', '   ', 12])('leaves unconfigured columns untouched: %j', name => {
+    expect(update_4_26_11(map(name, { columns: { navigate: { name } } }))).not.toHaveProperty('locationLinks')
+  })
+  it('preserves legacy world-map links inside dashboards', () => {
+    const worldMap = map('URL', { general: { type: 'data', geoType: 'world' } })
+    const result = update_4_26_11({ type: 'dashboard', visualizations: { world: worldMap } })
+    expect(result.visualizations.world.locationLinks).toEqual({
+      enableMapNavigation: true,
+      enableDataTableLinks: true
+    })
+  })
+  it('preserves authored flags and selector settings', () => {
+    const settings = {
+      enableMapNavigation: false,
+      enableDataTableLinks: false
+    }
+    const locationHighlighter = { enabled: true, dropdownLabel: 'Places' }
+    const result = update_4_26_11(map('URL', { locationLinks: settings, locationHighlighter }))
+    expect(result.locationLinks).toEqual(settings)
+    expect(result.locationHighlighter).toEqual(locationHighlighter)
+    expect(update_4_26_11(map('URL', { locationLinks: { enableMapNavigation: false } })).locationLinks).toEqual({
+      enableMapNavigation: false,
+      enableDataTableLinks: true
+    })
+  })
+  it('handles dashboard and inherited-version multi-dashboard children', () => {
+    const dashboard = { type: 'dashboard', version: '4.26.10', dashboard: {}, rows: [], visualizations: { map: map() } }
+    const result = coveUpdateWorker({ ...dashboard, multiDashboards: [{ ...dashboard, version: undefined }] } as any)
+    expect(result.visualizations.map.locationLinks.enableMapNavigation).toBe(true)
+    expect(result.multiDashboards[0].visualizations.map.locationLinks.enableDataTableLinks).toBe(true)
+  })
+  it('leaves Navigation maps and other visualization types unchanged', () => {
+    expect(update_4_26_11(map('URL', { general: { type: 'navigation' } }))).not.toHaveProperty('locationLinks')
+    expect(update_4_26_11(map('URL', { type: 'chart' }))).not.toHaveProperty('locationLinks')
+  })
+  it('does not migrate maps saved at the current version', () => {
+    expect(coveUpdateWorker(map('URL', { version: '4.26.11' }) as any)).not.toHaveProperty('locationLinks')
+  })
+})

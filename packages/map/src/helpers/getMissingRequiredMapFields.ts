@@ -4,9 +4,9 @@ import { getConfiguredBubbleLayers } from './bubbleLayers'
 import { getConfiguredDotDensitySeries, isDotDensitySupported } from './dotDensityConfig'
 
 export type MissingRequiredMapField = {
-  field: 'Geography' | 'Data Column' | 'Count Column'
+  field: 'Geography' | 'Data Column' | 'Count Column' | 'Navigation'
   section: 'Columns' | 'Dot Density'
-  target: 'map-geography' | 'map-data-column' | 'map-dot-density-count'
+  target: 'map-geography' | 'map-data-column' | 'map-dot-density-count' | 'map-url-column'
   subsectionTarget?: 'map-geography-section' | 'map-data-section'
 }
 
@@ -23,6 +23,11 @@ const REQUIRED_DATA_MAP_FIELDS: MissingRequiredMapField[] = [
     target: 'map-data-column',
     subsectionTarget: 'map-data-section'
   }
+]
+
+const REQUIRED_NAVIGATION_MAP_FIELDS: MissingRequiredMapField[] = [
+  REQUIRED_DATA_MAP_FIELDS[0],
+  { field: 'Navigation', section: 'Columns', target: 'map-url-column' }
 ]
 
 /** Sparse JSON rows may introduce columns after the first county. */
@@ -46,8 +51,10 @@ export const getMapDensitySourceColumns = (
 
 export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datasets): MissingRequiredMapField[] => {
   const mapType = config.general?.type as string
-  if (!['data', 'map'].includes(mapType)) return []
+  const isNavigationMap = mapType === 'navigation'
+  if (!isNavigationMap && !['data', 'map'].includes(mapType)) return []
   if (
+    !isNavigationMap &&
     getConfiguredBubbleLayers(config).length > 0 &&
     !(isDotDensitySupported(config) && config.dotDensity?.enabled === true)
   )
@@ -58,12 +65,14 @@ export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datase
   const hasAvailableColumns = availableColumns.length > 0
   const configuredColumns = {
     'map-geography': config.columns?.geo?.name || '',
-    'map-data-column': config.columns?.primary?.name || ''
+    'map-data-column': config.columns?.primary?.name || '',
+    'map-url-column': config.columns?.navigate?.name || ''
   }
 
-  const missing = REQUIRED_DATA_MAP_FIELDS.filter(({ target }) => {
+  const requiredFields = isNavigationMap ? REQUIRED_NAVIGATION_MAP_FIELDS : REQUIRED_DATA_MAP_FIELDS
+  const missing = requiredFields.filter(({ target }) => {
     const configuredColumn = configuredColumns[target as keyof typeof configuredColumns]
-    return !configuredColumn || (hasAvailableColumns && !availableColumns.includes(configuredColumn))
+    return !configuredColumn.trim() || (hasAvailableColumns && !availableColumns.includes(configuredColumn))
   })
   if (isDotDensitySupported(config) && config.dotDensity?.enabled === true) {
     const series = getConfiguredDotDensitySeries(config)

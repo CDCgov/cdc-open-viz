@@ -15,6 +15,7 @@ describe('createNewMapConfig', () => {
     expect(config).toMatchObject({
       type: 'map',
       version: CURRENT_COVE_CONFIG_VERSION,
+      locationHighlighter: { enabled: false, highlightSelectedLocation: true },
       general: {
         geoType: 'us',
         equalNumberOptIn: true,
