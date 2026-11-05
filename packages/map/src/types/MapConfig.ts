@@ -169,6 +169,24 @@ export type DataRow = {
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
+export type DotDensitySeries = {
+  id: string
+  column: string
+  label: string
+  color: string
+}
+
+export type DotDensityConfig = {
+  enabled: boolean
+  dotValue: number
+  radius: number
+  seed: number
+  unit: string
+  /** @deprecated Read only when importing earlier density prototypes; use general.showSidebar and legend. */
+  legend?: { show: boolean; title: string }
+  series: DotDensitySeries[]
+}
+
 export type SmallMultiples = {
   mode?: 'by-column'
   tileColumn?: string
@@ -195,6 +213,7 @@ export type TimePlaybackConfig = {
 }
 
 export type MapConfig = Visualization & {
+  dotDensity?: DotDensityConfig
   altText?: AltTextConfig
   annotations: Annotation[]
   // map color palette

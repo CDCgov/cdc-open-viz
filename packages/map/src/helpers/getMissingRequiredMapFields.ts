@@ -1,12 +1,13 @@
 import type { Datasets } from '@cdc/core/types/DataSet'
 import type { MapConfig } from '../types/MapConfig'
 import { getConfiguredBubbleLayers } from './bubbleLayers'
+import { getConfiguredDotDensitySeries, isDotDensitySupported } from './dotDensityConfig'
 
 export type MissingRequiredMapField = {
-  field: 'Geography' | 'Data Column'
-  section: 'Columns'
-  target: 'map-geography' | 'map-data-column'
-  subsectionTarget: 'map-geography-section' | 'map-data-section'
+  field: 'Geography' | 'Data Column' | 'Count Column'
+  section: 'Columns' | 'Dot Density'
+  target: 'map-geography' | 'map-data-column' | 'map-dot-density-count'
+  subsectionTarget?: 'map-geography-section' | 'map-data-section'
 }
 
 const REQUIRED_DATA_MAP_FIELDS: MissingRequiredMapField[] = [
@@ -24,26 +25,61 @@ const REQUIRED_DATA_MAP_FIELDS: MissingRequiredMapField[] = [
   }
 ]
 
-const getAvailableColumns = (config: MapConfig, datasets?: Datasets): string[] => {
-  if (config.data?.[0]) return Object.keys(config.data[0])
+/** Sparse JSON rows may introduce columns after the first county. */
+export const getAvailableMapColumns = (rows: readonly unknown[]): string[] => {
+  const columns = new Set<string>()
+  for (const row of rows) {
+    if (!row || typeof row !== 'object') continue
+    for (const column of Object.keys(row)) columns.add(column)
+  }
+  return [...columns]
+}
 
-  const assignedDataset = config.dataKey ? datasets?.[config.dataKey] : undefined
-  return assignedDataset?.data?.[0] ? Object.keys(assignedDataset.data[0]) : []
+/** Dashboard config.data can already be filtered; retain source and transformed count fields. */
+export const getMapDensitySourceColumns = (
+  config: Pick<MapConfig, 'data' | 'dataKey'>,
+  datasets?: Datasets
+): string[] => {
+  const assignedRows = config.dataKey ? datasets?.[config.dataKey]?.data : undefined
+  return [...new Set([...getAvailableMapColumns(config.data ?? []), ...getAvailableMapColumns(assignedRows ?? [])])]
 }
 
 export const getMissingRequiredMapFields = (config: MapConfig, datasets?: Datasets): MissingRequiredMapField[] => {
   const mapType = config.general?.type as string
-  if (!['data', 'map'].includes(mapType) || getConfiguredBubbleLayers(config).length > 0) return []
+  if (!['data', 'map'].includes(mapType)) return []
+  if (
+    getConfiguredBubbleLayers(config).length > 0 &&
+    !(isDotDensitySupported(config) && config.dotDensity?.enabled === true)
+  )
+    return []
 
-  const availableColumns = getAvailableColumns(config, datasets)
+  const assignedRows = config.dataKey ? datasets?.[config.dataKey]?.data : undefined
+  const availableColumns = getAvailableMapColumns(config.data?.length ? config.data : assignedRows ?? [])
   const hasAvailableColumns = availableColumns.length > 0
   const configuredColumns = {
     'map-geography': config.columns?.geo?.name || '',
     'map-data-column': config.columns?.primary?.name || ''
   }
 
-  return REQUIRED_DATA_MAP_FIELDS.filter(({ target }) => {
-    const configuredColumn = configuredColumns[target]
+  const missing = REQUIRED_DATA_MAP_FIELDS.filter(({ target }) => {
+    const configuredColumn = configuredColumns[target as keyof typeof configuredColumns]
     return !configuredColumn || (hasAvailableColumns && !availableColumns.includes(configuredColumn))
   })
+  if (isDotDensitySupported(config) && config.dotDensity?.enabled === true) {
+    const series = getConfiguredDotDensitySeries(config)
+    const densityColumns = new Set(getMapDensitySourceColumns(config, datasets))
+    return [
+      ...missing.filter(item => item.field === 'Geography'),
+      ...(!series.length || (densityColumns.size > 0 && series.some(item => !densityColumns.has(item.column)))
+        ? [
+            {
+              field: 'Count Column',
+              section: 'Dot Density',
+              target: 'map-dot-density-count'
+            } as MissingRequiredMapField
+          ]
+        : [])
+    ]
+  }
+  return missing
 }

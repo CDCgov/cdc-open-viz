@@ -62,6 +62,7 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { normalizeDotDensityLegend, withDotDensityColumns } from './helpers/dotDensityConfig'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
 import {
   DEFAULT_TIME_PLAYBACK_NOTE,
@@ -98,7 +99,11 @@ import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
-import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
+import {
+  getMissingRequiredMapFields,
+  getMapDensitySourceColumns,
+  type MissingRequiredMapField
+} from './helpers/getMissingRequiredMapFields'
 const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcMapComponent = {
@@ -137,7 +142,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
+  const normalizedConfig = normalizeDotDensityLegend(configObj)
+  const effectiveConfig = configIsPrepared ? normalizedConfig : applyConfigDefaults(normalizedConfig, defaults)
   const initialState = getInitialState(effectiveConfig)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
@@ -149,6 +155,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
     config,
     modal,
     accessibleStatus,
@@ -225,14 +232,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapConfig: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
+    const normalized = normalizeDotDensityLegend(newMapConfig)
+    dispatch({ type: 'SET_CONFIG', payload: normalized })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newMapConfig)
+      editorContext.setTempConfig(normalized)
     }
   }
 
   useEffect(() => {
-    const configClone = cloneConfig(configObj)
+    const configClone = normalizeDotDensityLegend(cloneConfig(configObj))
     const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
     const _newConfig = getInitialState(effectiveConfig).config
     if (configObj.data) {
@@ -674,6 +682,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
+  const densitySourceColumns = useMemo(
+    () => getMapDensitySourceColumns({ data: config.data, dataKey: config.dataKey }, datasets),
+    [config.data, config.dataKey, datasets]
+  )
+
   const mapProps = {
     setParentConfig,
     container,
@@ -696,6 +709,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
+    densitySourceColumns,
     scale,
     setConfig,
     setFilteredStateCountyCode,
@@ -731,6 +746,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     preparedConfig = preparedBubbleTable.config
     preparedColumns = preparedBubbleTable.columns
     preparedRuntimeData = preparedBubbleTable.runtimeData
+    preparedConfig = withDotDensityColumns(preparedConfig)
+    preparedColumns = preparedConfig.columns
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
@@ -811,6 +828,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const revealRequiredMapField = ({ target, subsectionTarget }: MissingRequiredMapField) => {
     const revealTarget = () => {
+      if (target === 'map-dot-density-count') {
+        const densityButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-dot-density']")
+        if (densityButton?.getAttribute('aria-expanded') !== 'true') densityButton?.click()
+        window.requestAnimationFrame(() =>
+          container?.querySelector<HTMLElement>("[data-required-field-control='map-dot-density-count']")?.focus()
+        )
+        return
+      }
       const columnsButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-columns']")
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 

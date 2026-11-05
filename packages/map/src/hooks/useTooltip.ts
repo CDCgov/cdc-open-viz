@@ -2,8 +2,10 @@ import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
 import { MapConfig } from '../types/MapConfig'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { withDotDensityColumns } from '../helpers/dotDensityConfig'
 
-export const createTooltipBuilder = (config: MapConfig) => {
+export const createTooltipBuilder = (sourceConfig: MapConfig) => {
+  const config = withDotDensityColumns(sourceConfig)
   /**
    * On county maps there's a need to append the state name
    * @param {String} toolTipText - previous tooltip text to build upon
