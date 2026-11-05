@@ -116,8 +116,12 @@ export const AuthorAndReload: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Type')
     await userEvent.selectOptions(canvas.getByLabelText(/Map Type/i, { selector: 'select' }), 'dot-density')
-    await userEvent.click(canvas.getByRole('button', { name: /Count Column/ }))
-    expect(canvas.getByRole('button', { name: 'Add Count Series' })).toHaveFocus()
+    await performAndAssert(
+      'Required-field navigation focuses Add Count Series',
+      () => canvasElement.ownerDocument.activeElement === canvas.getByRole('button', { name: 'Add Count Series' }),
+      async () => userEvent.click(canvas.getByRole('button', { name: /Count Column/ })),
+      (_, after) => after
+    )
     await userEvent.click(canvas.getByRole('button', { name: 'Add Count Series' }))
     await userEvent.selectOptions(canvas.getByLabelText('Count column 1'), 'measles')
     await waitForPresence('canvas[data-drawn-dots]', canvasElement)
