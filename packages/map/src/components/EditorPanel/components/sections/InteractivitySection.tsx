@@ -1,4 +1,4 @@
-import { getLocationSelector, isLocationSelectorEligible } from '../../../../helpers/locationSelector'
+import { getLocationHighlighter, isLocationHighlighterEligible } from '../../../../helpers/locationHighlighter'
 import { getLocationLinks, hasLocationLinkColumn } from '../../../../helpers/locationLinks'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { addUIDs } from '../../../../helpers/addUIDs'
@@ -92,12 +92,12 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
         {config.general.type === 'data' &&
           (() => {
             const links = getLocationLinks(config)
-            const selectorSettings = getLocationSelector(config)
+            const highlighterSettings = getLocationHighlighter(config)
             const hasUrlColumn = hasLocationLinkColumn(config)
             const tableVisible = config.table.forceDisplay ?? !isDashboard
             const changeLinks = (field, value, selector = false) => {
               const next = cloneConfig(config)
-              if (selector) next.locationSelector = { ...selectorSettings, [field]: value }
+              if (selector) next.locationHighlighter = { ...highlighterSettings, [field]: value }
               else next.locationLinks = { ...links, [field]: value }
               setConfig(next)
             }
@@ -160,22 +160,26 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                     </>
                   )}
                 </section>
-                {isLocationSelectorEligible(config) && (
-                  <section className='map-location-links-editor' aria-label='Location selector settings'>
-                    <h4>Location selector</h4>
+                {isLocationHighlighterEligible(config) && (
+                  <section className='map-location-links-editor' aria-label='Location highlighter settings'>
+                    <h4>Location highlighter</h4>
                     <CheckBox
-                      section='locationSelector'
+                      section='locationHighlighter'
                       fieldName='enabled'
-                      label='Show location selector'
-                      value={selectorSettings.enabled}
+                      label='Show location highlighter'
+                      aria-label='Show location highlighter'
+                      tooltip={help(
+                        'Let visitors choose a location from a dropdown to highlight it on the map and view information about it.'
+                      )}
+                      value={highlighterSettings.enabled}
                       updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                     />
-                    {selectorSettings.enabled && (
+                    {highlighterSettings.enabled && (
                       <>
                         <Select
-                          fieldName='locationSelectorPosition'
+                          fieldName='locationHighlighterPosition'
                           label='Position'
-                          value={selectorSettings.position}
+                          value={highlighterSettings.position}
                           options={[
                             { value: 'above', label: 'Above map' },
                             { value: 'below', label: 'Below map' }
@@ -184,45 +188,75 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                         />
                         {(
                           [
-                            ['label', 'Selector label'],
+                            ['dropdownLabel', 'Dropdown label'],
                             ['placeholder', 'Placeholder text']
                           ] as const
                         ).map(([field, label]) => (
                           <TextField
                             key={field}
-                            section='locationSelector'
+                            section='locationHighlighter'
                             fieldName={field}
                             label={label}
                             aria-label={label}
-                            value={selectorSettings[field]}
+                            value={highlighterSettings[field]}
+                            tooltip={
+                              field === 'dropdownLabel'
+                                ? help('Text displayed above the location dropdown.')
+                                : undefined
+                            }
                             updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
                           />
                         ))}
                         <TextField
                           type='textarea'
-                          section='locationSelector'
-                          fieldName='information'
-                          label='Location information'
-                          aria-label='Location information'
-                          tooltip={help(
-                            'Supporting text shown after a location is selected. Supports HTML and markup variables. {{location}} inserts the selected location’s display name.'
-                          )}
-                          value={selectorSettings.information}
+                          className='filter-editor__compact-textarea'
+                          section='locationHighlighter'
+                          fieldName='note'
+                          label='Note'
+                          value={highlighterSettings.note}
                           updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                         />
                         <CheckBox
-                          section='locationSelector'
+                          section='locationHighlighter'
+                          fieldName='showResetButton'
+                          label='Show reset button'
+                          value={highlighterSettings.showResetButton}
+                          updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
+                        />
+                        {highlighterSettings.showResetButton && (
+                          <TextField
+                            section='locationHighlighter'
+                            fieldName='resetButtonLabel'
+                            label='Reset button label'
+                            value={highlighterSettings.resetButtonLabel}
+                            updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
+                          />
+                        )}
+                        <TextField
+                          type='textarea'
+                          section='locationHighlighter'
+                          fieldName='details'
+                          label='Location details'
+                          aria-label='Location details'
+                          tooltip={help(
+                            'Information displayed after a visitor selects a location. Supports HTML and markup variables. Use {{location}} to insert the selected location’s display name.'
+                          )}
+                          value={highlighterSettings.details}
+                          updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
+                        />
+                        <CheckBox
+                          section='locationHighlighter'
                           fieldName='highlightSelectedLocation'
                           label='Highlight selected location on map'
                           aria-label='Highlight selected location on map'
-                          value={selectorSettings.highlightSelectedLocation}
+                          value={highlighterSettings.highlightSelectedLocation}
                           updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                         />
                         <Select
-                          fieldName='locationSelectorFilterColumn'
+                          fieldName='locationHighlighterFilterColumn'
                           label='Show locations with a value in'
                           aria-label='Show locations with a value in'
-                          value={selectorSettings.filterColumn}
+                          value={highlighterSettings.filterColumn}
                           options={[
                             { value: '', label: 'All available locations' },
                             ...columnsOptions

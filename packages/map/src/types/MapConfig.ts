@@ -220,19 +220,22 @@ export type LocationLinks = {
   enableDataTableLinks?: boolean
 }
 
-export type LocationSelector = {
+export type LocationHighlighter = {
+  note?: string
+  showResetButton?: boolean
+  resetButtonLabel?: string
   enabled?: boolean
   position?: 'above' | 'below'
   highlightSelectedLocation?: boolean
-  information?: string
-  label?: string
+  details?: string
+  dropdownLabel?: string
   placeholder?: string
   filterColumn?: string
 }
 
 export type MapConfig = Visualization & {
   dotDensity?: DotDensityConfig
-  locationSelector?: LocationSelector
+  locationHighlighter?: LocationHighlighter
   locationLinks?: LocationLinks
   altText?: AltTextConfig
   annotations: Annotation[]

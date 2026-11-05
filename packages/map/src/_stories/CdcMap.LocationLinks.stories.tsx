@@ -7,6 +7,7 @@ import {
   waitForEditor,
   waitForPresence
 } from '@cdc/core/helpers/testing'
+import Filters from '@cdc/core/components/Filters'
 import CdcMap from '../CdcMap'
 import CdcMapComponent from '../CdcMapComponent'
 import { createDefaultBubbleLayer } from '../helpers/bubbleLayers'
@@ -18,10 +19,10 @@ const makeConfig = () =>
     ...base,
     general: { ...base.general, navigationTarget: '_self' },
     table: { ...base.table, expanded: true, forceDisplay: true },
-    locationSelector: {
+    locationHighlighter: {
       enabled: true,
       position: 'below',
-      information: '<a href="{{url}}" target="_self">Learn more about {{location}} »</a>'
+      details: '<a href="{{url}}" target="_self">Learn more about {{location}} »</a>'
     },
     enableMarkupVariables: true,
     markupVariables: [{ name: 'url', tag: '{{url}}', columnName: 'URL', selectionMode: 'first', conditions: [] }],
@@ -37,14 +38,14 @@ export const Selection: Story = {
     await assertVisualizationRendered(canvasElement)
     const canvas = within(canvasElement)
     const select = canvas.getByLabelText('Select a location for more information')
-    const selectorStyles = getComputedStyle(canvasElement.querySelector('.map-location-selector')!)
+    const selectorStyles = getComputedStyle(canvasElement.querySelector('.map-location-highlighter')!)
     expect(selectorStyles.borderTopWidth).toBe('1px')
     expect(selectorStyles.borderTopStyle).toBe('solid')
     expect(selectorStyles.paddingTop).toBe(getComputedStyle(document.documentElement).fontSize)
-    expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter a')).toBeNull()
     await userEvent.selectOptions(select, 'US-AL')
     expect(select).toHaveFocus()
-    const link = within(canvasElement.querySelector('.map-location-selector') as HTMLElement).getByRole('link')
+    const link = within(canvasElement.querySelector('.map-location-highlighter') as HTMLElement).getByRole('link')
     expect(link).toHaveAttribute('target', '_self')
     expect(link).toHaveTextContent('Learn more about Alabama »')
     expect(link).not.toHaveTextContent('new window')
@@ -60,8 +61,8 @@ export const Selection: Story = {
     expect(observeClick).toHaveBeenCalledOnce()
     expect(args.navigationHandler).not.toHaveBeenCalled()
     await userEvent.selectOptions(select, 'US-AK')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Alaska')
-    const module = canvasElement.querySelector('.map-location-selector')!
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent('Alaska')
+    const module = canvasElement.querySelector('.map-location-highlighter')!
     const map = canvasElement.querySelector('.map-container')!
     expect(map.compareDocumentPosition(module) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     const bodyWrap = canvasElement.querySelector('.cove-visualization__body-wrap')!
@@ -78,9 +79,9 @@ export const AboveHexMobile: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationSelector.information = 'Supporting information <a href="/report">Report</a>'
+      c.locationHighlighter.details = 'Supporting information <a href="/report">Report</a>'
       c.general.displayAsHex = true
-      c.locationSelector.position = 'above'
+      c.locationHighlighter.position = 'above'
       return c
     })()
   },
@@ -93,7 +94,7 @@ export const AboveHexMobile: Story = {
     await assertVisualizationRendered(canvasElement)
     const select = within(canvasElement).getByRole('combobox', { name: 'Select a location for more information' })
     await userEvent.selectOptions(select, 'US-AL')
-    const module = canvasElement.querySelector('.map-location-selector') as HTMLElement
+    const module = canvasElement.querySelector('.map-location-highlighter') as HTMLElement
     const map = canvasElement.querySelector('.map-container')!
     expect(module.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     const content = canvasElement.querySelector('.cove-visualization__content-section')!
@@ -104,6 +105,8 @@ export const AboveHexMobile: Story = {
     expect(content.getBoundingClientRect().top - module.getBoundingClientRect().bottom).toBeCloseTo(sectionGap, 0)
     expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
     await userEvent.tab()
+    expect(within(module).getByRole('button', { name: 'Reset' })).toHaveFocus()
+    await userEvent.tab()
     expect(within(module).getByRole('link')).toHaveFocus()
   }
 }
@@ -112,7 +115,8 @@ export const InteractivityEditor: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationSelector.enabled = false
+      c.locationHighlighter.enabled = false
+      delete c.locationHighlighter.highlightSelectedLocation
       return c
     })(),
     isEditor: true,
@@ -133,8 +137,28 @@ export const InteractivityEditor: Story = {
     await waitForPresence('g.geo-group[id="Alabama"]', canvasElement)
     const linkControls = canvas.getByRole('region', { name: 'Location link settings' })
     expect(within(linkControls).getByRole('heading', { name: 'Location links' })).toBeVisible()
-    const selectorControls = canvas.getByRole('region', { name: 'Location selector settings' })
-    expect(within(selectorControls).getByRole('heading', { name: 'Location selector' })).toBeVisible()
+    const selectorControls = canvas.getByRole('region', { name: 'Location highlighter settings' })
+    expect(within(selectorControls).getByRole('heading', { name: 'Location highlighter' })).toBeVisible()
+    const highlighterToggle = within(selectorControls).getByLabelText('Show location highlighter')
+    const helpTarget = highlighterToggle.closest('label')!.querySelector('.cove-tooltip--target')!
+    const helpText =
+      'Let visitors choose a location from a dropdown to highlight it on the map and view information about it.'
+    await performAndAssert(
+      'Explain the location highlighter toggle',
+      () => {
+        const tooltip = canvas.queryByText(helpText)?.closest('.cove-tooltip__content')
+        return (
+          !!tooltip &&
+          getComputedStyle(tooltip).visibility === 'visible' &&
+          Number(getComputedStyle(tooltip).opacity) > 0
+        )
+      },
+      () => userEvent.hover(helpTarget),
+      (_, after) => after
+    )
+    expect(canvas.getByText(helpText)).toBeVisible()
+    await userEvent.unhover(helpTarget)
+
     expect(linkControls.compareDocumentPosition(selectorControls) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(canvas.queryByRole('heading', { name: 'Tooltips' })).toBeNull()
     expect(getComputedStyle(linkControls).borderTopWidth).toBe('1px')
@@ -169,18 +193,18 @@ export const InteractivityEditor: Story = {
     )
     await performAndAssert(
       'Enable selector',
-      () => !!canvasElement.querySelector('.map-location-selector'),
-      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      () => !!canvasElement.querySelector('.map-location-highlighter'),
+      () => userEvent.click(canvas.getByLabelText('Show location highlighter')),
       (_, after) => after
     )
     const select = canvas.getByLabelText('Select a location for more information')
+    const normalStateStroke = getComputedStyle(state.querySelector('.single-geo')!).stroke
     await userEvent.selectOptions(select, 'US-AL')
     const alaskaState = canvasElement.querySelector('g.geo-group[id="Alaska"]') as HTMLElement
     const highlight = canvas.getByLabelText('Highlight selected location on map')
-    const normalStateStroke = getComputedStyle(state.querySelector('.single-geo')!).stroke
-    expect(highlight).not.toBeChecked()
-    expect(getComputedStyle(alaskaState).opacity).toBe('1')
-    for (const enabled of [true, false]) {
+    expect(highlight).toBeChecked()
+    expect(getComputedStyle(alaskaState).opacity).toBe('0.5')
+    for (const enabled of [false, true]) {
       await performAndAssert(
         `${enabled ? 'Enable' : 'Disable'} selected-state highlighting`,
         () => getComputedStyle(alaskaState).opacity,
@@ -212,7 +236,6 @@ export const InteractivityEditor: Story = {
       (_, after) => after > 2
     )
     await userEvent.selectOptions(select, 'US-AK')
-    await userEvent.click(highlight)
     await performAndAssert(
       'Clear excluded selection and highlighting',
       () => !!canvasElement.querySelector('.selected-state-outline'),
@@ -220,7 +243,7 @@ export const InteractivityEditor: Story = {
       (_, after) => !after
     )
     expect(select).toHaveValue('')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toBeNull()
     expect(getComputedStyle(state).opacity).toBe('1')
     await userEvent.selectOptions(presence, '')
     await userEvent.selectOptions(select, 'US-AL')
@@ -230,22 +253,22 @@ export const InteractivityEditor: Story = {
       () => userEvent.selectOptions(canvas.getByLabelText('Open links in'), '_blank'),
       (_, after) => after.includes('new window')
     )
-    expect(canvasElement.querySelector('.map-location-selector a')).toHaveAttribute('target', '_self')
+    expect(canvasElement.querySelector('.map-location-highlighter a')).toHaveAttribute('target', '_self')
     await performAndAssert(
       'Move above map',
       () =>
         canvasElement
-          .querySelector('.map-location-selector')!
+          .querySelector('.map-location-highlighter')!
           .compareDocumentPosition(canvasElement.querySelector('.map-container')!),
       () => userEvent.selectOptions(canvas.getByLabelText('Position'), 'above'),
       (_, after) => !!(after & Node.DOCUMENT_POSITION_FOLLOWING)
     )
     for (const [label, value, selector] of [
-      ['Selector label', 'Choose place', '.map-location-selector label'],
-      ['Placeholder text', 'Choose an option', '.map-location-selector option[value=""]'],
-      ['Location information', 'Authored details', '.map-location-selector__information']
+      ['Dropdown label', 'Choose place', '.map-location-highlighter label'],
+      ['Placeholder text', 'Choose an option', '.map-location-highlighter option[value=""]'],
+      ['Location details', 'Authored details', '.map-location-highlighter__details']
     ]) {
-      await userEvent.selectOptions(canvasElement.querySelector('.map-location-selector select')!, 'US-AL')
+      await userEvent.selectOptions(canvasElement.querySelector('.map-location-highlighter select')!, 'US-AL')
       await performAndAssert(
         label,
         () => canvasElement.querySelector(selector)?.textContent ?? '',
@@ -263,7 +286,7 @@ export const InteractivityEditor: Story = {
       () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), ''),
       (_, after) => after === 0
     )
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Authored details')
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent('Authored details')
     expect(canvas.getByLabelText('Choose place')).toHaveValue('US-AL')
     expect(canvas.queryByLabelText('Link text')).toBeNull()
     expect(canvas.queryByLabelText('No-link message')).toBeNull()
@@ -275,14 +298,14 @@ export const PlaybackOptions: Story = {
     config: (() => {
       const c = makeConfig()
       c.general.showSidebar = false
-      c.locationSelector.information = 'Current rate: {{rate}}<a href="{{url}}">Report</a>'
+      c.locationHighlighter.details = 'Current rate: {{rate}}<a href="{{url}}">Report</a>'
       c.enableMarkupVariables = true
       c.markupVariables = [
         { name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [] },
         { name: 'url', tag: '{{url}}', columnName: 'URL', selectionMode: 'first', conditions: [] }
       ]
-      c.locationSelector.highlightSelectedLocation = true
-      c.locationSelector.filterColumn = 'Presence'
+      c.locationHighlighter.highlightSelectedLocation = true
+      c.locationHighlighter.filterColumn = 'Presence'
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
         { STATE: 'AL', Rate: 10, Year: 2021, Presence: true, URL: '/old' },
@@ -299,15 +322,15 @@ export const PlaybackOptions: Story = {
     const canvas = within(canvasElement)
     const select = canvas.getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'US-AL')
-    expect(canvasElement.querySelector('.map-location-selector a')).toHaveAttribute('href', '/new')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Current rate: 30')
+    expect(canvasElement.querySelector('.map-location-highlighter a')).toHaveAttribute('href', '/new')
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent('Current rate: 30')
     await performAndAssert(
       'Follow previous playback frame',
-      () => canvasElement.querySelector('.map-location-selector a')?.getAttribute('href'),
+      () => canvasElement.querySelector('.map-location-highlighter a')?.getAttribute('href'),
       () => userEvent.click(canvas.getByRole('button', { name: /previous/i })),
       (_, after) => after?.endsWith('/old')
     )
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Current rate: 10')
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent('Current rate: 10')
     expect(select).toHaveValue('US-AL')
     expect(within(select).queryByRole('option', { name: 'New York' })).toBeNull()
     await userEvent.selectOptions(select, 'US-CA')
@@ -317,7 +340,7 @@ export const PlaybackOptions: Story = {
       () => userEvent.click(canvas.getByRole('button', { name: /next/i })),
       (_, after) => after === ''
     )
-    expect(canvasElement.querySelector('.map-location-selector [aria-live]')).toBeEmptyDOMElement()
+    expect(canvasElement.querySelector('.map-location-highlighter [aria-live]')).toBeEmptyDOMElement()
     expect(getComputedStyle(canvasElement.querySelector('g.geo-group[id="Alabama"]')!).opacity).toBe('1')
   }
 }
@@ -326,9 +349,9 @@ export const IndependentWorldMaps: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationSelector.information = 'Supporting information'
+      c.locationHighlighter.details = 'Supporting information'
       c.general.geoType = 'world'
-      c.locationSelector.highlightSelectedLocation = true
+      c.locationHighlighter.highlightSelectedLocation = true
       c.general.showSidebar = false
       c.general.countriesPicked = [
         { iso: 'CAN', name: 'Canada' },
@@ -351,8 +374,8 @@ export const IndependentWorldMaps: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await waitForPresence('.map-location-selector select', canvasElement)
-    await waitForPresence('.cdc-open-viz-module + .cdc-open-viz-module .map-location-selector select', canvasElement)
+    await waitForPresence('.map-location-highlighter select', canvasElement)
+    await waitForPresence('.cdc-open-viz-module + .cdc-open-viz-module .map-location-highlighter select', canvasElement)
     const selects = within(canvasElement).getAllByLabelText('Select a location for more information')
     expect(selects).toHaveLength(2)
     expect(selects[0].id).not.toBe(selects[1].id)
@@ -360,9 +383,9 @@ export const IndependentWorldMaps: Story = {
     expect(within(selects[0]).queryByRole('option', { name: 'Hidden' })).toBeNull()
     await userEvent.selectOptions(selects[0], 'CAN')
     expect(selects[1]).toHaveValue('')
-    const modules = canvasElement.querySelectorAll('.map-location-selector')
-    expect(modules[0].querySelector('.map-location-selector__information')).toHaveTextContent('Supporting information')
-    expect(modules[1].querySelector('.map-location-selector__information')).toBeNull()
+    const modules = canvasElement.querySelectorAll('.map-location-highlighter')
+    expect(modules[0].querySelector('.map-location-highlighter__details')).toHaveTextContent('Supporting information')
+    expect(modules[1].querySelector('.map-location-highlighter__details')).toBeNull()
     await waitForPresence('.selected-location-outline', canvasElement)
     const maps = canvasElement.querySelectorAll('.cdc-open-viz-module')
     expect(getComputedStyle(maps[0].querySelector('[data-country-code="MEX"]')!.parentElement!).opacity).toBe('0.5')
@@ -370,7 +393,7 @@ export const IndependentWorldMaps: Story = {
     expect(maps[1].querySelector('.selected-location-outline')).toBeNull()
     expect(maps[0].querySelector('[data-country-code="FRA"]')).not.toBeVisible()
 
-    for (const module of canvasElement.querySelectorAll('.map-location-selector')) {
+    for (const module of canvasElement.querySelectorAll('.map-location-highlighter')) {
       expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
     }
   }
@@ -385,9 +408,9 @@ export const EmptySelector: Story = {
     })()
   },
   play: async ({ canvasElement }) => {
-    await waitForPresence('.map-location-selector select', canvasElement)
+    await waitForPresence('.map-location-highlighter select', canvasElement)
     expect(within(canvasElement).getByLabelText('Select a location for more information')).toBeDisabled()
-    expect(canvasElement.querySelector('.map-location-selector [aria-live]')).toBeEmptyDOMElement()
+    expect(canvasElement.querySelector('.map-location-highlighter [aria-live]')).toBeEmptyDOMElement()
   }
 }
 
@@ -422,10 +445,10 @@ export const BelowSelectorSpacing: Story = {
   play: async ({ canvasElement }) => {
     for (const [index, { territories, subtext, table }] of spacingCases.entries()) {
       const example = canvasElement.querySelector(`[data-spacing-case="${index}"]`) as HTMLElement
-      await waitForPresence('.map-location-selector select', example)
+      await waitForPresence('.map-location-highlighter select', example)
       if (territories) await waitForPresence('.territories', example)
       const content = example.querySelector('.cove-visualization__content-section') as HTMLElement
-      const selector = example.querySelector('.map-location-selector') as HTMLElement
+      const selector = example.querySelector('.map-location-highlighter') as HTMLElement
       const nextSection = selector.nextElementSibling as HTMLElement
       const gap = parseFloat(getComputedStyle(content.parentElement!).rowGap)
       expect(!!example.querySelector('.territories')).toBe(territories)
@@ -463,7 +486,7 @@ export const NavigationCompatibility: Story = {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
     await waitForPresence('.navigation-menu', canvasElement)
-    expect(canvasElement.querySelector('.map-location-selector')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter')).toBeNull()
     await openAccordion(canvas, 'Type')
     expect(canvas.getByText('Navigation Behavior')).toBeVisible()
     await openAccordion(canvas, 'Columns')
@@ -482,7 +505,7 @@ export const NavigationCompatibility: Story = {
 
 const longInformationConfig = () => {
   const config = makeConfig()
-  config.locationSelector.information =
+  config.locationHighlighter.details =
     '<p>Long supplementary information with an unbroken value: ' +
     'LongValue'.repeat(35) +
     '</p><ul><li>Details</li></ul><a href="/report">Report</a>'
@@ -501,16 +524,18 @@ export const AuthoredInformationWrapping: Story = {
   ),
   play: async ({ canvasElement }) => {
     for (const example of canvasElement.querySelectorAll<HTMLElement>('[data-information-width]')) {
-      await waitForPresence('.map-location-selector select', example)
+      await waitForPresence('.map-location-highlighter select', example)
       const select = within(example).getByLabelText('Select a location for more information')
       await userEvent.selectOptions(select, 'US-AL')
       expect(select).toHaveFocus()
-      const module = example.querySelector('.map-location-selector') as HTMLElement
-      const info = module.querySelector('.map-location-selector__information') as HTMLElement
+      const module = example.querySelector('.map-location-highlighter') as HTMLElement
+      const info = module.querySelector('.map-location-highlighter__details') as HTMLElement
       expect(info).toHaveTextContent('Long supplementary information')
       expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
       expect(info.scrollWidth).toBeLessThanOrEqual(info.clientWidth)
       expect(within(module).getAllByRole('link')).toHaveLength(1)
+      await userEvent.tab()
+      expect(within(module).getByRole('button', { name: 'Reset' })).toHaveFocus()
       await userEvent.tab()
       expect(within(module).getByRole('link')).toHaveFocus()
     }
@@ -523,7 +548,7 @@ export const HighlightSelectedState: Story = {
       const c = makeConfig()
       c.general.geoBorderColor = 'white'
       c.data.push({ STATE: 'PR', Rate: 15, URL: '' })
-      c.locationSelector.highlightSelectedLocation = true
+      c.locationHighlighter.highlightSelectedLocation = true
       return c
     })()
   },
@@ -610,8 +635,8 @@ export const SelectorWithoutUrlEditor: Story = {
     config: (() => {
       const c = makeConfig()
       c.columns.navigate.name = ''
-      c.locationSelector.enabled = false
-      delete c.locationSelector.information
+      c.locationHighlighter.enabled = false
+      delete c.locationHighlighter.details
       c.table.forceDisplay = false
       return c
     })(),
@@ -624,35 +649,31 @@ export const SelectorWithoutUrlEditor: Story = {
     expect(canvas.queryByLabelText('Open links in')).toBeNull()
     await performAndAssert(
       'Enable selector without links',
-      () => !!canvasElement.querySelector('.map-location-selector'),
-      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      () => !!canvasElement.querySelector('.map-location-highlighter'),
+      () => userEvent.click(canvas.getByLabelText('Show location highlighter')),
       (_, after) => after
     )
     const select = canvas.getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'US-AL')
-    expect(canvas.getByLabelText('Location information')).toHaveValue('')
+    expect(canvas.getByLabelText('Location details')).toHaveValue('')
     await performAndAssert(
       'Author details without links',
-      () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
-      () => userEvent.type(canvas.getByLabelText('Location information'), 'Supporting information'),
+      () => canvasElement.querySelector('.map-location-highlighter__details')?.textContent ?? '',
+      () => userEvent.type(canvas.getByLabelText('Location details'), 'Supporting information'),
       (_, after) => after === 'Supporting information'
     )
     const alaska = () => canvasElement.querySelector('[data-geo-id="US-AK"]')!
-    await performAndAssert(
-      'Highlight state without links',
-      () => getComputedStyle(alaska()).opacity,
-      () => userEvent.click(canvas.getByLabelText('Highlight selected location on map')),
-      (_, after) => after === '0.5'
-    )
+    expect(canvas.getByLabelText('Highlight selected location on map')).toBeChecked()
+    expect(getComputedStyle(alaska()).opacity).toBe('0.5')
     expect(canvasElement.querySelector('.selected-state-outline')).toBeInTheDocument()
     await userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL')
     expect(select).toHaveValue('US-AL')
-    expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter a')).toBeNull()
     expect(canvas.queryByLabelText('Show links in the data table')).toBeNull()
     await performAndAssert(
       'Hide selector while keeping map links configured',
-      () => !!canvasElement.querySelector('.map-location-selector'),
-      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      () => !!canvasElement.querySelector('.map-location-highlighter'),
+      () => userEvent.click(canvas.getByLabelText('Show location highlighter')),
       (_, after) => !after
     )
     expect(getComputedStyle(alaska()).opacity).toBe('1')
@@ -674,7 +695,7 @@ export const WorldSelectorWithoutUrl: Story = {
       ...makeConfig(),
       general: { ...makeConfig().general, geoType: 'world' },
       columns: { ...makeConfig().columns, navigate: { name: '' } },
-      locationSelector: { enabled: true, information: 'Supporting information', highlightSelectedLocation: true },
+      locationHighlighter: { enabled: true, details: 'Supporting information', highlightSelectedLocation: true },
       data: [{ STATE: 'Canada', Rate: 40 }]
     } as any)
   },
@@ -682,7 +703,7 @@ export const WorldSelectorWithoutUrl: Story = {
     await assertVisualizationRendered(canvasElement)
     const select = within(canvasElement).getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'CAN')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent(
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent(
       'Supporting information'
     )
     await waitForPresence('.selected-location-outline', canvasElement)
@@ -690,7 +711,7 @@ export const WorldSelectorWithoutUrl: Story = {
       '0.5'
     )
     expect(getComputedStyle(canvasElement.querySelector('[data-country-code="CAN"]')!.parentElement!).opacity).toBe('1')
-    expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter a')).toBeNull()
     expect(within(canvasElement).queryByText('No link available for Alaska.')).toBeNull()
   }
 }
@@ -710,7 +731,15 @@ const makeWorldHighlightConfig = () => {
 }
 
 export const WorldHighlightEditor: Story = {
-  args: { config: makeWorldHighlightConfig(), isEditor: true },
+  args: {
+    config: (() => {
+      const c = makeWorldHighlightConfig()
+      // Exercise an authored opt-out independently of the default-on setting.
+      c.locationHighlighter.highlightSelectedLocation = false
+      return c
+    })(),
+    isEditor: true
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
@@ -775,7 +804,7 @@ export const WorldHighlightEditor: Story = {
     await performAndAssert(
       'Hide selector and clear country highlighting',
       () => !!outline(),
-      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      () => userEvent.click(canvas.getByLabelText('Show location highlighter')),
       (_, after) => !after
     )
     expect(opacity('MEX')).toBe('1')
@@ -786,8 +815,8 @@ export const WorldHighlightPlayback: Story = {
   args: {
     config: (() => {
       const c = makeWorldHighlightConfig()
-      c.locationSelector.highlightSelectedLocation = true
-      c.locationSelector.filterColumn = 'Presence'
+      c.locationHighlighter.highlightSelectedLocation = true
+      c.locationHighlighter.filterColumn = 'Presence'
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
         { STATE: 'Canada', Rate: 40, Year: 2021, Presence: true, URL: '/old' },
@@ -808,7 +837,7 @@ export const WorldHighlightPlayback: Story = {
     await waitForPresence('.selected-location-outline', canvasElement)
     await performAndAssert(
       'Preserve country highlight across playback frames',
-      () => canvasElement.querySelector('.map-location-selector a')?.getAttribute('href'),
+      () => canvasElement.querySelector('.map-location-highlighter a')?.getAttribute('href'),
       () => userEvent.click(canvas.getByRole('button', { name: /previous/i })),
       (_, after) => after?.endsWith('/old')
     )
@@ -831,7 +860,7 @@ export const DashboardAndSelectorHighlighting: Story = {
     config: (() => {
       const c = makeConfig()
       c.general.displayStateLabels = true
-      c.locationSelector.highlightSelectedLocation = true
+      c.locationHighlighter.highlightSelectedLocation = true
       c.data = [
         { STATE: 'Alabama', Rate: 10, URL: '/al' },
         { STATE: 'Alaska', Rate: 20, URL: '' },
@@ -918,7 +947,7 @@ export const InformationMarkupVariables: Story = {
       ]
       config.dataMetadata = { Name: 'Outside selector' }
       config.general.subtext = 'Rate: {{rate}} / {{location}}'
-      config.locationSelector.information =
+      config.locationHighlighter.details =
         '<strong>{{location}} rate: {{rate}}</strong><ul><li>Supporting details</li></ul><a href="{{url}}">{{location}}: {{rate}}</a>'
       config.data[0].URL = '/al'
       return config
@@ -927,10 +956,10 @@ export const InformationMarkupVariables: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     const select = within(canvasElement).getByLabelText('Select a location for more information')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toBeNull()
+    expect(canvasElement.querySelector('.map-location-highlighter__details')).toBeNull()
     for (const id of ['US-AL', 'US-AK']) {
       await userEvent.selectOptions(select, id)
-      const info = canvasElement.querySelector('.map-location-selector__information')!
+      const info = canvasElement.querySelector('.map-location-highlighter__details')!
       expect(info).toHaveClass('cove-prose')
       expect(info.querySelector('strong')).toHaveTextContent(
         id === 'US-AL' ? 'Alabama rate: 10 and 15' : 'Alaska rate: 20'
@@ -939,7 +968,7 @@ export const InformationMarkupVariables: Story = {
         'Rate: 10, 15, and 20 / Outside selector'
       )
       expect(info.querySelector('li')).toHaveTextContent('Supporting details')
-      expect(canvasElement.querySelector('.map-location-selector__result')).toHaveTextContent(
+      expect(canvasElement.querySelector('.map-location-highlighter__result')).toHaveTextContent(
         id === 'US-AL' ? 'Alabama: 10 and 15' : 'Alaska: 20'
       )
     }
@@ -948,10 +977,10 @@ export const InformationMarkupVariables: Story = {
 
 const makeYearFilterConfig = () => {
   const config = makeConfig()
-  config.locationSelector.position = 'above'
-  config.locationSelector.highlightSelectedLocation = true
-  config.locationSelector.information = '<a href="{{url}}">{{location}}: {{cases}} cases in {{year}}</a>'
-  config.locationSelector.filterColumn = 'URL'
+  config.locationHighlighter.position = 'above'
+  config.locationHighlighter.highlightSelectedLocation = true
+  config.locationHighlighter.details = '<a href="{{url}}">{{location}}: {{cases}} cases in {{year}}</a>'
+  config.locationHighlighter.filterColumn = 'URL'
   config.enableMarkupVariables = true
   config.markupVariables = [
     { name: 'url', tag: '{{url}}', columnName: 'URL', conditions: [], selectionMode: 'first' },
@@ -987,8 +1016,8 @@ export const YearFilterSelection: Story = {
     const canvas = within(canvasElement)
     await waitForPresence('[data-geo-id="US-AL"]', canvasElement)
     const select = canvas.getByLabelText('Select a location for more information')
-    const information = () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? ''
-    const link = () => canvasElement.querySelector('.map-location-selector a')
+    const information = () => canvasElement.querySelector('.map-location-highlighter__details')?.textContent ?? ''
+    const link = () => canvasElement.querySelector('.map-location-highlighter a')
     const alabama = () => canvasElement.querySelector('[data-geo-id="US-AL"]')!
     await performAndAssert(
       'Select Alaska for 2024',
@@ -1043,7 +1072,7 @@ export const BelowYearFilterSelection: Story = {
   args: {
     config: (() => {
       const config = makeYearFilterConfig()
-      config.locationSelector.position = 'below'
+      config.locationHighlighter.position = 'below'
       return config
     })()
   }
@@ -1053,7 +1082,7 @@ export const HighlightOverlays: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationSelector.highlightSelectedLocation = true
+      c.locationHighlighter.highlightSelectedLocation = true
       c.general.displayStateLabels = true
       c.data.push({ STATE: 'New York City', Rate: 15, URL: '' }, { STATE: 'PR', Rate: 15, URL: '' })
       c.data = c.data.map(row => ({ ...row, Latitude: 40.7, Longitude: -74 }))
@@ -1144,5 +1173,308 @@ export const HighlightOverlays: Story = {
     expect(getComputedStyle(overlay).opacity).toBe('1')
     expect(getComputedStyle(coordinateBubble.parentElement!).opacity).toBe('1')
     expect(getComputedStyle(territory).opacity).toBe('1')
+  }
+}
+
+export const CitySelection: Story = {
+  args: {
+    config: (() => {
+      const c = makeConfig()
+      c.columns.geo.displayColumn = 'Display'
+      c.locationHighlighter.filterColumn = 'URL'
+      c.locationHighlighter.details = '<strong>{{location}}: {{rates}}</strong><a href="{{url}}">Report</a>'
+      c.markupVariables.push({
+        name: 'rates',
+        tag: '{{rates}}',
+        columnName: 'Rate',
+        selectionMode: 'all',
+        conditions: []
+      })
+      c.filters = [
+        { columnName: 'Period', label: 'Period', filterStyle: 'dropdown', active: '2025', values: ['2025', '2026'] }
+      ]
+      c.data = [
+        { STATE: 'New York', Display: 'New York State', Rate: 100, URL: '/state', Period: '2025' },
+        { STATE: 'new york city', Display: 'NYC', Rate: 10, URL: '/city', Period: '2025' },
+        { STATE: 'New York City', Display: 'NYC', Rate: 15, URL: '/city', Period: '2025' },
+        { STATE: 'Boston', Display: 'Boston', Rate: 5, URL: '/boston', Period: '2025' },
+        { STATE: 'New York', Display: 'New York State', Rate: 200, URL: '/state', Period: '2026' },
+        { STATE: 'New York City', Display: 'NYC', Rate: 20, URL: '', Period: '2026' },
+        { STATE: 'Boston', Display: 'Boston', Rate: 6, URL: '/boston', Period: '2026' }
+      ]
+      return c
+    })(),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Interactivity')
+    await waitForPresence('[data-city-id="NEW YORK CITY"]', canvasElement)
+    const select = canvas.getByLabelText('Select a location for more information')
+    expect(within(select).getByRole('option', { name: 'NYC' })).toHaveValue('NEW YORK CITY')
+    const city = () => canvasElement.querySelector('[data-city-id="NEW YORK CITY"]')!
+    const boston = () => canvasElement.querySelector('[data-city-id="BOSTON"]')!
+    const state = () => canvasElement.querySelector('[data-geo-id="US-NY"]')!
+    const info = () => canvasElement.querySelector('.map-location-highlighter__details')!
+    await performAndAssert(
+      'Select and highlight NYC independently of New York State',
+      () => getComputedStyle(state()).opacity,
+      () => userEvent.selectOptions(select, 'NEW YORK CITY'),
+      (_, after) => after === '0.5'
+    )
+    expect(getComputedStyle(city()).opacity).toBe('1')
+    expect(getComputedStyle(boston()).opacity).toBe('0.5')
+    expect(city().querySelector('path, circle, polygon')).toHaveAttribute('stroke', '#000000')
+    expect(city().querySelector('path, circle, polygon')).toHaveAttribute('stroke-width', '3px')
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+    expect(info()).toHaveTextContent('NYC: 10 or 15')
+    expect(info().querySelector('a')).toHaveAttribute('href', '/city')
+    await performAndAssert(
+      'Select the state without selecting its city',
+      () => getComputedStyle(city()).opacity,
+      () => userEvent.selectOptions(select, 'US-NY'),
+      (_, after) => after === '0.5'
+    )
+    expect(getComputedStyle(state()).opacity).toBe('1')
+    expect(info()).toHaveTextContent('New York State: 100')
+    expect(info().querySelector('a')).toHaveAttribute('href', '/state')
+    await userEvent.selectOptions(select, 'NEW YORK CITY')
+    const highlight = canvas.getByLabelText('Highlight selected location on map')
+    await performAndAssert(
+      'Keep city information available when highlighting is off',
+      () => getComputedStyle(state()).opacity,
+      () => userEvent.click(highlight),
+      (_, after) => after === '1'
+    )
+    expect(select).toHaveValue('NEW YORK CITY')
+    expect(info()).toHaveTextContent('NYC: 10 or 15')
+    expect(city().querySelector('path, circle, polygon')).toHaveAttribute('stroke-width', '2px')
+    await userEvent.click(highlight)
+    await performAndAssert(
+      'Clear city selection when its presence value becomes empty',
+      () => (select as HTMLSelectElement).value,
+      () => userEvent.selectOptions(canvas.getByLabelText('Period'), '2026'),
+      (_, after) => after === ''
+    )
+    expect(info()).toBeNull()
+    expect(getComputedStyle(city()).opacity).toBe('1')
+    expect(getComputedStyle(state()).opacity).toBe('1')
+    expect(within(select).queryByRole('option', { name: 'NYC' })).toBeNull()
+  }
+}
+
+export const SelectorNoteAndReset: Story = {
+  render: () => (
+    <>
+      {[
+        { geoType: 'us', location: 'Alabama', id: 'US-AL', width: 740 },
+        { geoType: 'us', location: 'New York City', id: 'NEW YORK CITY', width: 360 },
+        { geoType: 'world', location: 'Canada', id: 'CAN', width: 360 }
+      ].map(({ geoType, location, id, width }) => {
+        const c = makeConfig()
+        c.general.geoType = geoType as any
+        c.locationHighlighter.note = 'Choose a <strong>location</strong> for details.'
+        c.locationHighlighter.resetButtonLabel = 'Clear selection'
+        c.filters = [
+          {
+            columnName: 'Group',
+            label: 'Group',
+            filterStyle: 'dropdown',
+            active: 'A',
+            values: ['A', 'B'],
+            note: 'Choose a <strong>group</strong>.'
+          }
+        ]
+        c.data = [
+          { STATE: location, Rate: 10, URL: '/report', Group: 'A' },
+          { STATE: location, Rate: 20, URL: '/other', Group: 'B' }
+        ]
+        return (
+          <div key={id} data-reset-location={id} style={{ width, maxWidth: '100%' }}>
+            <CdcMap config={c} />
+          </div>
+        )
+      })}
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const example of canvasElement.querySelectorAll<HTMLElement>('[data-reset-location]')) {
+      await assertVisualizationRendered(example)
+      const canvas = within(example)
+      const module = example.querySelector('.map-location-highlighter') as HTMLElement
+      const selector = within(module)
+      const select = selector.getByRole('combobox')
+      const note = module.querySelector('.filters-section__note-text')!
+      const filterNote = example.querySelector('.filters-section .filters-section__note-text')!
+      expect(select).toHaveAccessibleDescription('Choose a location for details.')
+      expect(note.querySelector('strong')).toHaveTextContent('location')
+      for (const property of ['fontSize', 'fontWeight', 'lineHeight', 'maxWidth', 'marginBottom'] as const) {
+        expect(getComputedStyle(note)[property]).toBe(getComputedStyle(filterNote)[property])
+      }
+      expect(selector.queryByRole('button', { name: 'Clear selection' })).toBeNull()
+      const id = example.dataset.resetLocation!
+      if (id === 'CAN') await userEvent.click(canvas.getByRole('button', { name: 'Zoom In', exact: true }))
+      await userEvent.selectOptions(select, id)
+      const reset = selector.getByRole('button', { name: 'Clear selection' })
+      expect(module.querySelector('.map-location-highlighter__details')).toBeInTheDocument()
+      expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
+      expect(reset.getBoundingClientRect().right).toBeLessThanOrEqual(module.getBoundingClientRect().right)
+      await userEvent.tab()
+      expect(reset).toHaveFocus()
+      await performAndAssert(
+        'Reset only the location selection',
+        () => (select as HTMLSelectElement).value,
+        () => userEvent.keyboard('{Enter}'),
+        (_, after) => after === ''
+      )
+      expect(select).toHaveFocus()
+      expect(note).toBeVisible()
+      expect(selector.queryByRole('button', { name: 'Clear selection' })).toBeNull()
+      expect(module.querySelector('.map-location-highlighter__details')).toBeNull()
+      expect(example.querySelector('.selected-state-outline, .selected-location-outline')).toBeNull()
+      expect(canvas.getByRole('combobox', { name: 'Filter by Group' })).toHaveValue('A')
+      if (id === 'CAN') {
+        const country = example.querySelector('[data-country-code="CAN"]')!
+        expect(Number(country.getAttribute('stroke-width'))).toBeCloseTo(0.9 / 1.5)
+      }
+    }
+  }
+}
+
+export const SelectorNoteAndResetEditor: Story = {
+  args: { config: makeConfig(), isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Interactivity')
+    const editor = within(canvas.getByRole('region', { name: 'Location highlighter settings' }))
+    const module = canvasElement.querySelector('.map-location-highlighter') as HTMLElement
+    const select = within(module).getByRole('combobox')
+    expect(editor.getByLabelText('Show reset button')).toBeChecked()
+    expect(editor.getByLabelText('Reset button label')).toHaveValue('Reset')
+    const noteInput = editor.getByLabelText('Note')
+    expect(getComputedStyle(noteInput).minHeight).toBe('50px')
+    await performAndAssert(
+      'Author location guidance',
+      () => module.querySelector('.filters-section__note-text')?.textContent || '',
+      () => userEvent.type(noteInput, 'Helpful selector note'),
+      (_, after) => after === 'Helpful selector note'
+    )
+    await userEvent.selectOptions(select, 'US-AL')
+    const label = editor.getByLabelText('Reset button label')
+    await userEvent.clear(label)
+    expect(within(module).getByRole('button', { name: 'Reset' })).toBeVisible()
+    await performAndAssert(
+      'Customize the reset button label',
+      () => module.querySelector('.map-location-highlighter__controls button')?.textContent || '',
+      () => userEvent.type(label, 'Start over'),
+      (_, after) => after === 'Start over'
+    )
+    await performAndAssert(
+      'Disable the optional location reset control',
+      () => !!within(module).queryByRole('button', { name: 'Start over' }),
+      () => userEvent.click(editor.getByLabelText('Show reset button')),
+      (_, after) => !after
+    )
+    expect(editor.queryByLabelText('Reset button label')).toBeNull()
+    expect(select).toHaveValue('US-AL')
+    await userEvent.click(editor.getByLabelText('Show reset button'))
+    expect(editor.getByLabelText('Reset button label')).toHaveValue('Start over')
+    await userEvent.click(within(module).getByRole('button', { name: 'Start over' }))
+    expect(select).toHaveValue('')
+    expect(select).toHaveFocus()
+  }
+}
+
+export const SelectorContentSizing: Story = {
+  render: () => (
+    <>
+      {[
+        { name: 'none', note: '', width: 740 },
+        { name: 'short', note: 'Choose a place.', width: 740 },
+        { name: 'long-label', note: '', width: 740 },
+        {
+          name: 'long-label-note',
+          note: 'Choose a location to read detailed information and follow links to the latest reports for that location.',
+          width: 740
+        },
+        {
+          name: 'long',
+          note: 'Choose a location to read detailed information and follow links to the latest reports for that location.',
+          width: 740
+        },
+        {
+          name: 'mobile',
+          note: 'Choose a location to read detailed information and follow links to the latest reports for that location.',
+          width: 360
+        }
+      ].map(({ name, note, width }) => {
+        const c = makeConfig()
+        c.data = [
+          { STATE: 'Alabama', Rate: 10, URL: '/al' },
+          { STATE: 'Massachusetts', Rate: 20, URL: '/ma' }
+        ]
+        c.locationHighlighter.dropdownLabel = name.startsWith('long-label')
+          ? 'Select a location to view the latest reports and detailed information. '.repeat(4)
+          : 'Location'
+        c.locationHighlighter.note = note
+        c.filters = []
+        const filterConfig = {
+          ...c,
+          filters: [
+            {
+              columnName: 'STATE',
+              label: 'Location',
+              filterStyle: 'dropdown',
+              active: 'Alabama',
+              values: ['Alabama', 'Massachusetts'],
+              note
+            }
+          ]
+        }
+        return (
+          <div key={name} data-selector-sizing={name} style={{ width, maxWidth: '100%' }}>
+            <div className='cove-visualization'>
+              <Filters config={filterConfig as any} setFilters={() => {}} dimensions={[width, 400]} />
+            </div>
+            <CdcMap config={c} />
+          </div>
+        )
+      })}
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const widths: Record<string, number> = {}
+    for (const example of canvasElement.querySelectorAll<HTMLElement>('[data-selector-sizing]')) {
+      await assertVisualizationRendered(example)
+      await waitForPresence('.map-location-highlighter option[value="US-MA"]', example)
+      const module = example.querySelector('.map-location-highlighter') as HTMLElement
+      const select = within(module).getByRole('combobox')
+      const name = example.dataset.selectorSizing!
+      await document.fonts.ready
+      const width = select.getBoundingClientRect().width
+      widths[name] = width
+      const filter = example.querySelector('.filters-section select')!
+      if (name !== 'mobile') expect(width).toBeCloseTo(filter.getBoundingClientRect().width, 0)
+      expect(width).toBeLessThanOrEqual(module.clientWidth)
+      await userEvent.selectOptions(select, 'US-AL')
+      const reset = within(module).getByRole('button', { name: 'Reset' })
+      expect(select.getBoundingClientRect().width).toBeCloseTo(width, 0)
+      expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
+      if (name.startsWith('long-label')) {
+        const label = module.querySelector('label')!
+        expect(label.getBoundingClientRect().width).toBeGreaterThan(width + 50)
+        expect(label.getBoundingClientRect().bottom).toBeLessThanOrEqual(select.getBoundingClientRect().top)
+        expect(Math.abs(reset.getBoundingClientRect().top - select.getBoundingClientRect().top)).toBeLessThan(5)
+      }
+      if (name !== 'mobile')
+        expect(reset.getBoundingClientRect().left).toBeGreaterThanOrEqual(select.getBoundingClientRect().right)
+      else expect(reset.getBoundingClientRect().top).toBeGreaterThanOrEqual(select.getBoundingClientRect().bottom)
+    }
+    expect(widths.short).toBeCloseTo(widths.none, 0)
+    expect(widths.long).toBeGreaterThan(widths.none + 50)
+    expect(widths.long).toBeLessThanOrEqual(30 * parseFloat(getComputedStyle(document.documentElement).fontSize))
+    expect(widths.mobile).toBeLessThan(widths.long)
   }
 }

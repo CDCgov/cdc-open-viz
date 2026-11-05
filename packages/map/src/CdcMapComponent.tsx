@@ -1,4 +1,8 @@
-import { getLocationSelector, isLocationSelectorEligible, buildLocationOptions } from './helpers/locationSelector'
+import {
+  getLocationHighlighter,
+  isLocationHighlighterEligible,
+  buildLocationOptions
+} from './helpers/locationHighlighter'
 // Vendor
 import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
@@ -78,12 +82,12 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
-import LocationSelector from './components/LocationSelector'
+import LocationHighlighter from './components/LocationHighlighter'
 import { getLocationLinks, hasLocationLinkColumn } from './helpers/locationLinks'
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
-import { useLocationSelectorData } from './hooks/useLocationSelectorData'
+import { useLocationHighlighterData } from './hooks/useLocationHighlighterData'
 import useResizeObserver from './hooks/useResizeObserver'
 import useLegendMemo from './hooks/useLegendMemo'
 import usePrefersReducedMotion from '@cdc/core/hooks/usePrefersReducedMotion'
@@ -693,8 +697,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   )
 
   const locationLinks = getLocationLinks(config)
-  const selectorSettings = getLocationSelector(config)
-  const locationSelectorData = useLocationSelectorData({
+  const highlighterSettings = getLocationHighlighter(config)
+  const locationHighlighterData = useLocationHighlighterData({
     config,
     runtimeData,
     sourceData: playbackFrameData ?? [],
@@ -703,11 +707,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       : runtimeFilters
   })
   const highlightedLocationId =
-    isLocationSelectorEligible(config) &&
-    selectorSettings.enabled &&
-    selectorSettings.highlightSelectedLocation &&
-    locationSelectorData &&
-    buildLocationOptions(locationSelectorData.config, locationSelectorData.runtimeData).some(
+    isLocationHighlighterEligible(config) &&
+    highlighterSettings.enabled &&
+    highlighterSettings.highlightSelectedLocation &&
+    locationHighlighterData &&
+    buildLocationOptions(locationHighlighterData.config, locationHighlighterData.runtimeData).some(
       option => option.id === selectedLocationId
     )
       ? selectedLocationId
@@ -850,15 +854,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
-  const showLocationSelector = isLocationSelectorEligible(config) && selectorSettings.enabled
+  const showLocationHighlighter = isLocationHighlighterEligible(config) && highlighterSettings.enabled
 
-  const locationSelector =
-    showLocationSelector && locationSelectorData ? (
-      <LocationSelector
-        config={locationSelectorData.config}
-        runtimeData={locationSelectorData.runtimeData}
-        sourceData={locationSelectorData.sourceData}
-        runtimeFilters={locationSelectorData.runtimeFilters}
+  const locationHighlighter =
+    showLocationHighlighter && locationHighlighterData ? (
+      <LocationHighlighter
+        config={locationHighlighterData.config}
+        runtimeData={locationHighlighterData.runtimeData}
+        sourceData={locationHighlighterData.sourceData}
+        runtimeFilters={locationHighlighterData.runtimeFilters}
         isEditor={isEditor}
         onSelectionChange={setSelectedLocationId}
       />
@@ -980,8 +984,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
-                beforeContent={selectorSettings.position === 'above' ? locationSelector : null}
-                beforeFooter={selectorSettings.position === 'below' ? locationSelector : null}
+                beforeContent={highlighterSettings.position === 'above' ? locationHighlighter : null}
+                beforeFooter={highlighterSettings.position === 'below' ? locationHighlighter : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,

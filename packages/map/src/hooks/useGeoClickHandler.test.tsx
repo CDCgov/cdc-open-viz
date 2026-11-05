@@ -90,9 +90,10 @@ describe('useGeoClickHandler', () => {
   })
 })
 
-describe('Data map location link flags', () => {
+describe.each(['us', 'world'])('Data map location link flags on %s maps', geoType => {
   it.each([false, true])('direct navigation enabled=%s preserves shared filter actions', enabled => {
     const config = createConfig()
+    config.general.geoType = geoType
     config.columns.navigate.name = 'URL'
     config.tooltips.appearanceType = 'hover'
     config.locationLinks = { ...config.locationLinks, enableMapNavigation: enabled }
@@ -114,6 +115,7 @@ describe('Data map location link flags', () => {
   })
   it('preserves click modals when direct navigation is disabled', () => {
     const config = createConfig()
+    config.general.geoType = geoType
     config.columns.navigate.name = 'URL'
     config.locationLinks = { ...config.locationLinks, enableMapNavigation: false }
     const dispatch = vi.fn()
@@ -123,6 +125,7 @@ describe('Data map location link flags', () => {
   })
   it('preserves Navigation map navigation despite disabled Data-map flags', () => {
     const config = createConfig()
+    config.general.geoType = geoType
     config.general.type = 'navigation'
     config.tooltips.appearanceType = 'hover'
     config.columns.navigate.name = 'URL'
@@ -139,9 +142,10 @@ describe('Data map location link flags', () => {
   })
 })
 
-describe('direct map target resolution', () => {
+describe.each(['us', 'world'])('direct map target resolution on %s maps', geoType => {
   it.each(['_self', '_blank'])('opens relative URLs in %s', target => {
     const config = createConfig()
+    config.general.geoType = geoType
     config.general.navigationTarget = target
     config.columns.navigate.name = 'URL'
     config.tooltips.appearanceType = 'hover'

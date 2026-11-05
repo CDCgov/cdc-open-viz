@@ -10,7 +10,9 @@ const makeConfig = (geoType = 'us') =>
 describe('location information source rows', () => {
   it.each([
     ['us', 'US-AL', ['AL', 'Alabama', 'alabama'], 'AK'],
-    ['world', 'CAN', ['Canada', 'CANADA', 'canada'], 'Mexico']
+    ['world', 'CAN', ['Canada', 'CANADA', 'canada'], 'Mexico'],
+    ['us', 'NEW YORK CITY', ['New York City', 'NEW YORK CITY', 'new york city'], 'New York'],
+    ['world', 'NEW YORK CITY', ['New York City', 'NEW YORK CITY', 'new york city'], 'United States']
   ])('preserves duplicate rows and aliases on %s maps without changing source data', (geoType, id, aliases, other) => {
     const rows = [...aliases, other].map((Location, index) => Object.freeze({ Location, Value: index, uid: 'stale' }))
     const result = getLocationInformationRows(makeConfig(geoType), rows, [], id)

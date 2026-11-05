@@ -1,4 +1,4 @@
-import { buildLocationOptions, getLocationSelector, isLocationSelectorEligible } from './locationSelector'
+import { buildLocationOptions, getLocationHighlighter, isLocationHighlighterEligible } from './locationHighlighter'
 import { canNavigateMap, getLocationLinks, hasLocationLinkColumn } from './locationLinks'
 import { createNewMapConfig } from './createNewMapConfig'
 import generateRuntimeData from './generateRuntimeData'
@@ -27,29 +27,41 @@ describe('location link options', () => {
     }
   )
   it('hydrates omitted and partial selector settings with independent defaults', () => {
-    for (const locationSelector of [undefined, {}, { enabled: true }]) {
-      const hydrated = applyConfigDefaults({ locationSelector }, defaults)
-      expect(getLocationSelector(hydrated)).toEqual({ ...defaults.locationSelector, ...locationSelector })
+    for (const locationHighlighter of [undefined, {}, { enabled: true }]) {
+      const hydrated = applyConfigDefaults({ locationHighlighter }, defaults)
+      expect(getLocationHighlighter(hydrated)).toEqual({ ...defaults.locationHighlighter, ...locationHighlighter })
     }
-    expect(defaults.locationSelector).toEqual({
+    expect(defaults.locationHighlighter).toEqual({
       enabled: false,
       position: 'above',
-      highlightSelectedLocation: false,
-      information: '',
-      label: 'Select a location for more information',
+      highlightSelectedLocation: true,
+      note: '',
+      showResetButton: true,
+      resetButtonLabel: 'Reset',
+      details: '',
+      dropdownLabel: 'Select a location for more information',
       placeholder: '- Select -',
       filterColumn: ''
     })
   })
+  it('preserves explicitly disabled highlighting on existing configs', () => {
+    const hydrated = applyConfigDefaults(
+      { locationHighlighter: { enabled: false, highlightSelectedLocation: false } },
+      defaults
+    )
+    hydrated.locationHighlighter.enabled = true
+    expect(getLocationHighlighter(hydrated).highlightSelectedLocation).toBe(false)
+  })
+
   it.each(['above', 'below', 'bottom', '', null])('normalizes position %j without mutating settings', position => {
-    const cfg = config({ locationSelector: { position } })
-    expect(getLocationSelector(cfg).position).toBe(position === 'below' ? 'below' : 'above')
-    expect(cfg.locationSelector.position).toBe(position)
+    const cfg = config({ locationHighlighter: { position } })
+    expect(getLocationHighlighter(cfg).position).toBe(position === 'below' ? 'below' : 'above')
+    expect(cfg.locationHighlighter.position).toBe(position)
   })
   it.each([undefined, null, '', '  ', '\n', 0, false, 'value', 'not a URL'])(
     'filters presence for %j on the current runtime row',
     value => {
-      const cfg = config({ locationSelector: { filterColumn: 'Presence' } })
+      const cfg = config({ locationHighlighter: { filterColumn: 'Presence' } })
       const options = buildLocationOptions(cfg, { 'US-AL': { Presence: value } })
       expect(options).toHaveLength(value == null || (typeof value === 'string' && !value.trim()) ? 0 : 1)
     }
@@ -57,7 +69,7 @@ describe('location link options', () => {
   it('includes all eligible rows by default and excludes all when the configured column is missing', () => {
     const cfg = config()
     expect(buildLocationOptions(cfg, { 'US-AL': {} })).toHaveLength(1)
-    cfg.locationSelector.filterColumn = 'Missing'
+    cfg.locationHighlighter.filterColumn = 'Missing'
     expect(buildLocationOptions(cfg, { 'US-AL': {} })).toEqual([])
   })
   it('stamps new maps so migration retains current defaults even with a URL column', () => {
@@ -81,6 +93,36 @@ describe('location link options', () => {
         .sort()
     ).toEqual(['US-AL', 'US-DC', 'US-PR'])
   })
+  it.each(['us', 'world'])(
+    'includes supported cities with independent IDs and presence filtering on %s maps',
+    geoType => {
+      const cfg = config({
+        general: { type: 'data', geoType },
+        data: [
+          { State: geoType === 'us' ? 'New York' : 'Canada', Label: 'Region', URL: '/region' },
+          { State: 'new york city', Label: 'NYC report', URL: '/city' },
+          { State: 'Boston', Label: 'Boston', URL: '' },
+          { State: 'Unknown place', Label: 'Unknown', URL: '/unknown' }
+        ]
+      })
+      const data = generateRuntimeData(cfg, [], 1, false)
+      expect(
+        buildLocationOptions(cfg, data)
+          .map(option => option.id)
+          .sort()
+      ).toEqual(['BOSTON', 'NEW YORK CITY', geoType === 'us' ? 'US-NY' : 'CAN'].sort())
+      expect(buildLocationOptions(cfg, data).find(option => option.id === 'NEW YORK CITY')?.label).toBe('NYC report')
+      cfg.locationHighlighter.filterColumn = 'URL'
+      expect(buildLocationOptions(cfg, data).map(option => option.id)).not.toContain('BOSTON')
+      expect(buildLocationOptions(cfg, data).map(option => option.id)).toContain('NEW YORK CITY')
+      if (geoType === 'world') {
+        cfg.general.countriesPicked = [{ iso: 'MEX', name: 'Mexico' }]
+        cfg.general.hideUnselectedCountries = true
+        expect(buildLocationOptions(cfg, data).map(option => option.id)).toEqual(['NEW YORK CITY'])
+      }
+    }
+  )
+
   it('uses displayed labels and stable ID ties', () => {
     const options = buildLocationOptions(config(), {
       'US-AK': { Label: 'Same', URL: 123 },
@@ -109,12 +151,12 @@ describe('location link options', () => {
     expect(buildLocationOptions(cfg, data).map(option => option.id)).toEqual(['CAN', 'MEX'])
   })
   it.each(['us-county', 'us-region', 'single-state'])('excludes %s selectors', geoType => {
-    expect(isLocationSelectorEligible(config({ general: { type: 'data', geoType } }))).toBe(false)
+    expect(isLocationHighlighterEligible(config({ general: { type: 'data', geoType } }))).toBe(false)
   })
   it('excludes Navigation, geocode, and small multiples', () => {
     for (const type of ['navigation', 'us-geocode', 'world-geocode']) {
-      expect(isLocationSelectorEligible(config({ general: { type, geoType: 'world' } }))).toBe(false)
+      expect(isLocationHighlighterEligible(config({ general: { type, geoType: 'world' } }))).toBe(false)
     }
-    expect(isLocationSelectorEligible(config({ smallMultiples: { mode: 'by-column' } }))).toBe(false)
+    expect(isLocationHighlighterEligible(config({ smallMultiples: { mode: 'by-column' } }))).toBe(false)
   })
 })

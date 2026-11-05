@@ -35,7 +35,7 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
     return Object.keys(runtimeData).reduce((acc, key) => {
       const city = runtimeData[key]
       if (city && city[geoColumnName]) {
-        acc[city[geoColumnName]] = city
+        acc[key] = city
       }
       return acc
     }, {})
@@ -57,14 +57,15 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
   }
 
   // Cities output
-  return cityList.map((city, i) => {
+  return cityList.map(cityId => {
     // Get the city data directly from our memoized citiesData
-    const geoData = citiesData[city]
+    const geoData = citiesData[cityId]
 
     if (!geoData) {
       return null
     }
 
+    const city = String(geoData[geoColumnName])
     const cityDisplayName = displayGeoName(city)
 
     const legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -86,7 +87,9 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
       fillOpacity: 1
     }
 
-    const geoStrokeColor = getGeoStrokeColor(config)
+    const highlighted = isHighlighted(cityId, geoData[geoColumnName])
+    const geoStrokeColor = highlighted ? '#000000' : getGeoStrokeColor(config)
+    const markerStrokeWidth = highlighted ? '3px' : '2px'
 
     const pin = (
       <g>
@@ -99,7 +102,7 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
           data-tooltip-html={toolTip}
           transform={`scale(${radius / 7.5})`}
           stroke={geoStrokeColor}
-          strokeWidth={'2px'}
+          strokeWidth={markerStrokeWidth}
           tabIndex={-1}
           {...additionalProps}
         />
@@ -151,9 +154,9 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
 
     const styles = {
       fill: legendColors[0],
-      // Cities are independent locations, not children of the selected state/country.
-      opacity: isDimmed(undefined, geoData[geoColumnName]) ? MAP_DIMMED_OPACITY : 1,
-      stroke: isHighlighted(undefined, geoData[geoColumnName]) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+      // Match the canonical runtime ID, independently of source casing or display labels.
+      opacity: isDimmed(cityId, geoData[geoColumnName]) ? MAP_DIMMED_OPACITY : 1,
+      stroke: geoStrokeColor,
       '&:hover': {
         fill: legendColors[1],
         outline: 0
@@ -182,7 +185,7 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
       stroke: geoStrokeColor,
-      strokeWidth: '2px',
+      strokeWidth: markerStrokeWidth,
       tabIndex: -1,
       ...additionalProps
     }
@@ -213,7 +216,7 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
 
     // Render the city marker
     return (
-      <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
+      <g key={cityId} data-city-id={cityId} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
         {cityStyleShapes[shapeToUse]}
       </g>
     )

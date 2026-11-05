@@ -147,15 +147,23 @@ describe('4.26.11 location link compatibility', () => {
   it.each([undefined, null, '', '   ', 12])('leaves unconfigured columns untouched: %j', name => {
     expect(update_4_26_11(map(name, { columns: { navigate: { name } } }))).not.toHaveProperty('locationLinks')
   })
+  it('preserves legacy world-map links inside dashboards', () => {
+    const worldMap = map('URL', { general: { type: 'data', geoType: 'world' } })
+    const result = update_4_26_11({ type: 'dashboard', visualizations: { world: worldMap } })
+    expect(result.visualizations.world.locationLinks).toEqual({
+      enableMapNavigation: true,
+      enableDataTableLinks: true
+    })
+  })
   it('preserves authored flags and selector settings', () => {
     const settings = {
       enableMapNavigation: false,
       enableDataTableLinks: false
     }
-    const locationSelector = { enabled: true, label: 'Places' }
-    const result = update_4_26_11(map('URL', { locationLinks: settings, locationSelector }))
+    const locationHighlighter = { enabled: true, dropdownLabel: 'Places' }
+    const result = update_4_26_11(map('URL', { locationLinks: settings, locationHighlighter }))
     expect(result.locationLinks).toEqual(settings)
-    expect(result.locationSelector).toEqual(locationSelector)
+    expect(result.locationHighlighter).toEqual(locationHighlighter)
     expect(update_4_26_11(map('URL', { locationLinks: { enableMapNavigation: false } })).locationLinks).toEqual({
       enableMapNavigation: false,
       enableDataTableLinks: true

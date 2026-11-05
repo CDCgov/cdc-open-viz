@@ -1,26 +1,26 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { DataRow, MapConfig } from '../types/MapConfig'
 import type { VizFilter } from '@cdc/core/types/VizFilter'
-import { getLocationSelector, isLocationSelectorEligible } from '../helpers/locationSelector'
+import { getLocationHighlighter, isLocationHighlighterEligible } from '../helpers/locationHighlighter'
 
-type LocationSelectorData = {
+type LocationHighlighterData = {
   config: MapConfig
   runtimeData: Record<string, DataRow>
   sourceData: DataRow[]
   runtimeFilters: VizFilter[]
 }
 
-type LocationSelectorDataInput = Omit<LocationSelectorData, 'runtimeData'> & { runtimeData: unknown }
+type LocationHighlighterDataInput = Omit<LocationHighlighterData, 'runtimeData'> & { runtimeData: unknown }
 
 /** Adapt the map's runtime lifecycle without exposing filter payloads to the selector. */
-export const useLocationSelectorData = ({
+export const useLocationHighlighterData = ({
   config,
   runtimeData,
   sourceData,
   runtimeFilters
-}: LocationSelectorDataInput): LocationSelectorData | null => {
-  const enabled = isLocationSelectorEligible(config) && getLocationSelector(config).enabled
-  const lastData = useRef<LocationSelectorData | null>(null)
+}: LocationHighlighterDataInput): LocationHighlighterData | null => {
+  const enabled = isLocationHighlighterEligible(config) && getLocationHighlighter(config).enabled
+  const lastData = useRef<LocationHighlighterData | null>(null)
   const currentData = useMemo(() => {
     // Legacy year/filter changes temporarily put a filter array in runtimeData.
     // Generated geography data is a record, including when the completed result is empty.

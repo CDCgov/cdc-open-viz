@@ -14,12 +14,15 @@ const createInitialState = () => {
       enableMapNavigation: false,
       enableDataTableLinks: true
     },
-    locationSelector: {
+    locationHighlighter: {
       enabled: false,
       position: 'above',
-      highlightSelectedLocation: false,
-      information: '',
-      label: 'Select a location for more information',
+      highlightSelectedLocation: true,
+      note: '',
+      showResetButton: true,
+      resetButtonLabel: 'Reset',
+      details: '',
+      dropdownLabel: 'Select a location for more information',
       placeholder: '- Select -',
       filterColumn: ''
     },

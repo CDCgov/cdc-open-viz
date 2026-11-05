@@ -87,11 +87,11 @@ describe('useApplyTooltipsToGeo', () => {
   })
 })
 
-describe('Data-map modal link targets', () => {
+describe.each(['us', 'world'])('Data-map modal link targets on %s maps', geoType => {
   it.each(['_self', '_blank'])('keeps modal navigation using %s when direct links are off', target => {
     const config = {
       ...createConfig(),
-      general: { ...createConfig().general, type: 'data', navigationTarget: target },
+      general: { ...createConfig().general, geoType, type: 'data', navigationTarget: target },
       locationLinks: { enableMapNavigation: false }
     }
     const open = vi.spyOn(window, 'open').mockImplementation(() => null)

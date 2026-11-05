@@ -108,9 +108,9 @@ describe('city marker highlighting', () => {
           visual: { ...config.visual, cityStyle }
         },
         selectedLocationId: 'US-NY',
-        setSharedFilterValue: 'New York City',
+        setSharedFilterValue: 'new york city',
         position: { zoom: 1 },
-        runtimeData: { NYC: { Site: 'New York City', Latitude_jitter: 40.7, Longitude_jitter: -74 } },
+        runtimeData: { 'NEW YORK CITY': { Site: 'new york city', Latitude_jitter: 40.7, Longitude_jitter: -74 } },
         runtimeLegend: { items: [] }
       }
       const draw = (contextValue: typeof value) => (
@@ -123,6 +123,11 @@ describe('city marker highlighting', () => {
       const { container, rerender } = render(draw(value))
       expect(container.querySelector('.geo-point')).toHaveStyle({ opacity: '0.5' })
       expect(container.querySelector('.geo-point path, .geo-point circle, .geo-point polygon')).not.toBeNull()
+      rerender(draw({ ...value, selectedLocationId: 'NEW YORK CITY' }))
+      expect(container.querySelector('.geo-point')).toHaveStyle({ opacity: '1' })
+      const shape = container.querySelector('.geo-point path, .geo-point circle, .geo-point polygon')!
+      expect(shape).toHaveAttribute('stroke', '#000000')
+      expect(shape).toHaveAttribute('stroke-width', '3px')
       rerender(draw({ ...value, selectedLocationId: '' }))
       expect(container.querySelector('.geo-point')).toHaveStyle({ opacity: '1' })
       rerender(draw({ ...value, selectedLocationId: '', setSharedFilterValue: 'Alabama' }))
