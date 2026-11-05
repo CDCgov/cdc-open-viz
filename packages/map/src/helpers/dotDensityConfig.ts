@@ -1,4 +1,5 @@
 import { applyColorToLegend } from './applyColorToLegend'
+import { mapColorPalettes } from '@cdc/core/data/colorPalettes'
 import type { DotDensityConfig, DotDensitySeries, MapConfig } from '../types/MapConfig'
 
 export const createDefaultDotDensityConfig = (): DotDensityConfig => ({
@@ -57,6 +58,11 @@ export const getConfiguredDotDensitySeries = (config: MapConfig): ResolvedDotDen
   const categoryConfig = { ...config, legend: { ...config.legend, type: 'category', style: 'circles' } } as MapConfig
   const entries = series.map(item => ({ special: false, value: item.id }))
   const colors = series.map((_item, index) => applyColorToLegend(index, categoryConfig, entries))
+  const palette = config.general.palette
+  const namedCatalog =
+    palette?.version === '2.1' && !palette.customColors && !palette.customColorsOrdered && palette.name
+      ? mapColorPalettes.v2[palette.name]
+      : undefined
   const availableColors = colors.filter((color): color is string => typeof color === 'string' && color.length > 0)
   // Qualitative catalogs can run out of entries. Reuse their resolved colors; do not invent a new set.
   const fallback =
@@ -72,7 +78,8 @@ export const getConfiguredDotDensitySeries = (config: MapConfig): ResolvedDotDen
   return series.map((item, index) => ({
     ...item,
     color:
-      colors[index] ||
+      item.color ||
+      (namedCatalog?.length && index >= namedCatalog.length ? colors[index % namedCatalog.length] : colors[index]) ||
       (availableColors.length ? availableColors[index % availableColors.length] : undefined) ||
       fallback
   }))

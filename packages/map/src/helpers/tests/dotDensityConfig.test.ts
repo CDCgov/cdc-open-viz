@@ -150,12 +150,12 @@ describe('dot density map palettes', () => {
     config.general.palette = { name, version, isReversed: name.endsWith('reverse') }
     config.dotDensity!.series = [
       { id: 'draft', column: '', label: '' },
-      ...['A', 'B', 'C'].map(id => ({ id, column: id, label: id, color: '#123456' }))
+      ...['A', 'B', 'C'].map(id => ({ id, column: id, label: id }))
     ] as any
     return config
   }
 
-  it('uses the selected map palette instead of legacy colors without consuming draft colors', () => {
+  it('uses the selected map palette for new series without consuming draft colors', () => {
     const config = paletteConfig()
     const before = JSON.stringify(config)
     expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(
@@ -163,6 +163,18 @@ describe('dot density map palettes', () => {
     )
     expect(JSON.stringify(config)).toBe(before)
     expect(createDotDensitySeries([])).not.toHaveProperty('color')
+  })
+
+  it('preserves explicit legacy series colors without changing the map palette', () => {
+    const config = paletteConfig('qualitative_standard', '2.1')
+    config.dotDensity!.series = [
+      { id: 'A', column: 'A', label: 'A', color: '#123456' },
+      { id: 'B', column: 'B', label: 'B', color: '#abcdef' }
+    ]
+    const palette = JSON.stringify(config.general.palette)
+
+    expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(['#123456', '#abcdef'])
+    expect(JSON.stringify(config.general.palette)).toBe(palette)
   })
 
   it('follows palette 2.1 distribution and reversal, independently of base numeric bins', () => {
@@ -184,16 +196,18 @@ describe('dot density map palettes', () => {
     expect(getConfiguredDotDensitySeries(config).map(series => series.color)).toEqual(['#abcdef', '#fedcba', '#fedcba'])
   })
 
-  it('reuses available catalog colors when series outnumber the palette', () => {
-    const config = paletteConfig()
-    config.dotDensity!.series = Array.from({ length: 12 }, (_, index) => ({
-      id: String(index),
-      column: String(index),
-      label: ''
-    })) as any
-    const colors = getConfiguredDotDensitySeries(config).map(series => series.color)
-    expect(colors.slice(0, 9)).toEqual(mapColorPalettes.v2.qualitative_standard)
-    expect(colors.slice(9)).toEqual(colors.slice(0, 3))
+  it('cycles through named catalog colors when series outnumber the palette', () => {
+    for (const version of ['2.0', '2.1']) {
+      const config = paletteConfig('qualitative_standard', version)
+      config.dotDensity!.series = Array.from({ length: 12 }, (_, index) => ({
+        id: String(index),
+        column: String(index),
+        label: ''
+      })) as any
+      const colors = getConfiguredDotDensitySeries(config).map(series => series.color)
+      if (version === '2.0') expect(colors.slice(0, 9)).toEqual(mapColorPalettes.v2.qualitative_standard)
+      expect(colors.slice(9)).toEqual(colors.slice(0, 3))
+    }
   })
 })
 
