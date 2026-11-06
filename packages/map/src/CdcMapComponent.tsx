@@ -1,3 +1,8 @@
+import {
+  getLocationHighlighter,
+  isLocationHighlighterEligible,
+  buildLocationOptions
+} from './helpers/locationHighlighter'
 // Vendor
 import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
@@ -62,6 +67,7 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { normalizeDotDensityLegend, withDotDensityColumns } from './helpers/dotDensityConfig'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
 import {
   DEFAULT_TIME_PLAYBACK_NOTE,
@@ -76,9 +82,12 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
+import LocationHighlighter from './components/LocationHighlighter'
+import { getLocationLinks, hasLocationLinkColumn } from './helpers/locationLinks'
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
+import { useLocationHighlighterData } from './hooks/useLocationHighlighterData'
 import useResizeObserver from './hooks/useResizeObserver'
 import useLegendMemo from './hooks/useLegendMemo'
 import usePrefersReducedMotion from '@cdc/core/hooks/usePrefersReducedMotion'
@@ -98,7 +107,11 @@ import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
-import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
+import {
+  getMissingRequiredMapFields,
+  getMapDensitySourceColumns,
+  type MissingRequiredMapField
+} from './helpers/getMissingRequiredMapFields'
 const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcMapComponent = {
@@ -137,7 +150,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
+  const normalizedConfig = normalizeDotDensityLegend(configObj)
+  const effectiveConfig = configIsPrepared ? normalizedConfig : applyConfigDefaults(normalizedConfig, defaults)
   const initialState = getInitialState(effectiveConfig)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
@@ -149,6 +163,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
     config,
     modal,
     accessibleStatus,
@@ -177,6 +192,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         playbackFrames.findIndex(frame => String(frame) === String(timePlaybackEligibility.initialFrame))
       )
     : 0
+  const [selectedLocationId, setSelectedLocationId] = useState('')
   const [timeFrameIndex, setTimeFrameIndex] = useState<number | null>(null)
   const [isTimePlaybackPlaying, setIsTimePlaybackPlaying] = useState(false)
   const [hasTimePlaybackStarted, setHasTimePlaybackStarted] = useState(false)
@@ -225,14 +241,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapConfig: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
+    const normalized = normalizeDotDensityLegend(newMapConfig)
+    dispatch({ type: 'SET_CONFIG', payload: normalized })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newMapConfig)
+      editorContext.setTempConfig(normalized)
     }
   }
 
   useEffect(() => {
-    const configClone = cloneConfig(configObj)
+    const configClone = normalizeDotDensityLegend(cloneConfig(configObj))
     const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
     const _newConfig = getInitialState(effectiveConfig).config
     if (configObj.data) {
@@ -674,7 +691,34 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
+  const densitySourceColumns = useMemo(
+    () => getMapDensitySourceColumns({ data: config.data, dataKey: config.dataKey }, datasets),
+    [config.data, config.dataKey, datasets]
+  )
+
+  const locationLinks = getLocationLinks(config)
+  const highlighterSettings = getLocationHighlighter(config)
+  const locationHighlighterData = useLocationHighlighterData({
+    config,
+    runtimeData,
+    sourceData: playbackFrameData ?? [],
+    runtimeFilters: timePlaybackEligibility.eligible
+      ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+      : runtimeFilters
+  })
+  const highlightedLocationId =
+    isLocationHighlighterEligible(config) &&
+    highlighterSettings.enabled &&
+    highlighterSettings.highlightSelectedLocation &&
+    locationHighlighterData &&
+    buildLocationOptions(locationHighlighterData.config, locationHighlighterData.runtimeData).some(
+      option => option.id === selectedLocationId
+    )
+      ? selectedLocationId
+      : ''
+
   const mapProps = {
+    selectedLocationId: highlightedLocationId,
     setParentConfig,
     container,
     content: modal,
@@ -696,6 +740,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
+    densitySourceColumns,
     scale,
     setConfig,
     setFilteredStateCountyCode,
@@ -731,6 +777,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     preparedConfig = preparedBubbleTable.config
     preparedColumns = preparedBubbleTable.columns
     preparedRuntimeData = preparedBubbleTable.runtimeData
+    preparedConfig = withDotDensityColumns(preparedConfig)
+    preparedColumns = preparedConfig.columns
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
@@ -806,18 +854,40 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const showLocationHighlighter = isLocationHighlighterEligible(config) && highlighterSettings.enabled
+
+  const locationHighlighter =
+    showLocationHighlighter && locationHighlighterData ? (
+      <LocationHighlighter
+        config={locationHighlighterData.config}
+        runtimeData={locationHighlighterData.runtimeData}
+        sourceData={locationHighlighterData.sourceData}
+        runtimeFilters={locationHighlighterData.runtimeFilters}
+        isEditor={isEditor}
+        onSelectionChange={setSelectedLocationId}
+      />
+    ) : null
+
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
 
   const revealRequiredMapField = ({ target, subsectionTarget }: MissingRequiredMapField) => {
     const revealTarget = () => {
+      if (target === 'map-dot-density-count') {
+        const densityButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-dot-density']")
+        if (densityButton?.getAttribute('aria-expanded') !== 'true') densityButton?.click()
+        window.requestAnimationFrame(() =>
+          container?.querySelector<HTMLElement>("[data-required-field-control='map-dot-density-count']")?.focus()
+        )
+        return
+      }
       const columnsButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-columns']")
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 
       window.requestAnimationFrame(() => {
-        const subsectionButton = container?.querySelector<HTMLElement>(
-          `[data-required-field-subsection='${subsectionTarget}']`
-        )
+        const subsectionButton = subsectionTarget
+          ? container?.querySelector<HTMLElement>(`[data-required-field-subsection='${subsectionTarget}']`)
+          : null
         if (subsectionButton?.getAttribute('aria-expanded') !== 'true') subsectionButton?.click()
 
         window.requestAnimationFrame(() => {
@@ -914,6 +984,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
+                beforeContent={highlighterSettings.position === 'above' ? locationHighlighter : null}
+                beforeFooter={highlighterSettings.position === 'below' ? locationHighlighter : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,
@@ -947,6 +1019,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 bodySubtext={
                   processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
                 }
+                bodyAnnotations={config.annotations?.length > 0 ? <Annotation.Dropdown /> : null}
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -955,6 +1028,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {mapDataTableIsRendered ? (
                       <DataTable
+                        mapLinkSettings={
+                          general.type === 'data'
+                            ? {
+                                enabled: hasLocationLinkColumn(config) && locationLinks.enableDataTableLinks,
+                                target: general.navigationTarget
+                              }
+                            : undefined
+                        }
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
@@ -1016,8 +1097,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         </div>
                       )
                     )}
-
-                    {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                     {processedFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>

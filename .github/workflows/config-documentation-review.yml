@@ -12,6 +12,8 @@ jobs:
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
+      issues: write
+
       pull-requests: write
 
     steps:

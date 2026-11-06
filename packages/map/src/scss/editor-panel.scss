@@ -81,6 +81,18 @@
       }
     }
 
+    & .map-location-links-editor {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+
+      & > h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+    }
+
     .remove-column {
       font-size: 13px;
     }

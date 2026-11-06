@@ -1,3 +1,4 @@
+import { canNavigateMap } from '../../../../helpers/locationLinks'
 import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../../context'
 import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
@@ -68,7 +69,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
           // When to add pointer cursor
           if (
-            (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+            (canNavigateMap(config) && config.columns.navigate && geoData[config.columns.navigate.name]) ||
             config.tooltips.appearanceType === 'hover'
           ) {
             styles.cursor = 'pointer'

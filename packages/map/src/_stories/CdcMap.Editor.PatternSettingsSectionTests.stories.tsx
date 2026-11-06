@@ -87,53 +87,18 @@ export const PatternSettingsSectionTests: Story = {
     )
 
     // ==========================================================================
-    // TEST: Add a geo pattern and verify pattern appears on map
+    // TEST: Add a draft geo pattern before configuring its data match
     // ==========================================================================
     await performAndAssert(
-      'Pattern Settings → Add geo pattern',
-      () => {
-        // Look for pattern elements in ALL SVGs (there might be multiple)
-        // Pattern definitions are <pattern> elements, and they're used by paths with fill="url(#...)"
-        const allSvgs = canvasElement.querySelectorAll('svg')
-        let patternDefCount = 0
-        let patternPathCount = 0
-
-        allSvgs.forEach(svg => {
-          const patternDefs = svg.querySelectorAll('pattern')
-          patternDefCount += patternDefs.length
-
-          const allPaths = Array.from(svg.querySelectorAll('path'))
-          const patternPaths = allPaths.filter(path => {
-            const fill = path.getAttribute('fill')
-            return fill && fill.startsWith('url(#')
-          })
-          patternPathCount += patternPaths.length
-        })
-
-        return {
-          patternDefCount,
-          patternPathCount,
-          svgCount: allSvgs.length
-        }
-      },
-      async () => {
-        // Click "Add Geo Pattern" button
-        const buttons = Array.from(canvasElement.querySelectorAll('button'))
-        const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
-        if (!addPatternButton) {
-          throw new Error('Add Geo Pattern button not found')
-        }
-        await userEvent.click(addPatternButton)
-      },
-      (before, after) => {
-        // After clicking, at minimum a new pattern definition should be created.
-        // Pattern paths may remain unchanged until dataKey/dataValue are configured.
-        return after.patternDefCount > before.patternDefCount
-      }
+      'Pattern Settings → Add draft geo pattern',
+      () => canvas.getAllByRole('button').filter(button => button.textContent?.includes('Select Column')).length,
+      () => userEvent.click(canvas.getByRole('button', { name: 'Add Geo Pattern', exact: true })),
+      (before, after) => after === before + 1
     )
+    expect(canvasElement.querySelector('svg[role="img"] path[fill^="url(#"]')).not.toBeInTheDocument()
 
     // ==========================================================================
-    // TEST: Change pattern color to #111
+    // TEST: Open the draft pattern accordion
     // ==========================================================================
     // First, open the pattern accordion
     let patternAccordionButton: HTMLElement | null = null
@@ -157,47 +122,6 @@ export const PatternSettingsSectionTests: Story = {
       },
       (before, after) => {
         return !before.isExpanded && after.isExpanded
-      }
-    )
-
-    // Now change the pattern color
-    await performAndAssert(
-      'Pattern Settings → Change pattern color to #111',
-      () => {
-        // Check pattern color in the SVG - look for circle elements inside pattern definitions
-        const allSvgs = canvasElement.querySelectorAll('svg')
-        let patternCircleColors: string[] = []
-
-        allSvgs.forEach(svg => {
-          const patterns = svg.querySelectorAll('pattern')
-          patterns.forEach(pattern => {
-            const circles = pattern.querySelectorAll('circle')
-            circles.forEach(circle => {
-              const fill = circle.getAttribute('fill')
-              if (fill) patternCircleColors.push(fill)
-            })
-          })
-        })
-
-        return {
-          patternColors: patternCircleColors
-        }
-      },
-      async () => {
-        // Find the pattern color input and change it to #111
-        const input = canvasElement.querySelector('input[name="patternColor"]') as HTMLInputElement
-        if (!input) {
-          throw new Error('Pattern color input not found')
-        }
-        await userEvent.clear(input)
-        // Use paste to enter the entire value at once, avoiding intermediate contrast check warnings
-        await userEvent.paste('#111')
-        // Blur to commit the change
-        await userEvent.tab()
-      },
-      (before, after) => {
-        // Pattern circles should now have fill color #111
-        return after.patternColors.some(color => color === '#111')
       }
     )
 
@@ -245,6 +169,49 @@ export const PatternSettingsSectionTests: Story = {
       (before, after) => {
         // After setting STATE/Colorado, at least one matching patterned path should appear.
         return after.patternPathCount > before.patternPathCount && after.patternPathCount > 0
+      }
+    )
+
+    // =========================================================================
+    // TEST: Change pattern color to #111 on the configured overlay
+    // =========================================================================
+    await performAndAssert(
+      'Pattern Settings → Change pattern color to #111',
+      () => {
+        // Check pattern color in the SVG - look for circle elements inside pattern definitions
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternCircleColors: string[] = []
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            const circles = pattern.querySelectorAll('circle')
+            circles.forEach(circle => {
+              const fill = circle.getAttribute('fill')
+              if (fill) patternCircleColors.push(fill)
+            })
+          })
+        })
+
+        return {
+          patternColors: patternCircleColors
+        }
+      },
+      async () => {
+        // Find the pattern color input and change it to #111
+        const input = canvasElement.querySelector('input[name="patternColor"]') as HTMLInputElement
+        if (!input) {
+          throw new Error('Pattern color input not found')
+        }
+        await userEvent.clear(input)
+        // Use paste to enter the entire value at once, avoiding intermediate contrast check warnings
+        await userEvent.paste('#111')
+        // Blur to commit the change
+        await userEvent.tab()
+      },
+      (before, after) => {
+        // Pattern circles should now have fill color #111
+        return after.patternColors.some(color => color === '#111')
       }
     )
 

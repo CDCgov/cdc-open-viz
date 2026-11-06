@@ -1,3 +1,7 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
+import useMapHighlight from '../../../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../../../helpers/mapHighlight'
+import { canNavigateMap } from '../../../helpers/locationLinks'
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -15,7 +19,7 @@ import { feature as topoFeature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
-import { supportedCities, supportedStates } from '../../../data/supported-geos'
+import { supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
@@ -33,7 +37,7 @@ import FilterControls from '../../FilterControls'
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import TerritoriesSection from './TerritoriesSection'
 import SmallMultiples from '../../SmallMultiples/SmallMultiples'
@@ -60,25 +64,15 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
+import { getVisibleStateTerritories, isTerritoryBubblePlaceable } from '../../../helpers/bubblePlacement'
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
+import { getStateCalloutPosition, stateCallouts } from '../../../helpers/stateCallouts'
+import type { BubblePositionOverrides } from '../../../helpers/bubblePlacement'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
-const TERRITORY_KEYS = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
-
-const offsets = {
-  'US-VT': [53, -7],
-  'US-NH': [38, 7],
-  'US-MA': [34, -1],
-  'US-RI': [29, 7],
-  'US-CT': [43, 20],
-  'US-NJ': [26, 7],
-  'US-DE': [33, 0],
-  'US-MD': [51, 16],
-  [DC_GEO_KEY]: [58, 42]
-}
 
 const nudges = {
   'US-FL': [15, 3],
@@ -95,7 +89,7 @@ const nudges = {
 const UsaMap = () => {
   const {
     runtimeData,
-    setSharedFilterValue,
+    selectedLocationId,
     config,
     setConfig,
     tooltipId,
@@ -121,7 +115,6 @@ const UsaMap = () => {
 
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
-  let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
   const bubbleLayers = getConfiguredBubbleLayers(config)
@@ -132,25 +125,6 @@ const UsaMap = () => {
 
   const handleDragStateChange = (dragState: any) => {
     dispatch({ type: 'SET_IS_DRAGGING_ANNOTATION', payload: dragState })
-  }
-
-  if (setSharedFilterValue) {
-    Object.keys(supportedStates).forEach(supportedState => {
-      if (supportedStates[supportedState].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
-        isFilterValueSupported = true
-      }
-    })
-
-    Object.keys(supportedTerritories).forEach(supportedTerritory => {
-      if (supportedTerritories[supportedTerritory].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
-        isFilterValueSupported = true
-      }
-    })
-    Object.keys(supportedCities).forEach(supportedCity => {
-      if (supportedCity === setSharedFilterValue.toUpperCase()) {
-        isFilterValueSupported = true
-      }
-    })
   }
 
   // "Choose State" options
@@ -184,15 +158,7 @@ const UsaMap = () => {
     dispatch({ type: 'SET_TRANSLATE', payload: [SVG_WIDTH / 2, SVG_HEIGHT / 2] })
   }, [general.geoType])
 
-  const territoriesData = useMemo(() => {
-    if (general.territoriesAlwaysShow) {
-      // Show Available Territories whether in the data or not
-      return TERRITORY_KEYS
-    }
-
-    // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    return TERRITORY_KEYS.filter(key => runtimeData?.[key])
-  }, [runtimeData, general.territoriesAlwaysShow])
+  const territoriesData = useMemo(() => getVisibleStateTerritories(config, runtimeData), [config, runtimeData])
 
   const bubbleRenderRows: BubbleRenderRow[] = hasBubbleLayers
     ? getBubbleRenderData({
@@ -213,6 +179,15 @@ const UsaMap = () => {
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
+
+  const { isDimmed, isHighlighted } = useMapHighlight()
+  const getLocationHighlightStyles = (
+    locationId: string,
+    geoData: Record<string, any> | undefined = runtimeData?.[locationId]
+  ) => ({
+    opacity: isDimmed(locationId, geoData?.[columns.geo.name]) ? MAP_DIMMED_OPACITY : 1,
+    stroke: isHighlighted(locationId, geoData?.[columns.geo.name]) ? 'rgba(0, 0, 0, 1)' : geoStrokeColor
+  })
   const mapBubbleScale =
     Number.isFinite(Number(bubbleLegendScale)) && Number(bubbleLegendScale) > 0 ? Number(bubbleLegendScale) : 1
   const territoryRenderedSvgWidth = isMobileTerritoryViewport(vizViewport)
@@ -233,7 +208,9 @@ const UsaMap = () => {
     const territoryBubbleRows = displayAsHex
       ? []
       : bubbleRenderRows
-          .filter(bubbleRow => bubbleRow.uid === territory && !bubbleRow.usesExplicitCoordinates)
+          .filter(
+            bubbleRow => bubbleRow.uid === territory && isTerritoryBubblePlaceable(bubbleRow, config, runtimeData)
+          )
           .map(bubbleRow => ({
             ...bubbleRow,
             tooltipHtml: applyTooltipsToGeo(
@@ -248,8 +225,8 @@ const UsaMap = () => {
 
     let styles = {
       fill: geoFillColor,
-      stroke: geoStrokeColor,
-      color: APP_FONT_COLOR
+      color: APP_FONT_COLOR,
+      ...getLocationHighlightStyles(territory)
     }
 
     const label = supportedTerritories[territory][1]
@@ -280,7 +257,10 @@ const UsaMap = () => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
+      if (
+        (canNavigateMap(config) && columns.navigate && territoryData[columns.navigate.name]) ||
+        tooltips.appearanceType === 'click'
+      ) {
         needsPointer = true
       }
 
@@ -289,14 +269,7 @@ const UsaMap = () => {
       styles = {
         color: textColor,
         fill: legendColors[0],
-        opacity:
-          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[columns.geo.name]
-            ? 0.5
-            : 1,
-        stroke:
-          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[columns.geo.name]
-            ? 'rgba(0, 0, 0, 1)'
-            : geoStrokeColor,
+        ...getLocationHighlightStyles(territory, territoryData),
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1]
@@ -311,7 +284,7 @@ const UsaMap = () => {
           key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
-          strokeWidth={1}
+          strokeWidth={selectedLocationId === territory ? 2 : 1}
           textColor={textColor}
           strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
@@ -348,6 +321,8 @@ const UsaMap = () => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
     const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
+    const calloutConnectors: React.ReactNode[] = []
+    const calloutBubblePositions: BubblePositionOverrides = {}
     const getBubbleLabelColorByState = () => {
       const labelColors = new Map<string, string>()
 
@@ -355,7 +330,8 @@ const UsaMap = () => {
 
       bubbleRenderRows.forEach(bubbleRow => {
         const stateUid = String(bubbleRow.uid ?? '')
-        if (!stateUid || offsets[stateUid] || bubbleRow.usesExplicitCoordinates) return
+        if (!stateUid || bubbleRow.usesExplicitCoordinates) return
+        if (stateCallouts[stateUid] && !bubbleRow.placeOverLabels) return
         labelColors.set(stateUid, bubbleRow.fillColor)
       })
 
@@ -390,7 +366,8 @@ const UsaMap = () => {
 
       let styles = {
         fill: geoFillColor,
-        cursor: 'default'
+        cursor: 'default',
+        ...getLocationHighlightStyles(geo.properties.iso)
       }
 
       // Map the name from the geo data with the appropriate key for the processed data
@@ -414,10 +391,18 @@ const UsaMap = () => {
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
         const tooltipAttrs = getBaseGeoTooltipAttributes(tooltip, tooltipId, hasBubbleLayers)
-        const geoOpacity =
-          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
+        const highlightStyles = getLocationHighlightStyles(geoKey, geoData)
+        const geoOpacity = highlightStyles.opacity
         const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
-        const stateLabel = geoLabel(geo, bubbleLabelColor ?? legendColors[0], projection, Boolean(bubbleLabelColor))
+        const stateLabel = geoLabel(
+          geo,
+          bubbleLabelColor ?? legendColors[0],
+          projection,
+          Boolean(bubbleLabelColor),
+          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          geoOpacity,
+          renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+        )
         if (renderLabelsAboveBubbles && stateLabel) {
           labelJsx.push(
             <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
@@ -428,11 +413,7 @@ const UsaMap = () => {
 
         styles = {
           fill: legendColors[0],
-          opacity: geoOpacity,
-          stroke:
-            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[columns.geo.name]
-              ? 'rgba(0, 0, 0, 1)'
-              : geoStrokeColor,
+          ...highlightStyles,
           cursor: 'default',
           '&:hover': {
             fill: legendColors[1]
@@ -443,7 +424,10 @@ const UsaMap = () => {
         }
 
         // When to add pointer cursor
-        if ((columns.navigate && geoData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
+        if (
+          (canNavigateMap(config) && columns.navigate && geoData[columns.navigate.name]) ||
+          tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 
@@ -564,11 +548,9 @@ const UsaMap = () => {
                 const { pattern: patternData, matchedDataKey } = matchedPattern
                 const { pattern, size } = patternData
                 const currentFill = styles.fill
-                const patternColor = patternData.color || getContrastColor('#000', currentFill)
+                const patternColor = resolvePatternColor(patternData.color, currentFill)
                 const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
                 const patternId = `${mapId}--${sanitizedDataKey}--${geoIndex}`
-
-                checkColorContrast(currentFill, patternColor)
 
                 return (
                   <>
@@ -621,24 +603,63 @@ const UsaMap = () => {
 
       // Default return state, just geo with no additional information
       const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
-      const stateLabel = geoLabel(geo, bubbleLabelColor ?? styles.fill, projection, Boolean(bubbleLabelColor))
+      const stateLabel = geoLabel(
+        geo,
+        bubbleLabelColor ?? styles.fill,
+        projection,
+        Boolean(bubbleLabelColor),
+        renderLabelsAboveBubbles ? calloutConnectors : undefined,
+        styles.opacity,
+        renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+      )
       if (renderLabelsAboveBubbles && stateLabel) {
-        labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
+        labelJsx.push(
+          <g key={`${key}-label`} style={{ opacity: styles.opacity }}>
+            {stateLabel}
+          </g>
+        )
       }
 
       return (
         <g data-name={geoName} key={key} tabIndex={-1}>
           <g className='geo-group' style={styles} tabIndex={-1}>
-            <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
+            <path tabIndex={-1} className='single-geo' stroke={styles.stroke} strokeWidth={1.3} d={path} />
             {(displayAsHex || (showLabel && !renderLabelsAboveBubbles)) && stateLabel}
           </g>
         </g>
       )
     })
 
+    // Shared edges can be covered by neighboring states drawn later. Keep the
+    // selected outline above all state shapes without changing their reading order.
+    const selectedGeography = selectedLocationId
+      ? geographies.find(({ feature }) => feature.properties.iso === selectedLocationId)
+      : undefined
+    if (selectedGeography) {
+      geosJsx.push(
+        <path
+          key='selected-state-outline'
+          className='selected-state-outline'
+          d={selectedGeography.path}
+          fill='none'
+          stroke='rgba(0, 0, 0, 1)'
+          strokeWidth={2}
+          pointerEvents='none'
+          aria-hidden='true'
+        />
+      )
+    }
+
     if (displayAsHex) return geosJsx
 
-    const dcStateLabel = showLabel ? renderDcStateLabel(projection) : null
+    const dcStateLabel = showLabel
+      ? renderDcStateLabel(
+          projection,
+          bubbleLabelColorByState.get(DC_GEO_KEY),
+          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+        )
+      : null
     if (dcStateLabel && !renderLabelsAboveBubbles) {
       geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
     }
@@ -649,18 +670,31 @@ const UsaMap = () => {
         applyLegendToRow={applyLegendToRow}
         applyTooltipsToGeo={applyTooltipsToGeo}
         geoClickHandler={geoClickHandler}
-        isFilterValueSupported={isFilterValueSupported}
         key='cities'
         projection={projection}
-        setSharedFilterValue={setSharedFilterValue}
         titleCase={titleCase}
         tooltipId={tooltipId}
       />
     )
 
+    if (calloutConnectors.length) {
+      geosJsx.push(
+        <g key='state-callout-connectors' pointerEvents='none'>
+          {calloutConnectors}
+        </g>
+      )
+    }
+
     // Bubbles
     if (hasBubbleLayers) {
-      geosJsx.push(<BubbleList key='bubbles' runtimeData={dataRef.current} projection={projection} />)
+      geosJsx.push(
+        <BubbleList
+          key='bubbles'
+          runtimeData={dataRef.current}
+          projection={projection}
+          positionOverrides={calloutBubblePositions}
+        />
+      )
     }
 
     if (renderLabelsAboveBubbles && labelJsx.length > 0) {
@@ -679,13 +713,22 @@ const UsaMap = () => {
 
     if (pathArray.length > 0) {
       pathArray.map(layer => {
-        return geosJsx.push(layer)
+        return geosJsx.push(
+          <g key={layer.key} style={{ opacity: isDimmed() ? MAP_DIMMED_OPACITY : 1 }}>
+            {layer}
+          </g>
+        )
       })
     }
     return geosJsx
   }
 
-  function renderDcStateLabel(projection) {
+  function renderDcStateLabel(
+    projection,
+    bubbleColor?: string,
+    connectors?: React.ReactNode[],
+    bubblePositions?: BubblePositionOverrides
+  ) {
     const dcData = runtimeData?.[DC_GEO_KEY]
     if (!dcData) return null
 
@@ -695,39 +738,39 @@ const UsaMap = () => {
     const centroid = projection([Number(dcCoordinates.Longitude), Number(dcCoordinates.Latitude)])
     if (!centroid) return null
 
-    const [dx, dy] = offsets[DC_GEO_KEY]
-    const labelX = centroid[0] + dx
-    const labelY = centroid[1] + dy
-    const { textColor } = outlinedTextColor('#FFF')
-    const isDimmed = setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== dcData[columns.geo.name]
+    const { opacity } = getLocationHighlightStyles(DC_GEO_KEY, dcData)
+    const calloutFontSize = isMobileStateLabelViewport(currentViewport) ? 16 : 13
+    const { lineEnd, bubbleCenter } = getStateCalloutPosition(DC_GEO_KEY, centroid, calloutFontSize)!
+    if (bubblePositions) bubblePositions[DC_GEO_KEY] = bubbleCenter
+    const { textColor } = outlinedTextColor(bubbleColor ?? '#FFF')
+    const connector = (
+      <line
+        key='dc-callout-line'
+        opacity={connectors ? opacity : undefined}
+        className='dc-callout__line'
+        x1={centroid[0]}
+        y1={centroid[1]}
+        x2={lineEnd[0]}
+        y2={lineEnd[1]}
+        stroke='rgba(0,0,0,.5)'
+        strokeWidth={1}
+      />
+    )
+    if (connectors) connectors.push(connector)
 
     return (
-      <g
-        className='dc-callout'
-        style={{ opacity: isDimmed ? 0.5 : 1 }}
-        tabIndex={-1}
-        pointerEvents='none'
-        aria-hidden='true'
-      >
-        <line
-          className='dc-callout__line'
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={labelX}
-          y2={labelY}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
+      <g className='dc-callout' style={{ opacity }} tabIndex={-1} pointerEvents='none' aria-hidden='true'>
+        {!connectors && connector}
         <text
           className='dc-callout__label'
           x={4}
           strokeWidth='0'
           stroke={APP_FONT_COLOR}
-          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontSize={calloutFontSize}
           fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
-          transform={`translate(${labelX}, ${labelY})`}
+          transform={`translate(${lineEnd})`}
         >
           DC
         </text>
@@ -735,17 +778,25 @@ const UsaMap = () => {
     )
   }
 
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection, useProvidedBackground = false) => {
+  const geoLabel = (
+    geo,
+    bgColor = '#FFFFFF',
+    projection,
+    useProvidedBackground = false,
+    connectors?: React.ReactNode[],
+    connectorOpacity = 1,
+    bubblePositions?: BubblePositionOverrides
+  ) => {
     const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
     const abbr = geo.properties.iso
+    const calloutFontSize = isMobileStateLabelViewport(currentViewport) ? 16 : 13
+    const callout = !displayAsHex ? getStateCalloutPosition(abbr, centroid, calloutFontSize) : null
+    if (callout && bubblePositions) bubblePositions[abbr] = callout.bubbleCenter
 
     if (undefined === abbr) return null
 
     // Offset labels sit outside their geography, so they use white unless a bubble is the visual background.
-    if (
-      !useProvidedBackground &&
-      ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex))
-    ) {
+    if (!useProvidedBackground && ((abbr === 'US-HI' && !general.displayAsHex) || (callout && !general.displayAsHex))) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
@@ -759,7 +810,7 @@ const UsaMap = () => {
       y += nudges[abbr][1]
     }
 
-    if (undefined === offsets[abbr] || displayAsHex) {
+    if (!callout) {
       return (
         <g transform={`translate(${centroid})`} tabIndex={-1}>
           <text
@@ -779,27 +830,32 @@ const UsaMap = () => {
       )
     }
 
-    let [dx, dy] = offsets[abbr]
+    const connector = (
+      <line
+        key={`${abbr}-callout-line`}
+        opacity={connectors ? connectorOpacity : undefined}
+        x1={centroid[0]}
+        y1={centroid[1]}
+        x2={callout.lineEnd[0]}
+        y2={callout.lineEnd[1]}
+        stroke='rgba(0,0,0,.5)'
+        strokeWidth={1}
+      />
+    )
+    if (connectors) connectors.push(connector)
 
     return (
       <g tabIndex={-1}>
-        <line
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={centroid[0] + dx}
-          y2={centroid[1] + dy}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
+        {!connectors && connector}
         <text
           x={4}
           strokeWidth='0'
           stroke={APP_FONT_COLOR}
-          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontSize={calloutFontSize}
           fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
-          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+          transform={`translate(${callout.lineEnd})`}
         >
           {abbr.substring(3)}
         </text>

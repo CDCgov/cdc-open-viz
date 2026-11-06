@@ -345,7 +345,8 @@ export const RemoveLayerByIndex: Story = {
     await waitForEditor(canvas)
     await assertVisualizationRendered(canvasElement)
     await openAccordion(canvas, 'Custom Map Layers')
-    await waitForPresence('.custom-map-layer + .custom-map-layer path', canvasElement)
+    await waitForPresence('.custom-map-layer path[fill="#006778"]', canvasElement)
+    await waitForPresence('.custom-map-layer path[fill="#008000"]', canvasElement)
 
     const sectionButton = canvas.getByRole('button', { name: /^Custom Map Layers$/i })
     const section = sectionButton.closest('[data-accordion-component="AccordionItem"], .accordion__item') as HTMLElement
@@ -366,6 +367,7 @@ export const RemoveLayerByIndex: Story = {
       async () => userEvent.click(removeFirstLayer),
       (before, after) =>
         before.labels.length === 2 &&
+        before.fills.length === 2 &&
         after.labels.length === 1 &&
         after.labels[0] === 'Layer 1: Layer To Keep' &&
         after.fills.length === 1 &&
