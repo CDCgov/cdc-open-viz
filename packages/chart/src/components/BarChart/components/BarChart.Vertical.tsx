@@ -33,6 +33,7 @@ const BarChartVertical = () => {
     barBorderWidth,
     getAdditionalColumn,
     formatTooltipValue,
+    getCustomValueLabel,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
     labelFontSize,
@@ -266,7 +267,15 @@ const BarChartVertical = () => {
                     ? barBorderWidth
                     : 0
 
-                  const barDefaultLabel = isSuppressed || absentDataLabel || !config.labels ? '' : yAxisValue
+                  const customValueLabel = getCustomValueLabel(bar.key, dataValue, barGroup.index)
+                  const hasCustomValueLabel = customValueLabel !== undefined && isNumber(bar.value) && !isSuppressed
+                  const barDefaultLabel = hasCustomValueLabel
+                    ? config.labels
+                      ? customValueLabel
+                      : ''
+                    : isSuppressed || absentDataLabel || !config.labels
+                    ? ''
+                    : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -493,7 +502,7 @@ const BarChartVertical = () => {
                           textAnchor='middle'
                           fontSize={labelFontSize}
                         >
-                          {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                          {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
@@ -504,7 +513,7 @@ const BarChartVertical = () => {
                           textAnchor='middle'
                           fontSize={config.isLollipopChart ? null : labelFontSize}
                         >
-                          {absentDataLabel}
+                          {hasCustomValueLabel ? '' : absentDataLabel}
                         </Text>
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
