@@ -678,12 +678,17 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const circleStyle = config.visual?.circleStyle
+    const shouldUseCircleStyle = isTp5 && (circleStyle === 'light' || circleStyle === 'dark')
+    const circleFontSizeValue = Number(config.visual?.circleFontSize)
+    const circleFontSize = Number.isFinite(circleFontSizeValue) && circleFontSizeValue > 0 ? circleFontSizeValue : 30
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
+      shouldUseCircleStyle ? 'cdc-callout__body--circle-value' : '',
       shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
       shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
     ]
@@ -744,7 +749,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && (
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
-                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      {shouldUseCircleStyle ? (
+                        <span className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}>
+                          <span className='cdc-callout__value' style={{ fontSize: `${circleFontSize}px` }}>
+                            {calculateDataBite(true)}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      )}
                       {!shouldUseTrendBelow && hasTrendArrow && (
                         <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
                           {renderTrendArrow({
