@@ -4,6 +4,7 @@ import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
 
 import Chart from '../CdcChartComponent'
+import { createNewChartConfig } from '../helpers/createNewChartConfig'
 import forecastComboWithGaps from './_mock/forecast_combo_with_gaps.json'
 
 const meta: Meta<typeof Chart> = {
@@ -147,6 +148,12 @@ const buildLegendReviewConfig = (expandConfidenceIntervals?: true) => {
   return config
 }
 
+const buildNewForecastConfig = () => {
+  const starterConfig = buildConfig()
+  delete starterConfig.legend.expandForecastConfidenceIntervals
+  return createNewChartConfig(starterConfig)
+}
+
 const getLegendLabels = (canvasElement: HTMLElement) =>
   within(canvasElement)
     .getAllByRole('button')
@@ -182,7 +189,7 @@ export const ExpandedConfidenceIntervalLegendReview: Story = {
 
 export const ConfidenceIntervalLegendAuthoring: Story = {
   name: 'Editor: Confidence Interval Legend Expansion',
-  args: { config: buildConfig(), isEditor: true },
+  args: { config: buildNewForecastConfig(), isEditor: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
