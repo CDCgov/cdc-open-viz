@@ -2,7 +2,13 @@ import React from 'react'
 import { Accordion } from 'react-accessible-accordion'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import LegendSection, { getLegendStyleOptions, getLegendSubStyleOptions, type LegendSectionModel } from './LegendPanel'
+import LegendSection, {
+  getLegendStyleOptions,
+  getLegendSubStyleOptions,
+  supportsForecastConfidenceIntervalExpansion,
+  type LegendSectionModel
+} from './LegendPanel'
+import type { ChartConfig } from '../../../../../types/ChartConfig'
 
 vi.mock('@cdc/core/components/EditorPanel/Inputs', () => {
   const renderOptions = (options: any[]) =>
@@ -102,6 +108,7 @@ const model: LegendSectionModel = {
   label: 'Legend title',
   description: 'Legend description',
   unified: false,
+  expandForecastConfidenceIntervals: undefined,
   hasSuppressionData: true,
   supportsClicking: true,
   hasDynamicCategory: false,
@@ -109,6 +116,7 @@ const model: LegendSectionModel = {
   supportsColorCategory: true,
   supportsAxisAlign: true,
   supportsSelectableValues: true,
+  supportsForecastConfidenceIntervalExpansion: false,
   colorCodeByCategory: false,
   tooltipsSingleSeries: false,
   groupByOptions: ['category'],
@@ -133,6 +141,15 @@ const renderSection = (overrides: Partial<LegendSectionModel> = {}) => {
 }
 
 describe('LegendSection', () => {
+  it('supports only Forecasting and Combo charts that contain a Forecasting series', () => {
+    const forecastingSeries = [{ type: 'Forecasting' }] as ChartConfig['series']
+
+    expect(supportsForecastConfidenceIntervalExpansion('Forecasting', forecastingSeries)).toBe(true)
+    expect(supportsForecastConfidenceIntervalExpansion('Combo', forecastingSeries)).toBe(true)
+    expect(supportsForecastConfidenceIntervalExpansion('Line', forecastingSeries)).toBe(false)
+    expect(supportsForecastConfidenceIntervalExpansion('Combo', [])).toBe(false)
+  })
+
   it('preserves standard control order and routes ordinary and nested fields', () => {
     const { onFieldChange } = renderSection()
     const fields = screen.getAllByTestId(/.*/).map(control => control.getAttribute('data-field'))
@@ -197,6 +214,39 @@ describe('LegendSection', () => {
     renderSection({ behavior: 'highlight', tooltipsSingleSeries: true, seriesHighlight: [] })
     expect(screen.getByTestId('highlightOnHover')).toBeInTheDocument()
     expect(screen.queryByText('Add Isolate Value')).not.toBeInTheDocument()
+  })
+
+  it('shows forecast CI expansion only when supported and preserves strict boolean semantics', () => {
+    const unsupported = renderSection()
+    expect(screen.queryByTestId('expandForecastConfidenceIntervals')).not.toBeInTheDocument()
+    unsupported.unmount()
+
+    const legacy = renderSection({
+      visualizationType: 'Forecasting',
+      supportsForecastConfidenceIntervalExpansion: true,
+      expandForecastConfidenceIntervals: undefined
+    })
+    expect(screen.getByTestId('expandForecastConfidenceIntervals')).not.toBeChecked()
+    fireEvent.click(screen.getByTestId('expandForecastConfidenceIntervals'))
+    expect(legacy.onFieldChange).toHaveBeenLastCalledWith('expandForecastConfidenceIntervals', true, undefined)
+    legacy.unmount()
+
+    const explicitFalse = renderSection({
+      visualizationType: 'Forecasting',
+      supportsForecastConfidenceIntervalExpansion: true,
+      expandForecastConfidenceIntervals: false
+    })
+    expect(screen.getByTestId('expandForecastConfidenceIntervals')).not.toBeChecked()
+    explicitFalse.unmount()
+
+    const explicitTrue = renderSection({
+      visualizationType: 'Combo',
+      supportsForecastConfidenceIntervalExpansion: true,
+      expandForecastConfidenceIntervals: true
+    })
+    expect(screen.getByTestId('expandForecastConfidenceIntervals')).toBeChecked()
+    fireEvent.click(screen.getByTestId('expandForecastConfidenceIntervals'))
+    expect(explicitTrue.onFieldChange).toHaveBeenLastCalledWith('expandForecastConfidenceIntervals', false, undefined)
   })
 
   it('keeps behavior changes on their distinct command', () => {
