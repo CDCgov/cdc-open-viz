@@ -1621,6 +1621,7 @@ describe('HeatMap', () => {
     expect(columnLabel?.getAttribute('y')).toBe('-44')
   })
 
+  // Rendering the full editor and opening five panels can exceed 5s on shared CI runners.
   it('shows HeatMap editor controls in their owning accordion sections', () => {
     const context = buildHeatMapContext()
     ;(context.config as any).xAxis.manual = true
@@ -1680,5 +1681,5 @@ describe('HeatMap', () => {
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
     expect(Array.from(gradientStyleSelect.options).map(option => option.value)).toEqual(['linear blocks'])
     expect(screen.queryByLabelText('Tick Rotation (Degrees)')).toBeNull()
-  })
+  }, 15_000)
 })
