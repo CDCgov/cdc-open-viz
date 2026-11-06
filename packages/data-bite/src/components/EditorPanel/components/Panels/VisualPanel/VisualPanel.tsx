@@ -41,7 +41,7 @@ const VisualPanel = ({ variant }: VisualPanelProps) => {
           <TextField
             type='number'
             min={1}
-            value={config.visual?.circleFontSize ?? 30}
+            value={config.visual?.circleFontSize ?? 36}
             section='visual'
             fieldName='circleFontSize'
             label='Circle Font Size'

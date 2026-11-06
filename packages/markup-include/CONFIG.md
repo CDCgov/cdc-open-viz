@@ -83,7 +83,7 @@ Column value variables support `selectionMode: 'first'` when authored in the Con
 | Rendered layouts | Only used when `contentEditor.style` is `tp5`. |
 | Source selection | The editor builds mappings from `dataColors.column` using the active data rows. |
 | Runtime row selection | Current runtime color resolution uses the first row of `config.data`; dashboard `dataKey` fallback is not applied to data-color resolution. |
-| Color behavior | The callout background uses the resolved color and text color is computed automatically for contrast. |
+| Color behavior | A resolved color overrides either normal background style and removes the card border. Text color is computed automatically for contrast. Unmatched values retain the selected normal style. |
 
 `dataColors` itself is a shared [`DataColorConfig`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datacolorconfig) documented in `@cdc/core`.
 
