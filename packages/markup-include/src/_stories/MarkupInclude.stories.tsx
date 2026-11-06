@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, waitFor } from 'storybook/test'
 import CdcMarkupInclude from '../CdcMarkupInclude'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import primary from './_mock/primary.json'
 import noConditions from './_mock/no-conditions.json'
 import withConditions from './_mock/with-conditions.json'
@@ -182,3 +182,51 @@ export const Bootstrap_Grid_Mockup: Story = {
 }
 
 export default meta
+
+export const TP5DataDrivenBackgrounds: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 24, maxWidth: 700 }}>
+      {[false, true].flatMap(whiteBackground =>
+        [false, true].map(matched => (
+          <div key={`${whiteBackground}-${matched}`} data-white={whiteBackground} data-matched={matched}>
+            <CdcMarkupInclude
+              config={
+                {
+                  ...primary,
+                  data: [{ Status: matched ? 'High' : 'Unknown' }],
+                  contentEditor: {
+                    ...primary.contentEditor,
+                    style: 'tp5',
+                    title: `${whiteBackground ? 'White' : 'Cyan'} style, ${matched ? 'mapped' : 'unmapped'} value`,
+                    showHeader: true,
+                    useInlineHTML: true,
+                    inlineHTML: '<p>A matching status sets the background and removes the border.</p>'
+                  },
+                  visual: { ...primary.visual, whiteBackground },
+                  dataColors: { column: 'Status', mappings: [{ sourceValue: 'High', color: '#f45b53' }] }
+                } as any
+              }
+              datasets={{}}
+            />
+          </div>
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitForPresence('.markup-include-tp5', canvasElement)
+    const cards = canvasElement.querySelectorAll<HTMLElement>('[data-matched]')
+    expect(cards).toHaveLength(4)
+    for (const card of cards) {
+      const callout = card.querySelector<HTMLElement>('.markup-include-tp5')!
+      const matched = card.dataset.matched === 'true'
+      const style = getComputedStyle(callout)
+      expect(callout.classList.contains('cdc-callout--data-color')).toBe(matched)
+      expect(style.borderTopWidth).toBe(matched ? '0px' : '1px')
+      if (matched) {
+        expect(style.backgroundColor).toBe('rgb(244, 91, 83)')
+      }
+      expect(callout.querySelector('.cdc-callout__flag')).toBeNull()
+    }
+  }
+}

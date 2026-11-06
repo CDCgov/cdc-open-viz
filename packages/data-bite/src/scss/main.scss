@@ -1,28 +1,7 @@
+@import '@cdc/core/styles/layout/callout';
+@import '@cdc/core/components/waiting';
+
 .cove-visualization.type-data-bite {
-  .cove-visualization .cdc-callout {
-    --cdc-callout-background: var(--colors-cyan-10, #eff9fa);
-    --cdc-callout-border-color: var(--colors-cyan-15, #dff2f6);
-    --cdc-callout-border-radius: 0.25rem;
-    --cdc-callout-padding: 1.25rem;
-    --cdc-callout-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-
-    background: var(--cdc-callout-background);
-    border: 1px solid var(--cdc-callout-border-color);
-    border-radius: var(--cdc-callout-border-radius);
-    box-shadow: var(--cdc-callout-shadow);
-    margin: 0;
-    padding: var(--cdc-callout-padding);
-    position: relative;
-  }
-
-  .cove-visualization .cdc-callout .cdc-callout__flag {
-    height: auto;
-    position: absolute;
-    right: 1.08rem;
-    top: -0.36rem;
-    width: 1.84rem;
-  }
-
   &.theme-blue {
     .bite-value {
       color: var(--primary);
@@ -218,10 +197,14 @@
 
       // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
       .cdc-callout__heading {
-        padding-right: 1.5rem;
+        padding-right: 0;
         width: 100%;
         font-size: 1.1rem;
         font-family: var(--fonts-nunito) !important;
+      }
+
+      .cdc-callout--has-flag .cdc-callout__heading {
+        padding-right: 1.5rem;
       }
 
       .cdc-callout__body {
@@ -237,7 +220,15 @@
         grid-template-columns: fit-content(40%) minmax(0, 1fr);
       }
 
-      @container (max-width: 576px) {
+      .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+        align-self: center;
+      }
+
+      @container (max-width: 480px) {
+        .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+          align-self: start;
+        }
+
         .cdc-callout__body--content-right {
           grid-template-columns: minmax(0, 1fr);
         }
@@ -321,6 +312,35 @@
         }
       }
 
+      .cdc-callout__value-circle {
+        --data-bite-circle-size: 128px;
+        --data-bite-circle-ring: 14px;
+        --data-bite-circle-text: var(--colors-cyan-50v);
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        flex: 0 0 var(--data-bite-circle-size);
+        width: var(--data-bite-circle-size);
+        height: var(--data-bite-circle-size);
+        border: var(--data-bite-circle-ring) solid var(--colors-cyan-50v);
+        border-radius: 50%;
+        background: var(--colors-cyan-10);
+
+        &.cdc-callout__value-circle--dark {
+          --data-bite-circle-text: var(--colors-cyan-5);
+
+          border-color: var(--colors-cyan-15);
+          background: var(--colors-cyan-50v);
+        }
+
+        .cdc-callout__value {
+          color: var(--data-bite-circle-text);
+          white-space: nowrap;
+        }
+      }
+
       .bite-subtext {
         line-height: var(--visualization-body-line-height);
       }
@@ -338,10 +358,10 @@
           border: 1px solid #009ec1 !important;
           background: transparent;
         }
+      }
 
-        .cdc-callout--data-color {
-          border: none !important;
-        }
+      .cdc-callout.cdc-callout--data-color {
+        border: 0 !important;
       }
     }
 

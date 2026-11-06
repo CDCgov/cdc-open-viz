@@ -34,7 +34,9 @@ export default {
     borderColorTheme: false,
     showTitle: true,
     whiteBackground: false,
-    useWrap: false
+    useWrap: false,
+    circleStyle: 'off',
+    circleFontSize: 36
   },
   general: {
     isCompactStyle: false
