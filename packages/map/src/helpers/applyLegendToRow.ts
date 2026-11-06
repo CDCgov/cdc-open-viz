@@ -13,7 +13,8 @@ export const applyLegendToRow = (
   config: MapConfig,
   runtimeLegend: RuntimeLegend,
   legendMemo: Memo<number>,
-  legendSpecialClassLastMemo: Memo<number>
+  legendSpecialClassLastMemo: Memo<number>,
+  backgroundColor: string = DEFAULT_MAP_BACKGROUND
 ): string[] => {
   if (!config) return null
 
@@ -37,7 +38,7 @@ export const applyLegendToRow = (
     const hash = hashObj(rowObj)
 
     if (!legendMemo.current.has(hash)) {
-      return generateColorsArray(DEFAULT_MAP_BACKGROUND)
+      return generateColorsArray(backgroundColor)
     }
 
     const idx = legendMemo.current.get(hash)!

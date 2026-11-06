@@ -439,17 +439,18 @@ const CountyMap = () => {
     strokeWidth?: number,
     strokeColor?: string
   ) => {
+    const backgroundFill = dotDensity ? '#F5F6F7' : DEFAULT_MAP_BACKGROUND
     const legendValues =
       geoData !== undefined
-        ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo, backgroundFill)
         : false
 
     const baseFill =
       legendValues && config.general.type !== 'us-geocode'
         ? legendValues[0] === '#000000'
-          ? DEFAULT_MAP_BACKGROUND
+          ? backgroundFill
           : legendValues[0]
-        : DEFAULT_MAP_BACKGROUND
+        : backgroundFill
 
     context.fillStyle = baseFill
     context.fill(path2d)
