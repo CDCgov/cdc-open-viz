@@ -121,3 +121,38 @@ describe('updateChildFilters', () => {
     expect(result[1].active).toBe('San Francisco')
   })
 })
+
+describe('All parent and child selections', () => {
+  it.each(['All', ['All'], []].map(active => [active]))('keeps child options when a parent selects %j', active => {
+    const filters = [
+      {
+        key: 'Profile',
+        type: 'datafilter',
+        filterStyle: 'multi-select',
+        showAllOption: true,
+        columnName: 'profile',
+        active
+      },
+      { key: 'Year', type: 'datafilter', columnName: 'year', active: '2023' },
+      {
+        key: 'City',
+        type: 'datafilter',
+        columnName: 'city',
+        parents: ['Profile', 'Year'],
+        filterStyle: 'multi-select',
+        showAllOption: true,
+        active: ['All'],
+        values: []
+      }
+    ] as SharedFilter[]
+    const result = updateChildFilters(filters, {
+      source: [
+        { profile: 'Air', year: '2023', city: 'Phoenix' },
+        { profile: 'Water', year: '2023', city: 'Tucson' },
+        { profile: 'Water', year: '2024', city: 'Flagstaff' }
+      ]
+    })
+    expect(result[2].values).toEqual(['Phoenix', 'Tucson'])
+    expect(result[2].active).toEqual(['All'])
+  })
+})

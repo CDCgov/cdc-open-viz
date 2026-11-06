@@ -1,6 +1,7 @@
 import { SharedFilter } from '../types/SharedFilter'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
+import { isShowAllSelection } from './showAllFilter'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
 import { handleSorting } from '@cdc/core/components/Filters'
 
@@ -26,6 +27,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
     if (parentFilters.length > 0) {
       const filteredDataSet = dataSet.filter((d: Record<string, any>) => {
         return parentFilters.every(parentFilter => {
+          if (isShowAllSelection(parentFilter)) return true
           const parentActive = parentFilter.active
           if (Array.isArray(parentActive)) {
             return parentActive.includes(d[parentFilter.columnName])
@@ -51,26 +53,27 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
       const activeMultiSelectValues = Array.isArray(childFilter.active) ? childFilter.active : [childFilter.active]
       const validActiveMultiSelectValues = activeMultiSelectValues.filter(value => sortedFilter.values.includes(value))
-      const activeValue =
-        sortedFilter.values.length > 0
-          ? isChildMultiSelect
-            ? childFilter.order === 'data'
-              ? validActiveMultiSelectValues.length
-                ? validActiveMultiSelectValues
-                : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
-                ? [childFilter.defaultValue]
-                : [sortedFilter.values[0]]
-              : sortedFilter.values
-            : childFilter.active && sortedFilter.values.includes(childFilter.active)
-            ? childFilter.active
-            : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
-            ? childFilter.defaultValue
-            : childFilter.order === 'data'
-            ? sortedFilter.values[0]
-            : childFilter.resetLabel || sortedFilter.values[0]
-          : isChildMultiSelect
-          ? []
-          : childFilter.active || ''
+      const activeValue = isShowAllSelection(childFilter)
+        ? activeMultiSelectValues
+        : sortedFilter.values.length > 0
+        ? isChildMultiSelect
+          ? childFilter.order === 'data'
+            ? validActiveMultiSelectValues.length
+              ? validActiveMultiSelectValues
+              : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
+              ? [childFilter.defaultValue]
+              : [sortedFilter.values[0]]
+            : sortedFilter.values
+          : childFilter.active && sortedFilter.values.includes(childFilter.active)
+          ? childFilter.active
+          : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
+          ? childFilter.defaultValue
+          : childFilter.order === 'data'
+          ? sortedFilter.values[0]
+          : childFilter.resetLabel || sortedFilter.values[0]
+        : isChildMultiSelect
+        ? []
+        : childFilter.active || ''
 
       updatedFilters[childIndex] = {
         ...childFilter,

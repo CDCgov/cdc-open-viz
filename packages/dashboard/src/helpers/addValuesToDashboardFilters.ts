@@ -1,4 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep'
+import { getShowAllValue, hasShowAllOption } from './showAllFilter'
 import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
@@ -77,7 +78,14 @@ export const addValuesToDashboardFilters = (
     // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
     filterCopy.orderedValues = mergeCustomOrderValues(filterValues, filterCopy.orderedValues, filterCopy.order)
 
-    if (filterValues.length > 0) {
+    if (hasShowAllOption(filterCopy)) {
+      const sentinel = getShowAllValue(filterCopy)
+      const active = getQueryStringFilterValue(filterCopy) || filterCopy.active || filterCopy.defaultValue || sentinel
+      filterCopy.active = Array.isArray(active) ? active : [active]
+      if (filterCopy.queuedActive !== undefined && !Array.isArray(filterCopy.queuedActive)) {
+        filterCopy.queuedActive = [filterCopy.queuedActive]
+      }
+    } else if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue

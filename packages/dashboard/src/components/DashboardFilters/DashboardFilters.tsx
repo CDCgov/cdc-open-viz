@@ -1,4 +1,5 @@
 import React from 'react'
+import { getShowAllValue, hasShowAllOption } from '../../helpers/showAllFilter'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import ComboBox from '@cdc/core/components/ComboBox'
 import { SharedFilter } from '../../types/SharedFilter'
@@ -160,6 +161,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             })
           }
 
+          const showAll = hasShowAllOption(filter)
+          const showAllValue = getShowAllValue(filter)
+          if (showAll && !multiValues.some(option => option.value === showAllValue)) {
+            multiValues.unshift({ value: showAllValue, label: showAllValue })
+          }
+          const selected = filter.queuedActive ?? filter.active
+          const selectedValues = Array.isArray(selected) ? selected : selected ? [selected] : []
+
           const isDisabled = !values.length
           // push reset label only if it does not includes in filter values options
           if (filter.resetLabel && !filter.values.includes(filter.resetLabel) && !_key) {
@@ -201,7 +210,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   options={multiValues}
                   fieldName={filterIndex}
                   updateField={updateField}
-                  selected={filter.active as string[]}
+                  exclusiveValue={showAll ? showAllValue : undefined}
+                  selected={selectedValues}
                   limit={filter.selectLimit || 5}
                   loading={loading}
                   placeholder={filter.resetLabel || '- Select -'}

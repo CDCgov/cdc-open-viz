@@ -1,6 +1,6 @@
-import filter from 'lodash/filter'
 import { SharedFilter } from '../types/SharedFilter'
 import { FILTER_STYLE } from '../types/FilterStyles'
+import { isShowAllSelection } from './showAllFilter'
 
 /**
  * Recursively calculates the tier/depth of a filter based on its parent dependencies.
@@ -55,13 +55,14 @@ const isClientSideFilter = (filter: SharedFilter, data: Object[]) => {
 
 /**
  * Checks if a filter is currently at its reset/incomplete state.
+ * Opted-in multiselect All selections are complete and do not restrict data.
  * A filter is incomplete if it's visible AND:
  * - The active value is empty/null/undefined, OR
  * - The active value equals the resetLabel (if one is defined)
  */
 export const isFilterAtResetState = (filter: SharedFilter): boolean => {
   // Only check filters that are visible to the user
-  if (!filter.showDropdown) return false
+  if (!filter.showDropdown || isShowAllSelection(filter)) return false
 
   // Check if active value is empty/null/undefined
   const isEmptyValue = filter.active === '' || filter.active === null || filter.active === undefined
@@ -77,16 +78,16 @@ export const isFilterAtResetState = (filter: SharedFilter): boolean => {
  * Filters are applied hierarchically by tier to handle parent-child dependencies.
  */
 function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
-  const activeFilters = filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
+  const activeFilters = filters.filter(
+    f => !isShowAllSelection(f) && (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true)
+  )
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
       const columnName = getClientSideFilterColumnName(filter)
       const currentValue = columnName ? row[columnName] : undefined
 
       const selectedValue =
-        filter.queuedActive || filter.filterStyle === FILTER_STYLE.nestedDropdown
-          ? [filter.active, filter.subGrouping?.active]
-          : filter.active
+        filter.filterStyle === FILTER_STYLE.nestedDropdown ? [filter.active, filter.subGrouping?.active] : filter.active
       let isNotTheSelectedValue = true
       if (Array.isArray(selectedValue)) {
         isNotTheSelectedValue = !selectedValue.includes(currentValue)

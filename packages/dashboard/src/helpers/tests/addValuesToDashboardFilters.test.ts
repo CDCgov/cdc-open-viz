@@ -282,3 +282,45 @@ describe('addValuesToDashboardFilters', () => {
     expect(result[0].subGrouping.valuesLookup['2023']).not.toHaveProperty('descriptionsByValue')
   })
 })
+
+describe('All multiselect normalization', () => {
+  it.each(['All', ['All'], [], undefined].map(active => [active]))(
+    'normalizes saved selection %j without adding All to the data',
+    active => {
+      const filter = {
+        key: 'Profile',
+        columnName: 'profile',
+        type: 'datafilter',
+        filterStyle: 'multi-select',
+        showAllOption: true,
+        order: 'data',
+        values: [],
+        active,
+        queuedActive: 'Air'
+      } as SharedFilter
+      const [result] = addValuesToDashboardFilters([filter], { source: [{ profile: 'Air' }, { profile: 'Water' }] })
+      expect(result.active).toEqual(active === undefined ? ['All'] : Array.isArray(active) ? active : [active])
+      expect(result.queuedActive).toEqual(['Air'])
+      expect(result.values).toEqual(['Air', 'Water'])
+      expect(filter.active).toEqual(active)
+    }
+  )
+
+  it('restores an explicit default on reload and honors a query parameter', () => {
+    const filter = {
+      key: 'Profile',
+      columnName: 'profile',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      showAllOption: true,
+      defaultValue: 'Water',
+      setByQueryParameter: 'profile',
+      values: []
+    } as SharedFilter
+    delete window.location
+    window.location = new URL('https://example.com')
+    expect(addValuesToDashboardFilters([filter], { source: [{ profile: 'Water' }] })[0].active).toEqual(['Water'])
+    window.location = new URL('https://example.com?profile=Air')
+    expect(addValuesToDashboardFilters([filter], { source: [{ profile: 'Air' }] })[0].active).toEqual(['Air'])
+  })
+})

@@ -98,6 +98,16 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### Multiselect All option
+
+Data filters with `filterStyle: 'multi-select'` can explicitly enable `showAllOption`.
+The reserved value is `resetLabel || 'All'`; an All-only selection or an empty array
+skips that filter in `filterData` and when computing dependent-filter options.
+Other active filters still narrow the data. Scalar selections are normalized to arrays
+in `addValuesToDashboardFilters`. The control adds the option without synthetic rows,
+and keeps All mutually exclusive with specific values. Omitted or false preserves
+literal matching and required-filter reset behavior. URL filters do not use this option.
+
 ### Phase 3: Filter Application & Data Transformation
 
 ```

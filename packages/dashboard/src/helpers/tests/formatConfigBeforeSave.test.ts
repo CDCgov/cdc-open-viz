@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { cleanSharedFilters, stripConfig } from '../formatConfigBeforeSave'
 import { DashboardConfig } from '../../types/DashboardConfig'
+import { addValuesToDashboardFilters } from '../addValuesToDashboardFilters'
+import { filterData } from '../filterData'
 
 describe('cleanSharedFilters', () => {
   it('should remove unused shared filters', () => {
@@ -334,5 +336,37 @@ describe('stripConfig', () => {
     expect(stripped.visualizations.chart1.yAxisDomainData).toBeUndefined()
     expect(stripped.visualizations.chart1.runtime).toBeUndefined()
     expect(stripped.visualizations.chart1.editing).toBeUndefined()
+  })
+})
+
+describe('All option export and reload', () => {
+  it('retains opt-in and custom label when runtime active state is stripped', () => {
+    const config = {
+      dashboard: {
+        sharedFilters: [
+          {
+            key: 'Profile',
+            type: 'datafilter',
+            filterStyle: 'multi-select',
+            showDropdown: true,
+            showAllOption: true,
+            resetLabel: 'Any profile',
+            columnName: 'profile',
+            active: ['Water'],
+            order: 'data',
+            values: ['Water']
+          }
+        ]
+      },
+      visualizations: { controls: { type: 'dashboardFilters', sharedFilterIndexes: [0] } }
+    } as unknown as DashboardConfig
+    cleanSharedFilters(config)
+    const saved = JSON.parse(JSON.stringify(config))
+    expect(saved.dashboard.sharedFilters[0].showAllOption).toBe(true)
+    expect(saved.dashboard.sharedFilters[0].active).toBeUndefined()
+    const data = [{ profile: 'Air' }, { profile: 'Water' }]
+    const filters = addValuesToDashboardFilters(saved.dashboard.sharedFilters, { source: data })
+    expect(filters[0].active).toEqual(['Any profile'])
+    expect(filterData(filters, data)).toEqual(data)
   })
 })

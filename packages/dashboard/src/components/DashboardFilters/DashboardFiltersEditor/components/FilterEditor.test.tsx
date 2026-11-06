@@ -1622,3 +1622,23 @@ describe('FilterEditor implicit Query String URL filters', () => {
     expect(screen.queryByLabelText('Subgroup Description Field')).not.toBeInTheDocument()
   })
 })
+
+describe('FilterEditor All option', () => {
+  it('persists the explicit opt-in for multiselect data filters', () => {
+    const updateFilterProp = vi.fn()
+    const filter = { ...createNestedFilter('datafilter'), filterStyle: 'multi-select' }
+    render(
+      <FilterEditor
+        config={{ ...baseConfig, dashboard: { sharedFilters: [filter] } }}
+        filter={filter}
+        filterIndex={0}
+        updateFilterProp={updateFilterProp}
+        toggleNestedQueryParameters={vi.fn()}
+      />
+    )
+    const checkbox = screen.getByRole('checkbox', { name: /^Show All option/ })
+    expect(checkbox).not.toBeChecked()
+    fireEvent.click(checkbox)
+    expect(updateFilterProp).toHaveBeenCalledWith('showAllOption', true)
+  })
+})

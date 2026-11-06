@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { SharedFilter } from '../../types/SharedFilter'
 import { filterData } from '../filterData'
 
@@ -116,5 +115,63 @@ describe('filterData', () => {
 
     const result = filterData(filters, data)
     expect(result).toEqual([{ name: 'John', age: 25, color: 'red' }])
+  })
+})
+
+describe('multiselect All option', () => {
+  const data = [
+    { profile: 'Air', year: '2023', status: 'Final', language: 'English' },
+    { profile: 'Water', year: '2024', status: 'Draft', language: 'Spanish' },
+    { profile: 'Water', year: '2023', status: 'Final', language: 'English' }
+  ]
+  const makeFilter = (overrides = {}) =>
+    ({
+      key: 'Profile',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      showDropdown: true,
+      showAllOption: true,
+      columnName: 'profile',
+      active: ['All'],
+      values: ['Air', 'Water'],
+      ...overrides
+    } as SharedFilter)
+
+  it.each(['All', ['All'], []].map(active => [active]))('skips an opted-in All selection %j', active => {
+    expect(filterData([makeFilter({ active })], data)).toEqual(data)
+  })
+
+  it('supports a custom All label without treating it as an incomplete selection', () => {
+    expect(filterData([makeFilter({ resetLabel: 'Any profile', active: 'Any profile' })], data)).toEqual(data)
+  })
+
+  it('combines four filters without synthetic rows or helper columns', () => {
+    const filters = ['profile', 'year', 'status', 'language'].map(columnName =>
+      makeFilter({ key: columnName, columnName })
+    )
+    expect(filterData(filters, data)).toEqual(data)
+    filters[0].active = ['Water']
+    filters[1].active = ['2023']
+    expect(filterData(filters, data)).toEqual([data[2]])
+    filters[2].active = ['Draft']
+    expect(filterData(filters, data)).toEqual([])
+  })
+
+  it('keeps the applied array selection while another selection is queued', () => {
+    expect(filterData([makeFilter({ active: ['Water'], queuedActive: ['Air'] })], data)).toEqual([data[1], data[2]])
+  })
+
+  it.each([undefined, false])('matches literal All when showAllOption is %j', showAllOption => {
+    const rows = [{ profile: 'All' }, { profile: 'Water' }]
+    expect(filterData([makeFilter({ showAllOption })], rows)).toEqual([rows[0]])
+  })
+
+  it.each(['dropdown', 'nested-dropdown'])('does not override required %s reset behavior', filterStyle => {
+    expect(filterData([makeFilter({ filterStyle, active: 'All', resetLabel: 'All' })], data)).toEqual([])
+  })
+
+  it('preserves required prompts and empty selections when All is disabled', () => {
+    expect(filterData([makeFilter({ showAllOption: false, active: 'Select', resetLabel: 'Select' })], data)).toEqual([])
+    expect(filterData([makeFilter({ showAllOption: false, active: [] })], data)).toEqual([])
   })
 })

@@ -119,3 +119,32 @@ describe('MultiSelect', () => {
     expect(screen.getByText('Germany')).toBeInTheDocument()
   })
 })
+
+describe('exclusive multiselect option', () => {
+  it('switches between All and specific selections even at the selection limit', async () => {
+    const user = userEvent.setup()
+    const Controlled = () => {
+      const [selected, setSelected] = useState(['All'])
+      return (
+        <MultiSelect
+          fieldName='disease'
+          options={[{ value: 'All', label: 'All' }, ...options]}
+          selected={selected}
+          exclusiveValue='All'
+          limit={1}
+          updateField={(_section, _subsection, _fieldName, value) => setSelected(value)}
+        />
+      )
+    }
+    const { container } = render(<Controlled />)
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
+    await user.click(screen.getByRole('option', { name: 'Asthma' }))
+    expect(container.querySelector('.selected')).toHaveTextContent('Asthma')
+    expect(container.querySelector('.selected')).not.toHaveTextContent('All')
+    await user.click(screen.getByRole('option', { name: 'Cancer' }))
+    expect(container.querySelector('.selected')).not.toHaveTextContent('Cancer')
+    await user.click(screen.getByRole('option', { name: 'All' }))
+    expect(container.querySelector('.selected')).toHaveTextContent('All')
+    expect(container.querySelector('.selected')).not.toHaveTextContent('Asthma')
+  })
+})

@@ -456,3 +456,55 @@ describe('DashboardFilters filter notes', () => {
     expect(note).not.toHaveClass('mb-1')
   })
 })
+
+describe('DashboardFilters All multiselect', () => {
+  it('adds a synthetic All option and renders queued array selections', () => {
+    const handleOnChange = vi.fn()
+    const { container, rerender } = render(
+      <DashboardFilters
+        show={[0]}
+        filters={[
+          {
+            key: 'Profile',
+            type: 'datafilter',
+            filterStyle: 'multi-select',
+            showDropdown: true,
+            showAllOption: true,
+            values: ['Air', 'Water'],
+            active: 'All',
+            selectLimit: 1
+          } as any
+        ]}
+        apiFilterDropdowns={{}}
+        handleOnChange={handleOnChange}
+        showSubmit={false}
+        applyFilters={vi.fn()}
+      />
+    )
+    expect(container.querySelector('.selected')).toHaveTextContent('All')
+    fireEvent.click(screen.getByRole('option', { name: 'Air', hidden: true }))
+    expect(handleOnChange).toHaveBeenCalledWith(0, ['Air'])
+    rerender(
+      <DashboardFilters
+        show={[0]}
+        filters={[
+          {
+            key: 'Profile',
+            type: 'datafilter',
+            filterStyle: 'multi-select',
+            showDropdown: true,
+            showAllOption: true,
+            values: ['Air', 'Water'],
+            active: ['All'],
+            queuedActive: ['Water']
+          } as any
+        ]}
+        apiFilterDropdowns={{}}
+        handleOnChange={handleOnChange}
+        showSubmit={false}
+        applyFilters={vi.fn()}
+      />
+    )
+    expect(container.querySelector('.selected')).toHaveTextContent('Water')
+  })
+})

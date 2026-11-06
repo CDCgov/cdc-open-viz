@@ -1315,6 +1315,20 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
 
+              {filter.filterStyle === FILTER_STYLE.multiSelect && (
+                <label>
+                  <input
+                    type='checkbox'
+                    checked={filter.showAllOption === true}
+                    onChange={e => updateFilterProp('showAllOption', e.target.checked)}
+                  />
+                  <span> Show All option</span>
+                  <small className='d-block'>
+                    All skips this filter. The Reset Label (or All when blank) is reserved for this option.
+                  </small>
+                </label>
+              )}
+
               <label>
                 <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
                 <MultiSelect
