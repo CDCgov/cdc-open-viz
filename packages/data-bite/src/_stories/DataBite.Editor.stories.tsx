@@ -885,6 +885,54 @@ export const Tp5VisualSectionTests: Story = {
         !after.contentRight &&
         after.contentBelow
     )
+
+    const circleSelect = canvas.getByLabelText('Circle Styling')
+    const getCircleState = () => {
+      const circle = canvasElement.querySelector('.cdc-callout__value-circle')
+      const value = circle?.querySelector<HTMLElement>('.cdc-callout__value')
+      return {
+        light: Boolean(circle?.classList.contains('cdc-callout__value-circle--light')),
+        dark: Boolean(circle?.classList.contains('cdc-callout__value-circle--dark')),
+        fontSize: value ? getComputedStyle(value).fontSize : null,
+        color: value ? getComputedStyle(value).color : null,
+        fontControl: Boolean(canvas.queryByLabelText('Circle Font Size'))
+      }
+    }
+    expect(canvas.queryByLabelText('Circle Font Size')).not.toBeInTheDocument()
+    await performAndAssert(
+      'Light Circle',
+      getCircleState,
+      async () => await userEvent.selectOptions(circleSelect, 'light'),
+      (before, after) => !before.light && after.light && after.fontControl && after.fontSize === '30px'
+    )
+    await performAndAssert(
+      'Circle Font Size',
+      getCircleState,
+      async () => {
+        const input = canvas.getByLabelText('Circle Font Size')
+        await userEvent.clear(input)
+        await userEvent.type(input, '20')
+      },
+      (before, after) => before.fontSize === '30px' && after.fontSize === '20px'
+    )
+    await performAndAssert(
+      'Dark Circle',
+      getCircleState,
+      async () => await userEvent.selectOptions(circleSelect, 'dark'),
+      (before, after) => before.light && after.dark && after.color === 'rgb(244, 251, 252)'
+    )
+    await performAndAssert(
+      'Disable Circle',
+      getCircleState,
+      async () => await userEvent.selectOptions(circleSelect, 'off'),
+      (before, after) => before.dark && !after.light && !after.dark && !after.fontControl
+    )
+    await performAndAssert(
+      'Restore Circle Font Size',
+      getCircleState,
+      async () => await userEvent.selectOptions(circleSelect, 'light'),
+      (before, after) => !before.light && after.light && after.fontSize === '20px'
+    )
   }
 }
 
