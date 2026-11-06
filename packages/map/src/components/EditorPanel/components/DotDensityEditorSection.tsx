@@ -1,10 +1,7 @@
 import { useContext } from 'react'
-import chroma from 'chroma-js'
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import PanelSection from '@cdc/core/components/panels/PanelSection'
-import Icon from '@cdc/core/components/ui/Icon'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import ConfigContext from '../../../context'
@@ -32,7 +29,7 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
   }
   const updateSeries = (id: string, changes: Partial<DotDensitySeries>) =>
     update({ series: density.series.map(item => (item.id === id ? { ...item, ...changes } : item)) })
-  const numberField = (key: 'dotValue' | 'radius' | 'seed', label: string, min: number, step: number) => (
+  const numberField = (key: 'dotValue' | 'radius', label: string, min: number, step: number) => (
     <TextField
       label={label}
       aria-label={label}
@@ -42,21 +39,6 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
       section='dotDensity'
       min={min}
       step={step}
-      tooltip={
-        key === 'seed' ? (
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                Changes dot positions within each county, not counts. The same seed and data repeat the same
-                arrangement. Dots are not actual case locations.
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
-        ) : undefined
-      }
       updateField={(_section: unknown, _subsection: unknown, _field: unknown, value: string) =>
         update({ [key]: Number(value) })
       }
@@ -64,36 +46,37 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
   )
   return (
     <PanelSection title='Dot Density' buttonProps={{ 'data-required-field-section': 'map-dot-density' }}>
-      <p>
+      <span className='subtext'>
         Use nonnegative counts. Dots show approximate distribution within counties, not individual locations. Keep the
         base Data Column empty for a neutral map.
-      </p>
-      {numberField('dotValue', 'Value per dot', 0.001, 1)}
-      {numberField('radius', 'Dot radius', 0.25, 0.25)}
-      {numberField('seed', 'Placement seed', 0, 1)}
-      {density.series.length === 0 && <p>Choose Add Count Series, then select a count column.</p>}
+      </span>
+      <div className='two-col-inputs'>
+        {numberField('dotValue', 'Value per dot', 0.001, 1)}
+        {numberField('radius', 'Dot radius', 0.25, 0.25)}
+      </div>
+      <span className='subtext mt-3'>Choose series colors in Visual → Map Color Palette.</span>
+      {density.series.length === 0 && (
+        <span className='subtext mt-3'>Choose Add Count Series, then select a count column.</span>
+      )}
       {density.series.map((series, index) => (
-        <fieldset key={series.id} className='primary-fieldset edit-block'>
-          <legend>Count Series {index + 1}</legend>
-          <label className='d-block mb-2'>
-            Count column {index + 1}
-            <select
-              className='cove-form-select d-block w-100'
-              value={series.column}
-              data-required-field-control={index === unresolvedIndex ? 'map-dot-density-count' : undefined}
-              onChange={event => updateSeries(series.id, { column: event.target.value })}
-            >
-              <option value=''>- Select Option -</option>
-              {series.column && !columnNames.includes(series.column) && (
-                <option value={series.column}>{series.column} (missing)</option>
-              )}
-              {columnNames.map(column => (
-                <option key={column} value={column}>
-                  {column}
-                </option>
-              ))}
-            </select>
-          </label>
+        <fieldset key={series.id} className='edit-block'>
+          <legend className='mb-2'>Count Series {index + 1}</legend>
+          <Select
+            label={`Count column ${index + 1}`}
+            value={series.column}
+            section='dotDensity'
+            subsection={series.id}
+            fieldName='column'
+            initial='- Select Option -'
+            options={[
+              ...(series.column && !columnNames.includes(series.column)
+                ? [{ value: series.column, label: `${series.column} (missing)` }]
+                : []),
+              ...columnNames.map(column => ({ value: column, label: column }))
+            ]}
+            data-required-field-control={index === unresolvedIndex ? 'map-dot-density-count' : undefined}
+            onChange={event => updateSeries(series.id, { column: event.target.value })}
+          />
           <TextField
             label={`Series label ${index + 1}`}
             value={series.label}
@@ -104,19 +87,11 @@ export default function DotDensityEditorSection({ columnNames }: { columnNames: 
               updateSeries(series.id, { label })
             }
           />
-          <label className='d-block mb-2'>
-            Series color {index + 1}
-            <input
-              className='d-block'
-              type='color'
-              value={chroma.valid(series.color) ? chroma(series.color).hex() : '#0072b2'}
-              onChange={event => updateSeries(series.id, { color: event.target.value })}
-            />
-          </label>
           <Button
             type='button'
             variant='danger'
             size='sm'
+            className='mt-2'
             onClick={() => update({ series: density.series.filter(item => item.id !== series.id) })}
           >
             Remove Count Series {index + 1}
