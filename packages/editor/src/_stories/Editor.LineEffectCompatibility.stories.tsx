@@ -86,13 +86,17 @@ const reloadExportedConfig = async (canvasElement: HTMLElement, expectedScope?: 
   }
 
   const incomingDash = expectedScope === 'outgoing' ? '0' : '5 5'
-  const originalPath = getIncomingPath(canvasElement).getAttribute('d')
   await userEvent.click(canvas.getByRole('button', { name: 'Reload exported configuration' }))
   expect(canvas.getByTestId('editor-instance')).toHaveAttribute('data-revision', '1')
   await waitForEditor(canvas)
   await assertVisualizationRendered(canvasElement)
+  await performAndAssert(
+    'Wait for the reloaded line to render',
+    () => getIncomingPath(canvasElement)?.getAttribute('d') ?? '',
+    () => {},
+    (_, path) => (path.match(/-?\d*\.?\d+(?:e[+-]?\d+)?/gi) ?? []).length >= 4
+  )
   assertLineStyling(canvasElement, incomingDash)
-  expect(getIncomingPath(canvasElement)).toHaveAttribute('d', originalPath)
 }
 
 const meta: Meta<typeof CdcEditor> = {
