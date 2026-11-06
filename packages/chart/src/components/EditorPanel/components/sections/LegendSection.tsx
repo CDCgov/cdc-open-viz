@@ -32,6 +32,7 @@ export type LegendField =
   | 'label'
   | 'description'
   | 'unified'
+  | 'expandForecastConfidenceIntervals'
   | 'side'
   | 'topBottom'
 
@@ -58,6 +59,7 @@ export type LegendSectionModel = {
   label: LegendConfig['label']
   description: LegendConfig['description']
   unified: LegendConfig['unified']
+  expandForecastConfidenceIntervals: LegendConfig['expandForecastConfidenceIntervals']
   hasSuppressionData: boolean
   supportsClicking: boolean
   hasDynamicCategory: boolean
@@ -65,6 +67,7 @@ export type LegendSectionModel = {
   supportsColorCategory: boolean
   supportsAxisAlign: boolean
   supportsSelectableValues: boolean
+  supportsForecastConfidenceIntervalExpansion: boolean
   colorCodeByCategory: boolean
   tooltipsSingleSeries: boolean
   groupByOptions: string[]
@@ -101,6 +104,11 @@ export const getLegendStyleOptions = (model: LegendSectionModel) => {
 
 export const getLegendSubStyleOptions = (visualizationType: ChartConfig['visualizationType']) =>
   visualizationType === 'Bar' || visualizationType === 'HeatMap' ? ['linear blocks'] : ['linear blocks', 'smooth']
+
+export const supportsForecastConfidenceIntervalExpansion = (
+  visualizationType: ChartConfig['visualizationType'],
+  series: ChartConfig['series']
+) => ['Forecasting', 'Combo'].includes(visualizationType) && Boolean(series?.some(item => item.type === 'Forecasting'))
 
 const LegendSection = ({
   model,
@@ -455,6 +463,24 @@ const LegendSection = ({
               section='legend'
               fieldName='description'
               label='Legend Description'
+            />
+            <CheckBox
+              display={model.supportsForecastConfidenceIntervalExpansion}
+              value={model.expandForecastConfidenceIntervals === true}
+              section='legend'
+              fieldName='expandForecastConfidenceIntervals'
+              label='Expand Confidence Interval Legends'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Show separate legend entries for each confidence interval and forecasting stage.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
             />
             {model.visualizationType !== 'Warming Stripes' && (
               <CheckBox

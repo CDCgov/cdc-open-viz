@@ -66,7 +66,10 @@ import RightValueAxisSection, {
   type RightDataFormatField,
   type RightYAxisField
 } from './components/sections/RightValueAxisSection'
-import LegendSection, { type LegendField } from './components/sections/LegendSection'
+import LegendSection, {
+  supportsForecastConfidenceIntervalExpansion,
+  type LegendField
+} from './components/sections/LegendSection'
 import DataSeriesSection from './components/sections/DataSeriesSection'
 import {
   DataSeriesSectionProvider,
@@ -3600,6 +3603,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       label: config.legend.label,
                       description: config.legend.description,
                       unified: config.legend.unified,
+                      expandForecastConfidenceIntervals: config.legend.expandForecastConfidenceIntervals,
                       hasSuppressionData: Boolean(
                         config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
                       ),
@@ -3609,6 +3613,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       supportsColorCategory: supportsLegendColorCategory,
                       supportsAxisAlign: visHasLegendAxisAlign(),
                       supportsSelectableValues: visHasSelectableLegendValues,
+                      supportsForecastConfidenceIntervalExpansion: supportsForecastConfidenceIntervalExpansion(
+                        config.visualizationType,
+                        config.series
+                      ),
                       colorCodeByCategory,
                       tooltipsSingleSeries: config.tooltips.singleSeries,
                       groupByOptions: getColumns(),

@@ -137,6 +137,85 @@ const getTooltipBoundsState = (canvasElement: HTMLElement) => {
   }
 }
 
+const buildLegendReviewConfig = (expandConfidenceIntervals?: true) => {
+  const config = buildConfig()
+  if (expandConfidenceIntervals === true) {
+    config.legend.expandForecastConfidenceIntervals = true
+  } else {
+    delete config.legend.expandForecastConfidenceIntervals
+  }
+  return config
+}
+
+const getLegendLabels = (canvasElement: HTMLElement) =>
+  within(canvasElement)
+    .getAllByRole('button')
+    .filter(button => button.closest('[aria-label="legend"]'))
+    .map(item => item.textContent?.trim())
+
+export const LegacyStageOnlyLegendReview: Story = {
+  name: 'Review: Legacy Stage-only Legend',
+  args: { config: buildLegendReviewConfig(), isEditor: false },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    await waitFor(() => expect(getLegendLabels(canvasElement)).toEqual(['Estimate', 'Forecast']))
+  }
+}
+
+export const ExpandedConfidenceIntervalLegendReview: Story = {
+  name: 'Review: Expanded Confidence Interval Legend',
+  args: { config: buildLegendReviewConfig(true), isEditor: false },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    await waitFor(() =>
+      expect(getLegendLabels(canvasElement)).toEqual([
+        '50% CI Estimate',
+        '50% CI Forecast',
+        '90% CI Estimate',
+        '90% CI Forecast'
+      ])
+    )
+  }
+}
+
+export const ConfidenceIntervalLegendAuthoring: Story = {
+  name: 'Editor: Confidence Interval Legend Expansion',
+  args: { config: buildConfig(), isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    expect(canvas.getByLabelText('Chart Type')).toHaveValue('Forecasting')
+    await openAccordion(canvas, 'Legend')
+
+    const expansionToggle = canvas.getByRole('checkbox', { name: /Expand Confidence Interval Legends/i })
+    expect(expansionToggle).toBeChecked()
+    await waitFor(() =>
+      expect(getLegendLabels(canvasElement)).toEqual([
+        '50% CI Estimate',
+        '50% CI Forecast',
+        '90% CI Estimate',
+        '90% CI Forecast'
+      ])
+    )
+
+    await performAndAssert(
+      'Restore stage-only legends',
+      () => getLegendLabels(canvasElement),
+      () => userEvent.click(expansionToggle),
+      (before, after) => before.length === 4 && after.join('|') === 'Estimate|Forecast'
+    )
+
+    await performAndAssert(
+      'Expand confidence interval legends',
+      () => getLegendLabels(canvasElement),
+      () => userEvent.click(canvas.getByRole('checkbox', { name: /Expand Confidence Interval Legends/i })),
+      (before, after) => before.length === 2 && after.length === 4 && after[0] === '50% CI Estimate'
+    )
+  }
+}
+
 export const LegendRowsAndIndependentInteraction: Story = {
   args: { config: buildConfig(), isEditor: false },
   play: async ({ canvasElement }) => {
