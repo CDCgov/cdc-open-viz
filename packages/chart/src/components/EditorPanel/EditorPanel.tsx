@@ -36,7 +36,10 @@ import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/u
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 import type { RightDataFormatField, RightYAxisField } from './components/Panels/RightValueAxisPanel/RightValueAxisPanel'
-import type { LegendField } from './components/Panels/LegendPanel/LegendPanel'
+import {
+  supportsForecastConfidenceIntervalExpansion,
+  type LegendField
+} from './components/Panels/LegendPanel/LegendPanel'
 import {
   DataSeriesSectionProvider,
   type DataSeriesRootField,
@@ -1471,6 +1474,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       label: config.legend.label,
                       description: config.legend.description,
                       unified: config.legend.unified,
+                      expandForecastConfidenceIntervals: config.legend.expandForecastConfidenceIntervals,
                       hasSuppressionData: Boolean(
                         config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
                       ),
@@ -1480,6 +1484,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       supportsColorCategory: supportsLegendColorCategory,
                       supportsAxisAlign: visHasLegendAxisAlign(),
                       supportsSelectableValues: visHasSelectableLegendValues,
+                      supportsForecastConfidenceIntervalExpansion: supportsForecastConfidenceIntervalExpansion(
+                        config.visualizationType,
+                        config.series
+                      ),
                       colorCodeByCategory,
                       tooltipsSingleSeries: config.tooltips.singleSeries,
                       groupByOptions: getColumns(),
