@@ -1,0 +1,71 @@
+{
+  "type": "chart",
+  "version": "4.26.8",
+  "title": "Example Bar Chart with Highlighted Value",
+  "visualizationType": "Bar",
+  "visualizationSubType": "regular",
+  "orientation": "vertical",
+  "barStyle": "rounded",
+  "animate": false,
+  "series": [
+    {
+      "dataKey": "Age-adjusted rate",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "highlightedBarValues": [
+    {
+      "dataKey": "Age-adjusted rate",
+      "value": "Non-Hispanic American Indian",
+      "borderWidth": "5",
+      "legendLabel": "Optional Legend Title",
+      "color": "#FFA500"
+    }
+  ],
+  "data": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "Race",
+    "size": "50",
+    "tickRotation": "20"
+  },
+  "yAxis": {
+    "label": "Rate",
+    "min": "0",
+    "max": "700",
+    "size": "67"
+  },
+  "legend": {
+    "behavior": "isolate",
+    "axisAlign": true,
+    "position": "right"
+  },
+  "enableTooltips": true,
+  "labels": true,
+  "tooltips": {
+    "singleSeries": true
+  }
+}
