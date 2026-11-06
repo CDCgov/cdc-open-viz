@@ -13,7 +13,7 @@ export const getInitialState = (configObj = {}): MapState => {
     // Apply author defaults at load time only; runtime updates must keep user selections.
     config.filters = config.filters.map(filter => {
       const initialFilter = { ...filter }
-      if (filter.defaultValue != null) initialFilter.active = filter.defaultValue
+      if (filter.defaultValue != null && filter.defaultValue !== '') initialFilter.active = filter.defaultValue
       return initialFilter
     })
   }

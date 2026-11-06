@@ -28,7 +28,6 @@ import './cdcMapComponent.styles.css'
 
 // Core Helpers
 import {
-  getQueryStringFilterValue,
   isFilterHiddenByQuery,
   removeQueryParam,
   updateQueryParam,
@@ -138,7 +137,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   interactionLabel = 'no link provided'
 }) => {
   const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
-  const initialState = getInitialState(effectiveConfig)
+  const initialState = getInitialState({ ...effectiveConfig, ...(configObj.data ? { data: configObj.data } : {}) })
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
@@ -231,10 +230,35 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     }
   }
 
+  const synchronizedConfig = useRef({
+    data: configObj.data,
+    dataMetadata: configObj.dataMetadata,
+    configIsPrepared,
+    filtersHash: hashObj(configObj.filters)
+  })
   useEffect(() => {
+    const previous = synchronizedConfig.current
+    if (
+      previous.data === configObj.data &&
+      previous.dataMetadata === configObj.dataMetadata &&
+      previous.configIsPrepared === configIsPrepared
+    )
+      return
+
+    const filtersHash = hashObj(configObj.filters)
+    synchronizedConfig.current = {
+      data: configObj.data,
+      dataMetadata: configObj.dataMetadata,
+      configIsPrepared,
+      filtersHash
+    }
     const configClone = cloneConfig(configObj)
     const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
-    const _newConfig = getInitialState(effectiveConfig).config
+    // Refresh data/metadata without reapplying load defaults. Explicit incoming filter changes still win.
+    const _newConfig = {
+      ...effectiveConfig,
+      filters: filtersHash === previous.filtersHash ? config.filters : effectiveConfig.filters
+    }
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
@@ -388,10 +412,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
       if (filters) {
         filters.forEach((filter: VizFilter, index: number) => {
-          const queryStringFilterValue = getQueryStringFilterValue(filter)
-          if (queryStringFilterValue) {
-            filters[index].active = queryStringFilterValue
-          }
           if (isFilterHiddenByQuery(filter)) {
             filters[index].showDropdown = false
           }
