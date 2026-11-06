@@ -1,5 +1,3 @@
-@use 'sass:color';
-
 strong {
   font-weight: 600;
 }
@@ -11,11 +9,11 @@ strong {
   padding: 0.3rem 1rem;
   font-size: 0.9rem;
 
-  strong {
+  & strong {
     font-weight: 600;
   }
 
-  p {
+  & p {
     margin: 0;
   }
 
@@ -56,7 +54,7 @@ strong {
     height: 30px !important;
   }
 
-  path {
+  & path {
     fill: currentColor;
   }
 }
@@ -115,11 +113,12 @@ strong {
     color: #fff;
 
     &:hover {
-      background-color: color.adjust($red, $lightness: -5%);
+      // color.adjust($red, $lightness: -5%), precomputed
+      background-color: rgb(190.5, 0, 10.5833333333);
     }
   }
 
-  svg {
+  & svg {
     width: 16px;
     height: 16px;
     position: relative;
@@ -177,21 +176,21 @@ textarea {
     color: #444;
   }
 
-  >div {
+  > div {
     font-size: 0.9em;
   }
 
-  svg {
+  & svg {
     width: 60px;
     color: var(--blue);
     margin-right: 1rem;
 
-    path {
+    & path {
       fill: currentColor;
     }
   }
 
-  h3 {
+  & h3 {
     font-weight: 600;
     font-size: 1.2rem;
   }
@@ -216,8 +215,9 @@ section.footnotes {
 
   @media (hover: hover) {
     &:hover:not([disabled]) {
-      background-color: color.adjust($blue, $lightness: -4%);
-      border-color: color.adjust($blue, $lightness: -4%);
+      // color.adjust($blue, $lightness: -4%), precomputed
+      background-color: rgb(0, 82.72, 149.6);
+      border-color: rgb(0, 82.72, 149.6);
       box-shadow: 0 0.5rem 1.1rem rgb(0 94 170 / 22%);
     }
   }

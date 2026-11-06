@@ -89,6 +89,8 @@ export interface PreliminaryDataItem {
   circleSize: number
   displayGray: boolean
   weight?: number
+  /** Styles the segment after a matching point; omitted to style both adjacent segments. */
+  lineEffectScope?: 'outgoing'
 }
 
 type DataFormat = {

@@ -5,7 +5,7 @@ import ChartEditorConfig from '../../../chart/src/_stories/_mock/editor-tests/ba
 import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 
 const DATA_TABLE_EDITOR_CONFIG = {
@@ -456,7 +456,8 @@ export const LoadFromApiUrlPreview: Story = {
       expect(canvas.queryByText('Alabama')).not.toBeInTheDocument()
 
       await user.click(canvas.getByText('3. Configure'))
-      await user.click(await canvas.findByText('Dashboard Preview'))
+      await waitForPresence('.editor-heading', canvasElement)
+      await user.click(canvas.getByText('Dashboard Preview'))
       await expect(canvas.findByText('California')).resolves.toBeTruthy()
     } finally {
       window.fetch = originalFetch
@@ -812,7 +813,8 @@ export const RemapDashboardReplacementColumns: Story = {
     await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
     await expect(canvas.findByText('Remapped Dataset')).resolves.toBeTruthy()
     await user.click(canvas.getByText('3. Configure'))
-    await user.click(await canvas.findByText('Dashboard Preview'))
+    await waitForPresence('.editor-heading', canvasElement)
+    await user.click(canvas.getByText('Dashboard Preview'))
     await assertVisualizationRendered(canvasElement)
     await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
   }

@@ -36,13 +36,6 @@ const checkRequiredColumns = (type: string) => {
 }
 
 describe('useColumnsRequiredChecker', () => {
-  it('preserves Geography and Navigation requirements for Navigation maps', () => {
-    expect(checkRequiredColumns('navigation')).toHaveBeenCalledWith({
-      type: 'SET_REQUIRED_COLUMNS',
-      payload: ['Geography', 'Navigation']
-    })
-  })
-
   it.each(['us-geocode', 'world-geocode'])('preserves all legacy requirements for %s maps', type => {
     expect(checkRequiredColumns(type)).toHaveBeenCalledWith({
       type: 'SET_REQUIRED_COLUMNS',
@@ -50,7 +43,7 @@ describe('useColumnsRequiredChecker', () => {
     })
   })
 
-  it.each(['data', 'map'])('leaves %s maps to the structured alert checker', type => {
+  it.each(['data', 'map', 'navigation'])('leaves %s maps to the structured alert checker', type => {
     expect(checkRequiredColumns(type)).toHaveBeenCalledWith({
       type: 'SET_REQUIRED_COLUMNS',
       payload: null

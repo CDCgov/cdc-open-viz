@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fireEvent, userEvent, within } from 'storybook/test'
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 import { createNewChartConfig } from '../helpers/createNewChartConfig'
 import {
@@ -118,15 +118,24 @@ const labelOverlapsLink = (label: SVGTextElement, link: SVGLineElement) => {
   return overlapsAtDistance(linkLength)
 }
 
-const expectLabelsWithinSvg = (svg: SVGSVGElement) => {
-  const svgBounds = svg.getBoundingClientRect()
-  svg.querySelectorAll<SVGTextElement>('.network-chart__label').forEach(label => {
-    const labelBounds = label.getBoundingClientRect()
-    expect(labelBounds.left).toBeGreaterThanOrEqual(svgBounds.left - 1)
-    expect(labelBounds.right).toBeLessThanOrEqual(svgBounds.right + 1)
-    expect(labelBounds.top).toBeGreaterThanOrEqual(svgBounds.top - 1)
-    expect(labelBounds.bottom).toBeLessThanOrEqual(svgBounds.bottom + 1)
-  })
+const expectLabelsWithinSvg = async (svg: SVGSVGElement) => {
+  await waitFor(
+    () => {
+      const svgBounds = svg.getBoundingClientRect()
+      expect(svgBounds.width).toBeGreaterThan(0)
+      expect(svgBounds.height).toBeGreaterThan(0)
+      const labels = svg.querySelectorAll<SVGTextElement>('.network-chart__label')
+      expect(labels.length).toBeGreaterThan(0)
+      labels.forEach(label => {
+        const labelBounds = label.getBoundingClientRect()
+        expect(labelBounds.left).toBeGreaterThanOrEqual(svgBounds.left - 1)
+        expect(labelBounds.right).toBeLessThanOrEqual(svgBounds.right + 1)
+        expect(labelBounds.top).toBeGreaterThanOrEqual(svgBounds.top - 1)
+        expect(labelBounds.bottom).toBeLessThanOrEqual(svgBounds.bottom + 1)
+      })
+    },
+    { timeout: 5000 }
+  )
 }
 
 const meta: Meta<typeof Chart> = {
@@ -186,7 +195,7 @@ export const Network_Runtime: Story = {
     const viewport = svg.querySelector('.network-chart__viewport')
     const initialTransform = viewport?.getAttribute('transform')
     expect(initialTransform).toContain('rotate(30)')
-    expectLabelsWithinSvg(svg as SVGSVGElement)
+    await expectLabelsWithinSvg(svg as SVGSVGElement)
     fireEvent.wheel(svg, { deltaY: -100 })
     expect(viewport?.getAttribute('transform')).toBe(initialTransform)
 
@@ -197,7 +206,7 @@ export const Network_Runtime: Story = {
     expect(within(canvasElement).queryByLabelText('Rotate right')).not.toBeInTheDocument()
     await userEvent.click(within(canvasElement).getByLabelText('Reset view'))
     expect(viewport?.getAttribute('transform')).toBe(initialTransform)
-    expectLabelsWithinSvg(svg as SVGSVGElement)
+    await expectLabelsWithinSvg(svg as SVGSVGElement)
     await userEvent.hover(svg.querySelector('.network-chart__link-hitbox')!)
     const tooltip = await waitForPresence('.network-chart__tooltip', document.body)
     expect(window.getComputedStyle(tooltip).backgroundColor).toBe('rgb(255, 255, 255)')
@@ -236,7 +245,7 @@ export const Network_MinimumHeightWithLinkKey: Story = {
     expect(width).toBeGreaterThanOrEqual(160)
     expect(height).toBe(128)
     expect(within(canvasElement).getByRole('group', { name: 'Link styles' })).toBeVisible()
-    expectLabelsWithinSvg(svg)
+    await expectLabelsWithinSvg(svg)
   }
 }
 

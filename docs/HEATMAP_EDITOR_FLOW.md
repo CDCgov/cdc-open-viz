@@ -182,7 +182,7 @@ These are intentionally out of scope unless the product direction changes:
 - [`HeatMapGradientLegend.tsx`](../packages/chart/src/components/HeatMap/components/HeatMapGradientLegend.tsx)
 - [`helpers/index.ts`](../packages/chart/src/components/HeatMap/helpers/index.ts)
 - [`EditorPanel.tsx`](../packages/chart/src/components/EditorPanel/EditorPanel.tsx)
-- [`Panel.General.tsx`](../packages/chart/src/components/EditorPanel/components/Panels/Panel.General.tsx)
+- [`GeneralPanel.tsx`](../packages/chart/src/components/EditorPanel/components/Panels/GeneralPanel/GeneralPanel.tsx)
 - [`CdcChartComponent.tsx`](../packages/chart/src/CdcChartComponent.tsx)
 - [`missingRequiredSections.ts`](../packages/core/helpers/missingRequiredSections.ts)
 - [`getDataSeriesColumns.ts`](../packages/core/components/DataTable/helpers/getDataSeriesColumns.ts)

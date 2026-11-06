@@ -1,0 +1,205 @@
+{
+  "type": "map",
+  "version": "4.26.10",
+  "general": {
+    "title": "Simulated disease outbreaks in Arizona",
+    "subtext": "Synthetic case counts for one simulated reporting period. Select Arizona under Select Location to focus the map. These dots show approximate distributions, not individual case locations.",
+    "geoType": "us-county",
+    "type": "data",
+    "showTitle": true,
+    "showSidebar": true,
+    "headerColor": "theme-blue",
+    "showStateDropdown": true,
+    "showNeighboringStates": false,
+    "allowMapZoom": true,
+    "countyCensusYear": "2019",
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.1",
+      "isReversed": false
+    }
+  },
+  "columns": {
+    "geo": {
+      "name": "FIPS",
+      "label": "County",
+      "displayColumn": "County",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "",
+      "label": "",
+      "tooltip": false,
+      "dataTable": false
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "dotDensity": {
+    "enabled": true,
+    "dotValue": 5,
+    "radius": 2,
+    "seed": 42,
+    "unit": "cases",
+    "series": [
+      {
+        "id": "density-measles",
+        "column": "Measles",
+        "label": "Measles",
+        "color": "#0072B2"
+      },
+      {
+        "id": "density-salmonellosis",
+        "column": "Salmonellosis",
+        "label": "Salmonellosis",
+        "color": "#D55E00"
+      },
+      {
+        "id": "density-pertussis",
+        "column": "Pertussis",
+        "label": "Pertussis",
+        "color": "#8B4789"
+      }
+    ]
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "bubble": {
+    "layers": []
+  },
+  "filters": [],
+  "table": {
+    "label": "Synthetic county counts",
+    "caption": "Invented case counts for one shared simulated reporting period; not surveillance data.",
+    "forceDisplay": true,
+    "expanded": false,
+    "download": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "opacity": 90,
+    "linkLabel": "Learn more"
+  },
+  "data": [
+    {
+      "FIPS": "04001",
+      "County": "Apache",
+      "Measles": 30,
+      "Salmonellosis": 10,
+      "Pertussis": 15
+    },
+    {
+      "FIPS": "04003",
+      "County": "Cochise",
+      "Measles": 0,
+      "Salmonellosis": 125,
+      "Pertussis": 40
+    },
+    {
+      "FIPS": "04005",
+      "County": "Coconino",
+      "Measles": 85,
+      "Salmonellosis": 15,
+      "Pertussis": 35
+    },
+    {
+      "FIPS": "04007",
+      "County": "Gila",
+      "Measles": 8,
+      "Salmonellosis": 20,
+      "Pertussis": 25
+    },
+    {
+      "FIPS": "04009",
+      "County": "Graham",
+      "Measles": 0,
+      "Salmonellosis": 35,
+      "Pertussis": 10
+    },
+    {
+      "FIPS": "04011",
+      "County": "Greenlee",
+      "Measles": 0,
+      "Salmonellosis": 10,
+      "Pertussis": 0
+    },
+    {
+      "FIPS": "04012",
+      "County": "La Paz",
+      "Measles": 0,
+      "Salmonellosis": 65,
+      "Pertussis": 5
+    },
+    {
+      "FIPS": "04013",
+      "County": "Maricopa",
+      "Measles": 145,
+      "Salmonellosis": 185,
+      "Pertussis": 480
+    },
+    {
+      "FIPS": "04015",
+      "County": "Mohave",
+      "Measles": 32,
+      "Salmonellosis": 25,
+      "Pertussis": 20
+    },
+    {
+      "FIPS": "04017",
+      "County": "Navajo",
+      "Measles": 110,
+      "Salmonellosis": 5,
+      "Pertussis": 30
+    },
+    {
+      "FIPS": "04019",
+      "County": "Pima",
+      "Measles": 15,
+      "Salmonellosis": 240,
+      "Pertussis": 220
+    },
+    {
+      "FIPS": "04021",
+      "County": "Pinal",
+      "Measles": 25,
+      "Salmonellosis": 95,
+      "Pertussis": 175
+    },
+    {
+      "FIPS": "04023",
+      "County": "Santa Cruz",
+      "Measles": 0,
+      "Salmonellosis": 110,
+      "Pertussis": 15
+    },
+    {
+      "FIPS": "04025",
+      "County": "Yavapai",
+      "Measles": 60,
+      "Salmonellosis": 20,
+      "Pertussis": 45
+    },
+    {
+      "FIPS": "04027",
+      "County": "Yuma",
+      "Measles": 0,
+      "Salmonellosis": 190,
+      "Pertussis": 30
+    }
+  ],
+  "legend": {
+    "title": "Disease cases (synthetic data)",
+    "position": "top",
+    "style": "circles"
+  }
+}

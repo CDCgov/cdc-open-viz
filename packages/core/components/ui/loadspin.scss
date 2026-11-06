@@ -10,7 +10,7 @@
   height: 100%;
   transform-origin: top left;
 
-  div {
+  & div {
     animation: cove-loadspin__roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     transform-origin: 40px 40px;
 

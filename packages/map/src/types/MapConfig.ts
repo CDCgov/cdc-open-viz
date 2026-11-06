@@ -53,6 +53,8 @@ type MapVisualSettings = {
 export type BubbleLayer = {
   /** Chooses whether bubbles are positioned by geography lookup or explicit coordinates. */
   locationSource?: 'data-column' | 'latitude-longitude'
+  /** Positions small-state bubbles over visible outside labels when explicitly enabled. */
+  placeOverLabels?: boolean
   /** Chooses whether the size column is interpreted as numeric values or categories. */
   sizeType?: 'numeric' | 'category'
   /** Custom category order for categorical bubble sizing; empty means automatic sorting. */
@@ -79,6 +81,7 @@ export type BubbleLayer = {
     description?: string
     style?: 'circles' | 'boxes' | 'gradient'
     size?: {
+      singleItemLabel?: string
       show?: boolean
       title?: string
       description?: string
@@ -169,6 +172,24 @@ export type DataRow = {
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
+export type DotDensitySeries = {
+  id: string
+  column: string
+  label: string
+  color: string
+}
+
+export type DotDensityConfig = {
+  enabled: boolean
+  dotValue: number
+  radius: number
+  seed: number
+  unit: string
+  /** @deprecated Read only when importing earlier density prototypes; use general.showSidebar and legend. */
+  legend?: { show: boolean; title: string }
+  series: DotDensitySeries[]
+}
+
 export type SmallMultiples = {
   mode?: 'by-column'
   tileColumn?: string
@@ -194,7 +215,28 @@ export type TimePlaybackConfig = {
   customOrder?: Array<string | number>
 }
 
+export type LocationLinks = {
+  enableMapNavigation?: boolean
+  enableDataTableLinks?: boolean
+}
+
+export type LocationHighlighter = {
+  note?: string
+  showResetButton?: boolean
+  resetButtonLabel?: string
+  enabled?: boolean
+  position?: 'above' | 'below'
+  highlightSelectedLocation?: boolean
+  details?: string
+  dropdownLabel?: string
+  placeholder?: string
+  filterColumn?: string
+}
+
 export type MapConfig = Visualization & {
+  dotDensity?: DotDensityConfig
+  locationHighlighter?: LocationHighlighter
+  locationLinks?: LocationLinks
   altText?: AltTextConfig
   annotations: Annotation[]
   // map color palette
