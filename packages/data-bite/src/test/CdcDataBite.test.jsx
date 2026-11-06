@@ -96,6 +96,29 @@ const circleConfig = (visual = {}, overrides = {}) => ({
 })
 
 describe('TP5 circles', () => {
+  it.each([
+    [false, false, true],
+    [true, false, false],
+    [false, true, false],
+    [true, true, false]
+  ])('reserves flag space for white background %s and data colors %s', (whiteBackground, dataColors, hasFlag) => {
+    const { container } = render(
+      <CdcDataBite
+        config={circleConfig(
+          { whiteBackground },
+          {
+            dataColors: dataColors
+              ? { column: 'status', mappings: [{ sourceValue: 'alert', color: '#ff0000' }] }
+              : undefined
+          }
+        )}
+      />
+    )
+    const callout = container.querySelector('.cdc-callout')
+    expect(callout.classList.contains('cdc-callout--has-flag')).toBe(hasFlag)
+    expect(Boolean(callout.querySelector('.cdc-callout__flag'))).toBe(hasFlag)
+  })
+
   it.each([undefined, 'off'])('preserves plain values for circle mode %s', circleStyle => {
     const { container } = render(<CdcDataBite config={circleConfig({ circleStyle })} />)
     expect(container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
@@ -112,7 +135,7 @@ describe('TP5 circles', () => {
     const circle = container.querySelector('.cdc-callout__value-circle')
     expect(circle).toHaveClass(`cdc-callout__value-circle--${circleStyle}`)
     expect(circle).toHaveTextContent('$1,234%')
-    expect(circle.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: '30px' })
+    expect(circle.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: '36px' })
     expect(container.querySelector('.cdc-callout__body')).toHaveClass(
       useWrap ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right'
     )
@@ -124,12 +147,12 @@ describe('TP5 circles', () => {
   it.each([
     [18, 18],
     ['32', 32],
-    [undefined, 30],
-    ['', 30],
-    [0, 30],
-    [-2, 30],
-    ['invalid', 30],
-    [Infinity, 30]
+    [undefined, 36],
+    ['', 36],
+    [0, 36],
+    [-2, 36],
+    ['invalid', 36],
+    [Infinity, 36]
   ])('uses a valid circle font size for %s', (circleFontSize, expected) => {
     const { container } = render(<CdcDataBite config={circleConfig({ circleStyle: 'light', circleFontSize })} />)
     expect(container.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: `${expected}px` })

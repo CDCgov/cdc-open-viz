@@ -36,7 +36,7 @@ export default {
     whiteBackground: false,
     useWrap: false,
     circleStyle: 'off',
-    circleFontSize: 30
+    circleFontSize: 36
   },
   general: {
     isCompactStyle: false

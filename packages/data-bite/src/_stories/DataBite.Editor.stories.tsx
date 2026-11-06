@@ -711,6 +711,7 @@ export const DataDrivenColorsSectionTests: Story = {
     await expect(colorColumnSelect).toHaveValue('Status')
     await expect(canvas.getByRole('button', { name: 'Add Color Mapping' })).toBeVisible()
     await expect(callout).toHaveClass('cdc-callout--data-color')
+    await expect(getComputedStyle(callout).borderTopWidth).toBe('0px')
 
     await performAndAssert(
       'Clear Color Column',
@@ -903,7 +904,7 @@ export const Tp5VisualSectionTests: Story = {
       'Light Circle',
       getCircleState,
       async () => await userEvent.selectOptions(circleSelect, 'light'),
-      (before, after) => !before.light && after.light && after.fontControl && after.fontSize === '30px'
+      (before, after) => !before.light && after.light && after.fontControl && after.fontSize === '36px'
     )
     await performAndAssert(
       'Circle Font Size',
@@ -913,7 +914,7 @@ export const Tp5VisualSectionTests: Story = {
         await userEvent.clear(input)
         await userEvent.type(input, '20')
       },
-      (before, after) => before.fontSize === '30px' && after.fontSize === '20px'
+      (before, after) => before.fontSize === '36px' && after.fontSize === '20px'
     )
     await performAndAssert(
       'Dark Circle',

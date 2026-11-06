@@ -12,7 +12,13 @@ const meta: Meta<typeof DataBite> = {
 export default meta
 type Story = StoryObj<typeof DataBite>
 
-const config = (circleStyle: 'light' | 'dark', whiteBackground: boolean, useWrap: boolean, value = 123) => ({
+const config = (
+  circleStyle: 'light' | 'dark',
+  whiteBackground: boolean,
+  useWrap: boolean,
+  value = 123,
+  circleFontSize = 36
+) => ({
   type: 'data-bite',
   biteStyle: 'tp5',
   title: 'Title',
@@ -21,7 +27,7 @@ const config = (circleStyle: 'light' | 'dark', whiteBackground: boolean, useWrap
   dataFunction: 'Pass Through',
   data: [{ value }],
   dataFormat: { prefix: '', suffix: '', commas: true, roundToPlace: 0 },
-  visual: { showTitle: true, circleStyle, circleFontSize: value > 999 ? 14 : 30, whiteBackground, useWrap }
+  visual: { showTitle: true, circleStyle, circleFontSize, whiteBackground, useWrap }
 })
 
 export const MockupCombinations: Story = {
@@ -82,7 +88,7 @@ export const MockupCombinations: Story = {
 export const NarrowLongValue: Story = {
   render: () => (
     <div style={{ width: 280, padding: 16 }}>
-      <DataBite config={config('light', true, false, 1234567)} />
+      <DataBite config={config('light', true, false, 1234567, 20)} />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -90,9 +96,35 @@ export const NarrowLongValue: Story = {
     const circle = canvasElement.querySelector<HTMLElement>('.cdc-callout__value-circle')!
     const value = circle.querySelector<HTMLElement>('.cdc-callout__value')!
     expect(value.textContent).toBe('1,234,567')
-    expect(getComputedStyle(value).fontSize).toBe('14px')
+    expect(getComputedStyle(value).fontSize).toBe('20px')
     expect(value.getBoundingClientRect().width).toBeLessThanOrEqual(circle.clientWidth)
     const message = canvasElement.querySelector<HTMLElement>('.cdc-callout__content-slot')!
     expect(message.getBoundingClientRect().top).toBeGreaterThanOrEqual(circle.getBoundingClientRect().bottom)
+  }
+}
+
+export const ResponsiveBoundary: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {[480, 481].map(width => (
+        <div key={width} data-testid={`circle-width-${width}`} style={{ width }}>
+          <DataBite config={config('light', true, false)} />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitForPresence('.cdc-callout__value-circle', canvasElement)
+    for (const width of [480, 481]) {
+      const card = canvasElement.querySelector(`[data-testid="circle-width-${width}"]`)!
+      const circle = card.querySelector('.cdc-callout__value-circle')!.getBoundingClientRect()
+      const message = card.querySelector('.cdc-callout__content-slot')!.getBoundingClientRect()
+      if (width === 480) {
+        expect(message.top).toBeGreaterThanOrEqual(circle.bottom)
+      } else {
+        expect(message.left).toBeGreaterThanOrEqual(circle.right)
+        expect(message.top).toBeLessThan(circle.bottom)
+      }
+    }
   }
 }
