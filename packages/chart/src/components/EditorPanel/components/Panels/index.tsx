@@ -1,16 +1,27 @@
-import ForestPlotSettings from './Panel.ForestPlotSettings'
-import Series from './Panel.Series'
-import Regions from './Panel.Regions'
-import General from './Panel.General'
-import BoxPlot from './Panel.BoxPlot'
-import Visual from './Panel.Visual'
-import Sankey from './Panel.Sankey'
-import Network from './Panel.Network'
-import Dendrogram from './Panel.Dendrogram'
-import Radar from './Panel.Radar'
-import Annotate from './Panel.Annotate'
-import PatternSettings from './Panel.PatternSettings'
-import SmallMultiples from './Panel.SmallMultiples'
+import ForestPlotSettings from './ForestPlotSettingsPanel'
+import Series from './DataSeriesPanel/SeriesEditor'
+import Regions from './RegionsPanel'
+import General from './GeneralPanel'
+import BoxPlot from './MeasuresPanel'
+import Visual from './VisualPanel'
+import Sankey from './SankeyPanel'
+import Network from './NetworkPanel'
+import Dendrogram from './DendrogramPanel'
+import Radar from './RadarPanel'
+import Annotate from './TextAnnotationsPanel'
+import PatternSettings from './PatternSettingsPanel'
+import SmallMultiples from './SmallMultiplesPanel'
+import DataSeries from './DataSeriesPanel'
+import Legend from './LegendPanel'
+import RightValueAxis from './RightValueAxisPanel'
+import ValueAxis from './ValueAxisPanel'
+import HeatMapSettings from './HeatMapSettingsPanel'
+import Columns from './ColumnsPanel'
+import Filters from './FiltersPanel'
+import Footnotes from './FootnotesPanel'
+import DataTable from './DataTablePanel'
+import MarkupVariables from './MarkupVariablesPanel'
+import CategoryAxis from './CategoryAxisPanel'
 
 const Panels = {
   ForestPlot: ForestPlotSettings,
@@ -25,7 +36,18 @@ const Panels = {
   Radar,
   Annotate,
   PatternSettings,
-  SmallMultiples
+  SmallMultiples,
+  DataSeries,
+  Legend,
+  RightValueAxis,
+  ValueAxis,
+  HeatMapSettings,
+  Columns,
+  Filters,
+  Footnotes,
+  DataTable,
+  MarkupVariables,
+  CategoryAxis
 }
 
 export default Panels

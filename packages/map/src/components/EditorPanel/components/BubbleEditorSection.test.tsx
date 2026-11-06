@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from 'vitest'
 import ConfigContext from '../../../context'
 import { createNewMapConfig } from '../../../helpers/createNewMapConfig'
 import { createDefaultBubbleLayer } from '../../../helpers/bubbleLayers'
-import BubbleEditorSection from './BubbleEditorSection'
+import BubbleEditorSection from './Panels/BubbleLayersPanel/BubbleLayersPanel'
 
-vi.mock('./BubbleLayerFields', () => ({ default: () => null }))
+vi.mock('./Panels/BubbleLayersPanel/BubbleLayerFields', () => ({ default: () => null }))
 vi.mock('@cdc/core/components/ui/Icon', () => ({ default: () => null }))
 
 const renderEditor = (sizeShown: boolean) => {
