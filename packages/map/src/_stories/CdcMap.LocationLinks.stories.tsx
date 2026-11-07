@@ -487,7 +487,12 @@ export const NavigationCompatibility: Story = {
     await waitForEditor(canvas)
     await waitForPresence('.navigation-menu', canvasElement)
     expect(canvasElement.querySelector('.map-location-highlighter')).toBeNull()
-    await openAccordion(canvas, 'Type')
+    await performAndAssert(
+      'Open Type to show Navigation Behavior',
+      () => canvas.queryByText('Navigation Behavior')?.checkVisibility({ checkOpacity: true }) ?? false,
+      () => openAccordion(canvas, 'Type'),
+      (_, after) => after
+    )
     expect(canvas.getByText('Navigation Behavior')).toBeVisible()
     await performAndAssert(
       'Open Columns to show the Navigation control',
