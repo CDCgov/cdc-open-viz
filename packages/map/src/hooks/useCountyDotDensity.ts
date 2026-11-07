@@ -3,7 +3,12 @@ import type { MapConfig } from '../types/MapConfig'
 import { CountyDotDensityContext } from '../context/CountyDotDensityContext'
 import { prepareCountyDotDensity, type CountyDotDensitySettings } from '../helpers/countyDotDensityLayer'
 import type { DotDensityGeometry } from '../helpers/dotDensity'
-import { getDotDensityConfig, getConfiguredDotDensitySeries, isDotDensitySupported } from '../helpers/dotDensityConfig'
+import {
+  getDotDensityConfig,
+  getConfiguredDotDensitySeries,
+  isDotDensitySupported,
+  getActiveHiddenDensitySeries
+} from '../helpers/dotDensityConfig'
 import { getAvailableMapColumns } from '../helpers/getMissingRequiredMapFields'
 
 /** Separate expensive geographic preparation from radius and visibility redraws. */
@@ -35,7 +40,7 @@ export default function useCountyDotDensity(
         ? {
             settings: authoredSettings,
             radius,
-            hiddenSeries: hiddenDensitySeries.filter(id => authoredSettings.series.some(series => series.id === id))
+            hiddenSeries: getActiveHiddenDensitySeries(authoredSettings.series, hiddenDensitySeries)
           }
         : null),
     [previewDotDensity, authoredSettings, radius, hiddenDensitySeries]

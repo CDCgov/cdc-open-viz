@@ -71,8 +71,7 @@ describe('useCountyDotDensity', () => {
     ['seed', { seed: 99 }],
     ['quantity', { dotValue: 10 }],
     ['column', { series: [{ ...config.dotDensity!.series[0], column: 'b' }] }],
-    ['identity', { series: [{ ...config.dotDensity!.series[0], id: 'new-id' }] }],
-    ['color', { series: [{ ...config.dotDensity!.series[0], color: '#D55E00' }] }]
+    ['identity', { series: [{ ...config.dotDensity!.series[0], id: 'new-id' }] }]
   ])('prepares again when %s changes', (_name, change) => {
     const { result, rerender } = renderHook(useLayer, { initialProps: config })
     const prepared = result.current.densityLayer
@@ -142,4 +141,36 @@ describe('useCountyDotDensity', () => {
     expect(result.current.densityLayer?.dots).toHaveLength(10)
     expect(result.current.densityLayer?.dots.every(dot => dot.countyId === '04013')).toBe(true)
   })
+})
+
+it.each([undefined, '#0072B2'])('handles palette edits with series color %s without moving dots', color => {
+  const paletteConfig = {
+    ...config,
+    general: {
+      ...config.general,
+      palette: { name: 'qualitative_standard', version: '2.1', isReversed: false, customColorsOrdered: ['#123456'] }
+    },
+    dotDensity: {
+      ...config.dotDensity!,
+      series: config.dotDensity!.series.map(series => ({ ...series, color }))
+    }
+  }
+  const { result, rerender } = renderHook(useLayer, { initialProps: paletteConfig })
+  const before = result.current.densityLayer!
+  expect(before.dots.map(dot => dot.color)).toEqual(Array(10).fill(color ?? '#123456'))
+  rerender({
+    ...paletteConfig,
+    general: {
+      ...paletteConfig.general,
+      palette: { name: 'qualitative_standard', version: '2.1', isReversed: false, customColorsOrdered: ['#abcdef'] }
+    }
+  })
+  const after = result.current.densityLayer!
+  if (color) {
+    expect(after).toBe(before)
+  } else {
+    expect(after).not.toBe(before)
+  }
+  expect(after.dots.map(dot => dot.color)).toEqual(Array(10).fill(color ?? '#abcdef'))
+  expect(after.dots.map(dot => dot.position)).toEqual(before.dots.map(dot => dot.position))
 })

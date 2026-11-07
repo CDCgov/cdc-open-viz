@@ -6,6 +6,7 @@ import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { computeAreaPosition } from '../data/continent-bounding-boxes'
+import { getActiveHiddenDensitySeries, getDotDensityConfig } from '../helpers/dotDensityConfig'
 
 export const getInitialState = (configObj = {}): MapState => {
   const config = { ...configObj } as MapConfig
@@ -78,8 +79,27 @@ export type MapState = {
 
 const reducer = (state: MapState, action: MapActions): MapState => {
   switch (action.type) {
-    case 'SET_CONFIG':
-      return { ...state, config: action.payload }
+    case 'SET_CONFIG': {
+      const mappedSeries = (config: MapConfig) =>
+        getDotDensityConfig(config).series.filter(series => typeof series.column === 'string' && series.column.trim())
+      const previousSeries = mappedSeries(state.config)
+      const hidden = new Set(getActiveHiddenDensitySeries(previousSeries, state.hiddenDensitySeries))
+      const isolatedId =
+        hidden.size > 0 && hidden.size === previousSeries.length - 1
+          ? previousSeries.find(series => !hidden.has(series.id))?.id
+          : undefined
+      const nextSeries = mappedSeries(action.payload)
+      return {
+        ...state,
+        config: action.payload,
+        hiddenDensitySeries:
+          isolatedId !== undefined
+            ? nextSeries.some(series => series.id === isolatedId)
+              ? nextSeries.filter(series => series.id !== isolatedId).map(series => series.id)
+              : []
+            : getActiveHiddenDensitySeries(nextSeries, state.hiddenDensitySeries)
+      }
+    }
     case 'SET_LOADING':
       return { ...state, loading: action.payload }
     case 'SET_ACCESSIBLE_STATUS':

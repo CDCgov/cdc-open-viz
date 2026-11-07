@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+
       pull-requests: write
 
     steps:
@@ -36,6 +37,10 @@ jobs:
             const packageNames = ['data-bite', 'chart', 'dashboard', 'data-table', 'map', 'markup-include', 'waffle-chart']
 
             const packageSignals = new Map()
+            // Documentation follows config ownership, even when a type is stored in core.
+            const coreTypeDocOwners = new Map([
+              ['packages/core/types/Series.ts', 'chart']
+            ])
 
             const ensureSignal = pkg => {
               if (!packageSignals.has(pkg)) {
@@ -56,6 +61,11 @@ jobs:
             ]
 
             for (const file of changed) {
+              const docOwner = coreTypeDocOwners.get(file)
+              if (docOwner) {
+                ensureSignal(docOwner).configCodeChanged.push(file)
+              }
+
               for (const pkg of packageNames) {
                 const pkgPrefix = `packages/${pkg}/`
                 if (!file.startsWith(pkgPrefix)) continue
@@ -75,9 +85,11 @@ jobs:
 
             const coreConfigChanged = changed.includes('packages/core/CONFIG.md')
             const coreSharedCodeChanged = changed.some(file =>
-              file.startsWith('packages/core/types/') ||
-              file.startsWith('packages/core/components/DataTable/types/') ||
-              /packages\/core\/.*migrat/i.test(file)
+              !coreTypeDocOwners.has(file) && (
+                file.startsWith('packages/core/types/') ||
+                file.startsWith('packages/core/components/DataTable/types/') ||
+                /packages\/core\/.*migrat/i.test(file)
+              )
             )
 
             const flaggedPackages = [...packageSignals.entries()]

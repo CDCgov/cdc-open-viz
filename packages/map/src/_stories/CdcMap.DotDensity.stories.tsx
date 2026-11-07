@@ -161,6 +161,19 @@ export const DiseaseOutbreaks: Story = {
     })
     // Verify each disease color actually reaches the Canvas, not just the legend.
     const pixels = map.getContext('2d')!.getImageData(0, 0, map.width, map.height).data
+    let backgroundPixels = 0
+    let oldBackgroundPixels = 0
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i] === 245 && pixels[i + 1] === 246 && pixels[i + 2] === 247 && pixels[i + 3] === 255) {
+        backgroundPixels++
+      }
+      if (pixels[i] === 223 && pixels[i + 1] === 225 && pixels[i + 2] === 226 && pixels[i + 3] === 255) {
+        oldBackgroundPixels++
+      }
+    }
+    expect(backgroundPixels).toBeGreaterThan(100)
+    // Antialiased boundaries can coincidentally match the old shade at isolated pixels.
+    expect(oldBackgroundPixels).toBeLessThan(10)
     for (const disease of diseaseSeries) {
       const rgb = [1, 3, 5].map(offset => parseInt(disease.color.slice(offset, offset + 2), 16))
       let matches = 0
