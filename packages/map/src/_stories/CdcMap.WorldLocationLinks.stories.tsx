@@ -190,29 +190,33 @@ export const WorldOverlays: Story = {
     const canvas = within(canvasElement)
     const select = canvas.getByLabelText('Select a location for more information')
     expect(within(select).getByRole('option', { name: 'New York City' })).toHaveValue('NEW YORK CITY')
-    const city = canvasElement.querySelector('.geo-point')!
+    const city = () => canvasElement.querySelector('.geo-point')!
     const canadaBubble = () => canvasElement.querySelector('circle.country--Canada')!
     const mexicoBubble = () => canvasElement.querySelector('circle.country--Mexico')!
     await performAndAssert(
       'Fade world overlays with selection',
-      () => getComputedStyle(city).opacity,
+      () => getComputedStyle(city()).opacity,
       () => userEvent.selectOptions(select, 'CAN'),
       (_, after) => after === '0.5'
     )
     expect(getComputedStyle(canadaBubble().parentElement!).opacity).toBe('1')
     expect(getComputedStyle(mexicoBubble().parentElement!).opacity).toBe('0.5')
     expect(canadaBubble()).toHaveAttribute('fill-opacity', '0.8')
+    const outline = canvasElement.querySelector('.selected-location-outline')!
+    for (const marker of canvasElement.querySelectorAll('.bubble, .geo-point')) {
+      expect(marker.compareDocumentPosition(outline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    }
     for (const bubble of canvasElement.querySelectorAll('.bubble--coordinate')) {
       expect(getComputedStyle(bubble.parentElement!).opacity).toBe('0.5')
       expect(bubble).toHaveAttribute('fill-opacity', '0.6')
     }
     await performAndAssert(
       'Highlight the selected world city marker independently of countries',
-      () => getComputedStyle(city).opacity,
+      () => getComputedStyle(city()).opacity,
       () => userEvent.selectOptions(select, 'NEW YORK CITY'),
       (_, after) => after === '1'
     )
-    expect(city.querySelector('path, circle, polygon')).toHaveAttribute('stroke', '#000000')
+    expect(city().querySelector('path, circle, polygon')).toHaveAttribute('stroke', '#000000')
     expect(canvasElement.querySelector('.map-location-highlighter__details')).toHaveTextContent(
       'Report for New York City'
     )

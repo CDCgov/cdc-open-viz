@@ -137,3 +137,42 @@ describe('city marker highlighting', () => {
     }
   )
 })
+
+describe('city foreground ordering', () => {
+  it('raises only the active city for either highlight source and restores normal order', () => {
+    const value = {
+      config: { ...config, general: { ...config.general, geoType: 'us' } },
+      selectedLocationId: '',
+      setSharedFilterValue: '',
+      position: { zoom: 1 },
+      runtimeData: {
+        'NEW YORK CITY': { Site: 'New York City', Latitude_jitter: 40.7, Longitude_jitter: -74 },
+        BOSTON: { Site: 'Boston', Latitude_jitter: 42.3, Longitude_jitter: -71 }
+      },
+      runtimeLegend: { items: [] }
+    }
+    const draw = (highlight: Partial<typeof value>) => (
+      <ConfigContext.Provider value={{ ...value, ...highlight } as any}>
+        <svg>
+          <CityList projection={() => [100, 100]} tooltipId='order' highlightedOnly={false} />
+          <circle className='other-layer' />
+          <CityList projection={() => [100, 100]} tooltipId='order' highlightedOnly />
+        </svg>
+      </ConfigContext.Provider>
+    )
+    const { container, rerender } = render(draw({}))
+    const order = () =>
+      Array.from(container.querySelector('svg')!.children).map(
+        el => el.getAttribute('data-city-id') || el.getAttribute('class')
+      )
+    expect(order()).toEqual(['NEW YORK CITY', 'BOSTON', 'other-layer'])
+    rerender(draw({ setSharedFilterValue: 'New York City' }))
+    expect(order()).toEqual(['BOSTON', 'other-layer', 'NEW YORK CITY'])
+    rerender(draw({ setSharedFilterValue: 'Boston', selectedLocationId: 'NEW YORK CITY' }))
+    expect(order()).toEqual(['BOSTON', 'other-layer', 'NEW YORK CITY'])
+    rerender(draw({ setSharedFilterValue: 'Boston' }))
+    expect(order()).toEqual(['NEW YORK CITY', 'other-layer', 'BOSTON'])
+    rerender(draw({}))
+    expect(order()).toEqual(['NEW YORK CITY', 'BOSTON', 'other-layer'])
+  })
+})
