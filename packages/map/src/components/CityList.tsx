@@ -17,9 +17,10 @@ import { getColumnNames } from '../helpers/getColumnNames'
 type CityListProps = {
   tooltipId: string
   projection: any
+  highlightedOnly?: boolean
 }
 
-const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
+const CityList: React.FC<CityListProps> = ({ tooltipId, projection, highlightedOnly }) => {
   const { config, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
   const { isDimmed, isHighlighted } = useMapHighlight()
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
@@ -52,7 +53,7 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
   }
 
   // Early exit if no cities to render
-  if (!cityList.length) {
+  if (!cityList.length || (highlightedOnly === true && !isDimmed())) {
     return null
   }
 
@@ -60,6 +61,8 @@ const CityList: React.FC<CityListProps> = ({ tooltipId, projection }) => {
   return cityList.map(cityId => {
     // Get the city data directly from our memoized citiesData
     const geoData = citiesData[cityId]
+    if (highlightedOnly !== undefined && isHighlighted(cityId, geoData?.[geoColumnName]) !== highlightedOnly)
+      return null
 
     if (!geoData) {
       return null

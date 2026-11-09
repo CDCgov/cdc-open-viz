@@ -19,6 +19,7 @@ type BubbleListProps = {
   projection?: GeoProjection
   runtimeData?: DataRow[]
   positionOverrides?: BubblePositionOverrides
+  highlightedOnly?: boolean
 }
 
 type BubbleMarkerProps = {
@@ -108,11 +109,12 @@ const renderBubbleMarker = ({
 const BubbleList: React.FC<BubbleListProps> = ({
   customProjection,
   projection: providedProjection,
-  positionOverrides
+  positionOverrides,
+  highlightedOnly
 }) => {
   const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
-  const { isDimmed } = useMapHighlight()
+  const { isDimmed, isHighlighted } = useMapHighlight()
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
     useLegendMemoContext()
 
@@ -166,7 +168,7 @@ const BubbleList: React.FC<BubbleListProps> = ({
   }
 
   const renderBubbles = () => {
-    if (!projection) return null
+    if (!projection || (highlightedOnly === true && !isDimmed())) return null
     const bubbleRows = getBubbleRenderData({
       config,
       filteredCountryCode,
@@ -185,6 +187,11 @@ const BubbleList: React.FC<BubbleListProps> = ({
 
     return getPlacedBubbleRows(bubbleRows, geoType, projection, positionOverrides).map(
       ({ row: bubbleRow, location }, index) => {
+        const highlighted = isHighlighted(
+          location.usesExplicitCoordinates ? undefined : bubbleRow.uid,
+          runtimeData?.[bubbleRow.uid]?.[config.columns.geo.name] ?? bubbleRow.sourceRow[config.columns.geo.name]
+        )
+        if (highlightedOnly !== undefined && highlighted !== highlightedOnly) return null
         const classSuffix = location.displayName.replace(/\s+/g, '')
         const markerKey = `${bubbleRow.layerIndex}-${bubbleRow.uid ?? index}-${classSuffix}`
         const className = location.usesExplicitCoordinates

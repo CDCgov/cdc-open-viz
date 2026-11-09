@@ -25,6 +25,29 @@ const VisualPanel = ({ variant }: VisualPanelProps) => {
           label='Value Above Message'
           updateField={updateField}
         />
+        <Select
+          value={config.visual?.circleStyle || 'off'}
+          section='visual'
+          fieldName='circleStyle'
+          label='Circle Styling'
+          options={[
+            { label: 'Off', value: 'off' },
+            { label: 'Light', value: 'light' },
+            { label: 'Dark', value: 'dark' }
+          ]}
+          updateField={updateField}
+        />
+        {(config.visual?.circleStyle === 'light' || config.visual?.circleStyle === 'dark') && (
+          <TextField
+            type='number'
+            min={1}
+            value={config.visual?.circleFontSize ?? 36}
+            section='visual'
+            fieldName='circleFontSize'
+            label='Circle Font Size'
+            updateField={updateField}
+          />
+        )}
         {/* TODO: Uncomment when ready to release Display Border feature
         <CheckBox
           value={config.visual?.border}

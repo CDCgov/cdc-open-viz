@@ -100,6 +100,8 @@ Visual booleans are partly package-owned and partly consumed by shared shell sty
 | `visual.showTitle`           | `boolean` | No       | `true`  | Shows or hides the title area.                                                          | `true`, `false`                                                                                     |
 | `visual.whiteBackground`     | `boolean` | No       | `false` | Uses the TP5 white background variant instead of the default filled callout background. | Only meaningful for `biteStyle: "tp5"`.                                                             |
 | `visual.useWrap`             | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
+| `visual.circleStyle` | `'off' \| 'light' \| 'dark'` | No | `off` | Displays the TP5 metric in an outlined light circle or a filled dark circle. | Only meaningful for `biteStyle: "tp5"`; works with either card background. Trend indicators stay outside the circle. |
+| `visual.circleFontSize` | `number \| string` | No | `36` | Pixel size of the metric inside the TP5 circle. | Used only for Light or Dark. Positive finite values, including numeric strings, are accepted; invalid values fall back to `36`. Values stay on one line; adjust the font size to fit longer metrics. |
 
 ### `general`
 
@@ -159,6 +161,7 @@ Package-specific behavior:
 | Rendered layouts     | Only rendered in the `tp5` layout.                                                             |
 | Source row selection | Uses the first filtered row when filters resolve data; otherwise uses the first available row. |
 | Text color           | Text color is computed automatically for contrast against the resolved background color.       |
+| Background and border | A resolved color overrides either normal background style and removes the card border. Unmatched values retain the selected normal style. |
 
 ## Fields You Can Ignore
 

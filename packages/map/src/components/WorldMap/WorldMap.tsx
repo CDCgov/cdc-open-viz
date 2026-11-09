@@ -43,7 +43,6 @@ const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
-    selectedLocationId,
     runtimeFilters,
     filteredCountryCode,
     position: mapPosition,
@@ -53,7 +52,7 @@ const WorldMap = () => {
     interactionLabel
   } = useContext(ConfigContext)
 
-  const { isDimmed } = useMapHighlight()
+  const { isDimmed, isHighlighted } = useMapHighlight()
   const a11y = handleMapAriaLabels(config)
 
   const position = mapPosition
@@ -282,7 +281,7 @@ const WorldMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const isHighlightedLocation = selectedLocationId === geo.properties.iso
+      const isHighlightedLocation = isHighlighted(geo.properties.iso)
       const geoStrokeWidth = isHighlightedLocation ? 2 / (position?.zoom || 1) : strokeWidth
       const geoStrokeColor = isHighlightedLocation ? '#000000' : getGeoStrokeColor(config)
       const geoFillColor = getGeoFillColor(config)
@@ -408,34 +407,38 @@ const WorldMap = () => {
     })
 
     // Redraw every part of the selected country above neighboring borders.
-    if (selectedLocationId) {
-      geographies.forEach(({ feature: geo, path }, index) => {
-        if (geo.properties.iso !== selectedLocationId) return
-        geosJsx.push(
-          <path
-            key={`selected-location-outline-${index}`}
-            className='selected-location-outline'
-            d={path}
-            fill='none'
-            stroke='#000000'
-            strokeWidth={2 / (position?.zoom || 1)}
-            strokeLinejoin='round'
-            strokeLinecap='round'
-            pointerEvents='none'
-            aria-hidden='true'
-          />
-        )
-      })
-    }
+    const selectedOutlines: React.ReactNode[] = []
+    geographies.forEach(({ feature: geo, path }, index) => {
+      if (!isHighlighted(geo.properties.iso)) return
+      selectedOutlines.push(
+        <path
+          key={`selected-location-outline-${index}`}
+          className='selected-location-outline'
+          d={path}
+          fill='none'
+          stroke='#000000'
+          strokeWidth={2 / (position?.zoom || 1)}
+          strokeLinejoin='round'
+          strokeLinecap='round'
+          pointerEvents='none'
+          aria-hidden='true'
+        />
+      )
+    })
 
     // Cities
-    geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} />)
+    geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} highlightedOnly={false} />)
 
     // Bubbles
     if (hasBubbleLayers) {
-      geosJsx.push(<BubbleList />)
+      geosJsx.push(<BubbleList highlightedOnly={false} />)
     }
 
+    geosJsx.push(
+      <BubbleList key='highlighted-bubbles' highlightedOnly />,
+      <CityList key='highlighted-cities' projection={projection} tooltipId={tooltipId} highlightedOnly />,
+      ...selectedOutlines
+    )
     return geosJsx
   }
 

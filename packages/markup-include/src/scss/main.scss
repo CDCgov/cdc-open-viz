@@ -36,7 +36,7 @@
       flex: auto;
     }
 
-    @container (max-width: 576px) {
+    @container (max-width: 480px) {
       .cdc-callout__body {
         flex-wrap: wrap;
       }
@@ -59,10 +59,10 @@
         background: transparent;
         box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
+    }
 
-      .cdc-callout--data-color {
-        border: none !important;
-      }
+    .cdc-callout.cdc-callout--data-color {
+      border: 0 !important;
     }
 
     &.white-background-style.display-border {

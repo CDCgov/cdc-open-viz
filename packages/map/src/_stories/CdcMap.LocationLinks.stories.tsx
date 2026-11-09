@@ -607,6 +607,16 @@ export const HighlightSelectedState: Story = {
       (_, after) => after === '1'
     )
     expect(getComputedStyle(territoryShape).stroke).toBe('rgb(0, 0, 0)')
+    const territorySvg = territory.closest('svg')!
+    if (territorySvg.classList.contains('territory-wrapper--hex')) {
+      expect(territory.querySelector('.selected-territory-outline')).toBeNull()
+      expect(territorySvg.style.zIndex).toBe('')
+      expect(territorySvg.style.position).toBe('')
+    } else {
+      expect(territory.querySelector('.selected-territory-outline')).toHaveAttribute('pointer-events', 'none')
+      expect(territorySvg.style.zIndex).toBe('1')
+      expect(territorySvg.style.position).toBe('relative')
+    }
     expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
     expect(getComputedStyle(alabamaShape).stroke).toBe(normalStroke)
     await performAndAssert(
@@ -1183,6 +1193,14 @@ export const HighlightOverlays: Story = {
     expect(getComputedStyle(overlay).opacity).toBe('1')
     expect(getComputedStyle(coordinateBubble.parentElement!).opacity).toBe('1')
     expect(getComputedStyle(territory).opacity).toBe('1')
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+    await userEvent.selectOptions(select, 'US-PR')
+    const territoryOutline = territory.querySelector('.selected-territory-outline')!
+    expect(territoryOutline).toHaveAttribute('pointer-events', 'none')
+    expect(territoryBubble.compareDocumentPosition(territoryOutline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(getComputedStyle(territory.closest('svg')!).zIndex).toBe('1')
+    await userEvent.selectOptions(select, '')
+    expect(territory.querySelector('.selected-territory-outline')).toBeNull()
   }
 }
 
@@ -1486,5 +1504,87 @@ export const SelectorContentSizing: Story = {
     expect(widths.long).toBeGreaterThan(widths.none + 50)
     expect(widths.long).toBeLessThanOrEqual(30 * parseFloat(getComputedStyle(document.documentElement).fontSize))
     expect(widths.mobile).toBeLessThan(widths.long)
+  }
+}
+
+export const HighlightForegroundOrder: Story = {
+  args: {
+    config: (() => {
+      const c = structuredClone(HighlightOverlays.args!.config)
+      c.data = c.data.filter(row => !['RI', 'CT'].includes(row.STATE))
+      c.data.push({ STATE: 'Rhode Island', Rate: 25, URL: '' }, { STATE: 'Connecticut', Rate: 30, URL: '' })
+      c.bubble.layers[0].placeOverLabels = true
+      c.bubble.layers.push(
+        createDefaultBubbleLayer({
+          columns: { geo: { name: 'STATE' }, primary: { name: 'Rate' } },
+          placeOverLabels: true,
+          minBubbleSize: 20,
+          maxBubbleSize: 30,
+          opacity: 0.7
+        })
+      )
+      return c
+    })()
+  },
+  render: args => (
+    <CdcMapComponent {...({ ...args, isDashboard: true, setSharedFilterValue: 'Rhode Island' } as any)} />
+  ),
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.custom-map-layer', canvasElement)
+    const select = within(canvasElement).getByLabelText('Select a location for more information')
+    const outline = () => canvasElement.querySelector('.selected-state-outline')!
+    const assertAbove = (front: Element, back: Element) => {
+      expect(back.compareDocumentPosition(front) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    }
+    const checkState = (id: string, name: string) => {
+      expect(outline()).toHaveAttribute(
+        'd',
+        canvasElement.querySelector(`[data-geo-id="${id}"] .single-geo`)!.getAttribute('d')
+      )
+      expect(outline()).toHaveAttribute('pointer-events', 'none')
+      const foregroundBubbles = Array.from(canvasElement.querySelectorAll('circle.bubble')).filter(
+        bubble =>
+          !bubble.classList.contains('territory-bubble') && getComputedStyle(bubble.parentElement!).opacity === '1'
+      )
+      expect(foregroundBubbles).toHaveLength(2)
+      expect(foregroundBubbles.map(bubble => bubble.getAttribute('data-bubble-layer-index'))).toEqual(['0', '2'])
+      expect(foregroundBubbles.map(bubble => bubble.getAttribute('fill-opacity'))).toEqual(['0.8', '0.7'])
+      for (const bubble of foregroundBubbles) {
+        expect(bubble.getAttribute('data-tooltip-html')).toContain(name)
+        assertAbove(bubble, canvasElement.querySelector('.custom-map-layer')!)
+        assertAbove(outline(), bubble)
+      }
+      for (const marker of canvasElement.querySelectorAll('.geo-point, .bubble--coordinate'))
+        assertAbove(outline(), marker)
+      const label = Array.from(canvasElement.querySelectorAll('text')).find(text => text.textContent === id.slice(3))!
+      expect(label).toBeVisible()
+      assertAbove(label, foregroundBubbles[1])
+    }
+    checkState('US-RI', 'Rhode Island')
+    await performAndAssert(
+      'Move dropdown highlight above dashboard highlight',
+      () => outline().getAttribute('d'),
+      () => userEvent.selectOptions(select, 'US-CT'),
+      (_, after) => after === canvasElement.querySelector('[data-geo-id="US-CT"] .single-geo')!.getAttribute('d')
+    )
+    checkState('US-CT', 'Connecticut')
+    await performAndAssert(
+      'Bring selected city above every bubble',
+      () => getComputedStyle(canvasElement.querySelector('[data-city-id="NEW YORK CITY"]')!).opacity,
+      () => userEvent.selectOptions(select, 'NEW YORK CITY'),
+      () => getComputedStyle(canvasElement.querySelector('[data-city-id="NEW YORK CITY"]')!).opacity === '1'
+    )
+    const city = canvasElement.querySelector('[data-city-id="NEW YORK CITY"]')!
+    for (const bubble of canvasElement.querySelectorAll('circle.bubble:not(.territory-bubble)'))
+      assertAbove(city, bubble)
+    expect(outline()).toBeNull()
+    await performAndAssert(
+      'Restore dashboard foreground after clearing selector',
+      () => outline()?.getAttribute('d'),
+      () => userEvent.selectOptions(select, ''),
+      (_, after) => after === canvasElement.querySelector('[data-geo-id="US-RI"] .single-geo')!.getAttribute('d')
+    )
+    checkState('US-RI', 'Rhode Island')
   }
 }

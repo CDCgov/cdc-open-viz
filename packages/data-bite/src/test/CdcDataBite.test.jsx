@@ -81,6 +81,127 @@ const dynamicImageConfig = (value, dataFunction = 'Sum') => ({
   data: [{ value }]
 })
 
+const circleConfig = (visual = {}, overrides = {}) => ({
+  type: 'data-bite',
+  theme: 'theme-blue',
+  biteStyle: 'tp5',
+  title: 'Circle metric',
+  biteBody: 'Message',
+  dataColumn: 'value',
+  dataFunction: 'Pass Through',
+  dataFormat: { prefix: '$', suffix: '%', commas: true, roundToPlace: 0 },
+  visual: { showTitle: true, ...visual },
+  data: [{ value: 1234, trend: 'increase', status: 'alert' }],
+  ...overrides
+})
+
+describe('TP5 circles', () => {
+  it.each([
+    [false, false, true],
+    [true, false, false],
+    [false, true, false],
+    [true, true, false]
+  ])('reserves flag space for white background %s and data colors %s', (whiteBackground, dataColors, hasFlag) => {
+    const { container } = render(
+      <CdcDataBite
+        config={circleConfig(
+          { whiteBackground },
+          {
+            dataColors: dataColors
+              ? { column: 'status', mappings: [{ sourceValue: 'alert', color: '#ff0000' }] }
+              : undefined
+          }
+        )}
+      />
+    )
+    const callout = container.querySelector('.cdc-callout')
+    expect(callout.classList.contains('cdc-callout--has-flag')).toBe(hasFlag)
+    expect(Boolean(callout.querySelector('.cdc-callout__flag'))).toBe(hasFlag)
+  })
+
+  it.each([undefined, 'off'])('preserves plain values for circle mode %s', circleStyle => {
+    const { container } = render(<CdcDataBite config={circleConfig({ circleStyle })} />)
+    expect(container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
+    expect(container.querySelector('.cdc-callout__value')).toHaveTextContent('$1,234%')
+  })
+
+  it.each([
+    ['light', false, false],
+    ['light', true, true],
+    ['dark', false, true],
+    ['dark', true, false]
+  ])('renders %s circles with white background %s and stacked layout %s', (circleStyle, whiteBackground, useWrap) => {
+    const { container } = render(<CdcDataBite config={circleConfig({ circleStyle, whiteBackground, useWrap })} />)
+    const circle = container.querySelector('.cdc-callout__value-circle')
+    expect(circle).toHaveClass(`cdc-callout__value-circle--${circleStyle}`)
+    expect(circle).toHaveTextContent('$1,234%')
+    expect(circle.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: '36px' })
+    expect(container.querySelector('.cdc-callout__body')).toHaveClass(
+      useWrap ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right'
+    )
+    expect(container.querySelector('.cove-visualization__body').classList.contains('white-background-style')).toBe(
+      whiteBackground
+    )
+  })
+
+  it.each([
+    [18, 18],
+    ['32', 32],
+    [undefined, 36],
+    ['', 36],
+    [0, 36],
+    [-2, 36],
+    ['invalid', 36],
+    [Infinity, 36]
+  ])('uses a valid circle font size for %s', (circleFontSize, expected) => {
+    const { container } = render(<CdcDataBite config={circleConfig({ circleStyle: 'light', circleFontSize })} />)
+    expect(container.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: `${expected}px` })
+  })
+
+  it('ignores circle settings outside TP5', () => {
+    const { container } = render(<CdcDataBite config={circleConfig({ circleStyle: 'dark' }, { biteStyle: 'body' })} />)
+    expect(container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
+  })
+
+  it.each(['', 'Compared with last year'])('keeps trends outside circles with label "%s"', upLabel => {
+    const { container } = render(
+      <CdcDataBite
+        config={circleConfig(
+          { circleStyle: 'dark' },
+          {
+            trendIndicator: {
+              mode: 'categorical',
+              column: 'trend',
+              upLabel,
+              mappings: [{ sourceValue: 'increase', arrowType: 'up' }]
+            }
+          }
+        )}
+      />
+    )
+    expect(container.querySelector('.cdc-callout__value-circle .mock-trend-arrow')).not.toBeInTheDocument()
+    expect(container.querySelector('.mock-trend-arrow')).toBeInTheDocument()
+    expect(
+      container.querySelector(upLabel ? '.cdc-callout__trend-row' : '.cdc-callout__trend-slot--inline')
+    ).toBeInTheDocument()
+  })
+
+  it.each([false, true])('preserves data-driven card colors with white background %s', whiteBackground => {
+    const { container } = render(
+      <CdcDataBite
+        config={circleConfig(
+          { circleStyle: 'dark', whiteBackground },
+          {
+            dataColors: { column: 'status', mappings: [{ sourceValue: 'alert', color: '#ff0000' }] }
+          }
+        )}
+      />
+    )
+    expect(container.querySelector('.cdc-callout')).toHaveStyle({ backgroundColor: '#ff0000' })
+    expect(container.querySelector('.cdc-callout__value-circle')).toHaveTextContent('$1,234%')
+  })
+})
+
 describe('Data Bite', () => {
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')

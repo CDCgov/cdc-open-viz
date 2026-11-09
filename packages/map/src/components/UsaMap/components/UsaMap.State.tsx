@@ -89,7 +89,6 @@ const nudges = {
 const UsaMap = () => {
   const {
     runtimeData,
-    selectedLocationId,
     config,
     setConfig,
     tooltipId,
@@ -181,6 +180,7 @@ const UsaMap = () => {
   const geoFillColor = getGeoFillColor(config)
 
   const { isDimmed, isHighlighted } = useMapHighlight()
+  const hasActiveHighlight = isDimmed()
   const getLocationHighlightStyles = (
     locationId: string,
     geoData: Record<string, any> | undefined = runtimeData?.[locationId]
@@ -284,7 +284,7 @@ const UsaMap = () => {
           key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
-          strokeWidth={selectedLocationId === territory ? 2 : 1}
+          strokeWidth={isHighlighted(territory, territoryData?.[columns.geo.name]) ? 2 : 1}
           textColor={textColor}
           strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
@@ -322,6 +322,8 @@ const UsaMap = () => {
     let showLabel = general.displayStateLabels
     const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
     const calloutConnectors: React.ReactNode[] = []
+    const highlightedConnectors: React.ReactNode[] = []
+    const highlightedLabels: React.ReactNode[] = []
     const calloutBubblePositions: BubblePositionOverrides = {}
     const getBubbleLabelColorByState = () => {
       const labelColors = new Map<string, string>()
@@ -360,6 +362,9 @@ const UsaMap = () => {
     })
 
     const labelJsx: React.ReactNode[] = []
+    const isGeoHighlighted = (id: string) => isHighlighted(id, runtimeData?.[id]?.[columns.geo.name])
+    const connectorsFor = (id: string) => (isGeoHighlighted(id) ? highlightedConnectors : calloutConnectors)
+    const labelsFor = (id: string) => (isGeoHighlighted(id) ? highlightedLabels : labelJsx)
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
       const key = createScopedKey(mapId, displayAsHex ? 'hex-state' : 'state', geo.properties.iso)
@@ -399,13 +404,19 @@ const UsaMap = () => {
           bubbleLabelColor ?? legendColors[0],
           projection,
           Boolean(bubbleLabelColor),
-          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          renderLabelsAboveBubbles ? connectorsFor(geoKey) : undefined,
           geoOpacity,
           renderLabelsAboveBubbles ? calloutBubblePositions : undefined
         )
         if (renderLabelsAboveBubbles && stateLabel) {
-          labelJsx.push(
+          labelsFor(geoKey).push(
             <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
+              {stateLabel}
+            </g>
+          )
+        } else if (!displayAsHex && showLabel && stateLabel && isGeoHighlighted(geoKey)) {
+          highlightedLabels.push(
+            <g key={`${key}-highlight-label`} aria-hidden='true'>
               {stateLabel}
             </g>
           )
@@ -608,13 +619,19 @@ const UsaMap = () => {
         bubbleLabelColor ?? styles.fill,
         projection,
         Boolean(bubbleLabelColor),
-        renderLabelsAboveBubbles ? calloutConnectors : undefined,
+        renderLabelsAboveBubbles ? connectorsFor(geoKey) : undefined,
         styles.opacity,
         renderLabelsAboveBubbles ? calloutBubblePositions : undefined
       )
       if (renderLabelsAboveBubbles && stateLabel) {
-        labelJsx.push(
+        labelsFor(geoKey).push(
           <g key={`${key}-label`} style={{ opacity: styles.opacity }}>
+            {stateLabel}
+          </g>
+        )
+      } else if (!displayAsHex && showLabel && stateLabel && isGeoHighlighted(geoKey)) {
+        highlightedLabels.push(
+          <g key={`${key}-highlight-label`} aria-hidden='true'>
             {stateLabel}
           </g>
         )
@@ -632,31 +649,27 @@ const UsaMap = () => {
 
     // Shared edges can be covered by neighboring states drawn later. Keep the
     // selected outline above all state shapes without changing their reading order.
-    const selectedGeography = selectedLocationId
-      ? geographies.find(({ feature }) => feature.properties.iso === selectedLocationId)
-      : undefined
-    if (selectedGeography) {
-      geosJsx.push(
-        <path
-          key='selected-state-outline'
-          className='selected-state-outline'
-          d={selectedGeography.path}
-          fill='none'
-          stroke='rgba(0, 0, 0, 1)'
-          strokeWidth={2}
-          pointerEvents='none'
-          aria-hidden='true'
-        />
-      )
-    }
+    const selectedGeography = geographies.find(({ feature }) => isGeoHighlighted(feature.properties.iso))
+    const selectedOutline = selectedGeography ? (
+      <path
+        key='selected-state-outline'
+        className='selected-state-outline'
+        d={selectedGeography.path}
+        fill='none'
+        stroke='rgba(0, 0, 0, 1)'
+        strokeWidth={2}
+        pointerEvents='none'
+        aria-hidden='true'
+      />
+    ) : null
 
-    if (displayAsHex) return geosJsx
+    if (displayAsHex) return [...geosJsx, selectedOutline]
 
     const dcStateLabel = showLabel
       ? renderDcStateLabel(
           projection,
           bubbleLabelColorByState.get(DC_GEO_KEY),
-          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          renderLabelsAboveBubbles ? connectorsFor(DC_GEO_KEY) : undefined,
           renderLabelsAboveBubbles ? calloutBubblePositions : undefined
         )
       : null
@@ -671,6 +684,7 @@ const UsaMap = () => {
         applyTooltipsToGeo={applyTooltipsToGeo}
         geoClickHandler={geoClickHandler}
         key='cities'
+        highlightedOnly={false}
         projection={projection}
         titleCase={titleCase}
         tooltipId={tooltipId}
@@ -690,6 +704,7 @@ const UsaMap = () => {
       geosJsx.push(
         <BubbleList
           key='bubbles'
+          highlightedOnly={false}
           runtimeData={dataRef.current}
           projection={projection}
           positionOverrides={calloutBubblePositions}
@@ -705,7 +720,7 @@ const UsaMap = () => {
       )
     }
 
-    if (dcStateLabel && renderLabelsAboveBubbles) {
+    if (dcStateLabel && renderLabelsAboveBubbles && !isGeoHighlighted(DC_GEO_KEY)) {
       geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
     }
 
@@ -719,6 +734,30 @@ const UsaMap = () => {
           </g>
         )
       })
+    }
+    if (hasActiveHighlight) {
+      // Foreground graphics share the dashboard/dropdown highlight decision. Labels
+      // without bubble layers retain their original hit targets and gain decorative
+      // copies here; the foreground outline and labels do not intercept interaction.
+      geosJsx.push(
+        <g key='highlighted-connectors' pointerEvents='none'>
+          {highlightedConnectors}
+        </g>,
+        <BubbleList
+          key='highlighted-bubbles'
+          projection={projection}
+          positionOverrides={calloutBubblePositions}
+          highlightedOnly
+        />,
+        <CityList key='highlighted-cities' projection={projection} tooltipId={tooltipId} highlightedOnly />,
+        selectedOutline,
+        <g key='highlighted-labels' pointerEvents='none'>
+          {highlightedLabels}
+        </g>
+      )
+      if (dcStateLabel && isGeoHighlighted(DC_GEO_KEY)) {
+        geosJsx.push(<React.Fragment key='highlighted-dc-callout'>{dcStateLabel}</React.Fragment>)
+      }
     }
     return geosJsx
   }
