@@ -31,9 +31,12 @@ describe('geographyTranslations', () => {
     expect(getLocalizedGeographyName(uid)).toBeUndefined()
   })
 
-  it.each(['XAC', 'XBK', 'SAH', 'VUT', 'unknown'])('leaves untranslated geography %s for English fallback', uid => {
-    expect(getLocalizedGeographyName(uid, 'es-MX')).toBeUndefined()
-  })
+  it.each(['XAC', 'XBK', 'SAH', 'VUT', 'XWK', 'unknown'])(
+    'leaves untranslated geography %s for English fallback',
+    uid => {
+      expect(getLocalizedGeographyName(uid, 'es-MX')).toBeUndefined()
+    }
+  )
 
   it('resolves country names without adding country aliases to US data matching', () => {
     expect(getCountryGeographyUidAlias('Alemania')).toBe('DEU')

@@ -85,7 +85,8 @@ describe('displayGeoName', () => {
     ['XAC', 'Ashmore and Cartier Islands'],
     ['XBK', 'Baker Island'],
     ['SAH', 'Western Sahara'],
-    ['VUT', 'Vanuatu']
+    ['VUT', 'Vanuatu'],
+    ['XWK', 'Wake Island']
   ])('falls back to English for untranslated country %s', (uid, english) => {
     expect(displayGeoName(uid, undefined, 'es-MX')).toBe(english)
   })

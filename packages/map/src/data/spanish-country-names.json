@@ -246,7 +246,6 @@
   "ZMB": "Zambia",
   "ZWE": "Zimbabue",
   "XQZ": "Akrotiri",
-  "XWK": "Dekelia",
   "Antarctica": "Antártida",
   "ATA": "Antártida",
   "Saint Paul and Amsterdam Islands": "Islas de San Pablo y Nueva Ámsterdam",
@@ -257,5 +256,6 @@
   "US-AK": "Alaska",
   "Alaska": "Alaska",
   "Canary Islands": "Islas Canarias",
-  "Akrotiri": "Akrotiri"
+  "Akrotiri": "Akrotiri",
+  "Dhekelia": "Dekelia"
 }
