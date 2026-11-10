@@ -143,6 +143,7 @@ const setText = async (user: User, scope: HTMLElement, label: string, value: str
   window.addEventListener('updateVizConfig', onConfigUpdate)
   try {
     fireEvent.change(control, { target: { value } })
+    fireEvent.blur(control)
     await waitFor(() => {
       expect(control).toHaveValue(
         control instanceof HTMLInputElement && control.type === 'number' ? Number(value) : value
@@ -1620,6 +1621,7 @@ export const MAP004: Story = {
     const originalUrl = window.location.href
     const originalConsoleWarn = console.warn
     const layerFetches: string[] = []
+    let placeholderLayerFetches = 0
     const topologyFetches: string[] = []
     const deniedFetches: string[] = []
     const downloads: DownloadCapture = { blobs: [], anchors: [] }
@@ -1648,6 +1650,10 @@ export const MAP004: Story = {
 
     window.fetch = (input: RequestInfo | URL) => {
       const url = input instanceof Request ? input.url : String(input)
+      if (url === '') {
+        placeholderLayerFetches += 1
+        return Promise.resolve(new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      }
       const path = new URL(url, window.location.origin).pathname
       if (path === LAYER_URL) {
         layerFetches.push(path)
@@ -1715,6 +1721,7 @@ export const MAP004: Story = {
       for (const checkpoint of REQUIRED)
         expect(completed.has(checkpoint), `Missing checkpoint ${checkpoint}`).toBe(true)
       expect(layerFetches).toEqual(EXPECTED_LAYER_FETCHES)
+      expect(placeholderLayerFetches).toBe(2)
       expect(deniedFetches).toEqual([])
       for (const year of TOPOLOGY_YEARS) {
         expect(topologyFetches).toContain(`${TOPOLOGY_ROOT}cb_${year}_us_county_20m.json`)
@@ -1723,7 +1730,10 @@ export const MAP004: Story = {
         { destination: '01001', target: '_self' },
         { destination: '01001', target: '_blank' }
       ])
-      expect(unhandledRejections).toEqual([])
+      if (unhandledRejections.length)
+        throw new Error(
+          `Unhandled rejections: ${unhandledRejections.map(reason => String(reason?.stack || reason)).join(' | ')}`
+        )
       const remainingErrors = [...consoleCapture.errors]
       for (const expected of consoleCapture.expectedPatternErrors) {
         const index = remainingErrors.indexOf(expected)
