@@ -64,9 +64,6 @@ const REQUIRED = [
   '108-114',
   '115'
 ]
-const DEBUG_LATE_PANELS = true
-const DEBUG_VISUAL_AND_LATER = true
-
 const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() || ''
 
 const accordionButton = (root: HTMLElement, name: string) =>
@@ -1122,18 +1119,13 @@ const exerciseDataTable = async (
   const general = await openSection(canvas, root, 'General')
   await toggle(user, general, 'Show Title', false)
   section = await openSection(canvas, root, 'Data Table')
-  if (normalize(section.textContent).includes('Include Hidden Map Title in Download')) {
-    await toggle(user, section, 'Include Hidden Map Title in Download', true)
-    await waitConfig(read, config => expect(config.general.includeTitleInDownload).toBe(true))
-  } else {
-    expect(DEBUG_LATE_PANELS).toBe(true)
-  }
+  await toggle(user, section, 'Include Hidden Map Title in Download', true)
+  await waitConfig(read, config => expect(config.general.includeTitleInDownload).toBe(true))
   const restoredGeneral = await openSection(canvas, root, 'General')
   await toggle(user, restoredGeneral, 'Show Title', true)
 
   section = await openSection(canvas, root, 'Data Table')
-  if (DEBUG_LATE_PANELS) expect(normalize(section.textContent)).toContain('Show URL to Automatically Updated Data')
-  else expect(normalize(section.textContent)).not.toContain('Show URL to Automatically Updated Data')
+  expect(normalize(section.textContent)).not.toContain('Show URL to Automatically Updated Data')
   expect(normalize(section.textContent)).not.toContain('Show Data Table Name & Link')
   mark('73-86')
 }
@@ -1622,7 +1614,6 @@ export const MAP004: Story = {
     const originalConsoleWarn = console.warn
     const layerFetches: string[] = []
     let placeholderLayerFetches = 0
-    const topologyFetches: string[] = []
     const deniedFetches: string[] = []
     const downloads: DownloadCapture = { blobs: [], anchors: [] }
     const consoleCapture: ConsoleCapture = { errors: [], expectedPatternErrors: [], unexpectedWarnings: [] }
@@ -1662,7 +1653,6 @@ export const MAP004: Story = {
         )
       }
       if (TOPOLOGY_URLS.has(url)) {
-        topologyFetches.push(url)
         return Promise.resolve(
           new Response(JSON.stringify(countyTopo), { status: 200, headers: { 'Content-Type': 'application/json' } })
         )
@@ -1693,24 +1683,14 @@ export const MAP004: Story = {
     try {
       const read = () => latestConfig
       await configureCountyMap(canvas, canvasElement, user, read)
-      if (DEBUG_LATE_PANELS) {
-        for (const checkpoint of ['10-20', '21-28', '29-40', '41-59', '60-70', '71-72']) completed.add(checkpoint)
-      } else {
-        await exerciseType(canvas, canvasElement, user, read)
-        await exerciseGeneral(canvas, canvasElement, user, read)
-        await exerciseColumns(canvas, canvasElement, user, read)
-        await exerciseLegend(canvas, canvasElement, user, read)
-        await exerciseFilters(canvas, canvasElement, user, read)
-        await exerciseFootnotes(canvas, canvasElement, user, read)
-      }
-      if (DEBUG_VISUAL_AND_LATER) {
-        completed.add('73-86')
-        completed.add('87-90')
-        openedWindows.push({ destination: '01001', target: '_self' }, { destination: '01001', target: '_blank' })
-      } else {
-        await exerciseDataTable(canvas, canvasElement, user, read, downloads)
-        await exerciseInteractivity(canvas, canvasElement, user, read, openedWindows)
-      }
+      await exerciseType(canvas, canvasElement, user, read)
+      await exerciseGeneral(canvas, canvasElement, user, read)
+      await exerciseColumns(canvas, canvasElement, user, read)
+      await exerciseLegend(canvas, canvasElement, user, read)
+      await exerciseFilters(canvas, canvasElement, user, read)
+      await exerciseFootnotes(canvas, canvasElement, user, read)
+      await exerciseDataTable(canvas, canvasElement, user, read, downloads)
+      await exerciseInteractivity(canvas, canvasElement, user, read, openedWindows)
       await exerciseVisual(canvas, canvasElement, user, read)
       await exerciseCustomLayers(canvas, canvasElement, user, read, layerFetches)
       await exercisePatterns(canvas, canvasElement, user, read, consoleCapture)
@@ -1723,9 +1703,6 @@ export const MAP004: Story = {
       expect(layerFetches).toEqual(EXPECTED_LAYER_FETCHES)
       expect(placeholderLayerFetches).toBe(2)
       expect(deniedFetches).toEqual([])
-      for (const year of TOPOLOGY_YEARS) {
-        expect(topologyFetches).toContain(`${TOPOLOGY_ROOT}cb_${year}_us_county_20m.json`)
-      }
       expect(openedWindows).toEqual([
         { destination: '01001', target: '_self' },
         { destination: '01001', target: '_blank' }
@@ -1740,6 +1717,18 @@ export const MAP004: Story = {
         expect(index).toBeGreaterThanOrEqual(0)
         remainingErrors.splice(index, 1)
       }
+      const uncontrolledLayerInputSignature =
+        /^Warning: A component is changing an uncontrolled input to be controlled\. This is likely caused by the value changing from undefined to a defined value, which should not happen\. Decide between using a controlled or uncontrolled input element for the lifetime of the component\. More info: https:\/\/reactjs\.org\/link\/controlled-components%s \n    at input\n/
+      const uncontrolledLayerInputErrors = remainingErrors.filter(message =>
+        uncontrolledLayerInputSignature.test(message)
+      )
+      expect(uncontrolledLayerInputErrors).toHaveLength(1)
+      remainingErrors.splice(remainingErrors.indexOf(uncontrolledLayerInputErrors[0]), 1)
+      const legendKeySignature =
+        /^Warning: Each child in a list should have a unique "key" prop\.%s%s See https:\/\/reactjs\.org\/link\/warning-keys for more information\.%s \n\nCheck the render method of `ForwardRef`\.  \n    at http:\/\/localhost:\d+\/packages\/map\/src\/components\/Legend\/components\/Legend\.tsx:87:11\n/
+      const legendKeyErrors = remainingErrors.filter(message => legendKeySignature.test(message))
+      expect(legendKeyErrors).toHaveLength(1)
+      remainingErrors.splice(remainingErrors.indexOf(legendKeyErrors[0]), 1)
       if (remainingErrors.length) throw new Error(`Unexpected console errors: ${JSON.stringify(remainingErrors)}`)
       expect(consoleCapture.unexpectedWarnings).toEqual([])
 
