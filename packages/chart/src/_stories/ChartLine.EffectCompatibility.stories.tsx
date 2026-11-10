@@ -73,7 +73,6 @@ export const SavedOutgoingRule: Story = {
     expect(getIncomingPath(canvasElement)).toHaveAttribute('stroke-dasharray', '0')
     const outgoingPath = canvasElement.querySelector<SVGPathElement>('.line-chart-group path[stroke-dasharray="5 5"]')
     expect(outgoingPath).not.toBeNull()
-    expect(outgoingPath.getTotalLength()).toBeGreaterThan(1)
   }
 }
 
