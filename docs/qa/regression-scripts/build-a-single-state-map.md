@@ -26,7 +26,7 @@ state selector and unselected-state visibility behavior unique to single-state m
 ## Preconditions
 
 - Start a new visualization with no previously loaded configuration.
-- Use the bundled sample; do not upload a local file or call a network resource.
+- Use the bundled sample; do not upload a local file or depend on an external network response.
 - Use a desktop browser that supports hover.
 - Clear the browser console before starting and monitor it through the final step.
 

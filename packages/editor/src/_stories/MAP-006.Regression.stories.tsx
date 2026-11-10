@@ -25,7 +25,7 @@ type Story = StoryObj<typeof CdcEditor>
 type Config = Record<string, any>
 type Canvas = ReturnType<typeof within>
 
-const TOPOLOGY_URL = 'https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/'
+const TOPOLOGY_URL = 'https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_2019_us_county_20m.json'
 const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() || ''
 
 const accordionButton = (root: HTMLElement, name: string) =>
@@ -66,6 +66,12 @@ const visibleTooltipText = (root: HTMLElement) => {
   return normalize(tooltip?.textContent)
 }
 
+const tooltipText = (element: Element) => {
+  const container = document.createElement('div')
+  container.innerHTML = element.getAttribute('data-tooltip-html') || ''
+  return normalize(Array.from(container.children, child => child.textContent).join(' '))
+}
+
 export const MAP006: Story = {
   name: 'MAP-006 — Build a single-state map',
   args: { config: {} },
@@ -75,8 +81,10 @@ export const MAP006: Story = {
     const originalConsoleError = console.error
     const originalFetch = window.fetch
     const consoleErrors: string[] = []
+    const unexpectedRequests: string[] = []
     const unhandledRejections: unknown[] = []
     const windowErrors: unknown[] = []
+    let topologyRequests = 0
     let latestConfig: Config = {}
 
     const onConfig = (event: Event) => {
@@ -95,12 +103,14 @@ export const MAP006: Story = {
     window.addEventListener('error', onWindowError)
     window.fetch = async input => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      if (url.startsWith(TOPOLOGY_URL)) {
+      if (url === TOPOLOGY_URL) {
+        topologyRequests += 1
         return new Response(JSON.stringify(countyTopology), {
           status: 200,
           headers: { 'Content-Type': 'application/json' }
         })
       }
+      unexpectedRequests.push(url)
       throw new Error(`Unexpected network request in MAP-006: ${url}`)
     }
 
@@ -161,6 +171,7 @@ export const MAP006: Story = {
         '[data-required-field-control="map-data-column"]'
       )!
       await waitForOptionsToPopulate(dataColumn)
+      await waitForPresence('.map-required-fields-alerts', canvasElement)
       await user.selectOptions(dataColumn, 'Percent Vaccinated')
       await waitForAbsence('.map-required-fields-alerts', canvasElement)
       await waitFor(() => expect(latestConfig.columns.primary.name).toBe('Percent Vaccinated'))
@@ -184,19 +195,27 @@ export const MAP006: Story = {
       await assertVisualizationRendered(canvasElement)
       await waitFor(() => expect(counties(canvasElement)).toHaveLength(67))
       expect(canvasElement.querySelectorAll('.legend-container linearGradient stop')).toHaveLength(5)
+      const legendLabels = Array.from(canvasElement.querySelectorAll<SVGTextElement>('.legend-container svg text')).map(
+        label => normalize(label.textContent)
+      )
+      expect(legendLabels).toHaveLength(5)
+      for (const label of legendLabels) expect(label).toMatch(/\d/)
 
       const autauga = county(canvasElement, '01001', 'Autauga County')
       const baldwin = county(canvasElement, '01003', 'Baldwin County')
-      expect(autauga.getAttribute('data-tooltip-html')).toContain('County: Autauga')
-      expect(autauga.getAttribute('data-tooltip-html')).toContain('Percent Vaccinated: 34.13')
-      expect(baldwin.getAttribute('data-tooltip-html')).toContain('County: Baldwin')
-      expect(baldwin.getAttribute('data-tooltip-html')).toContain('Percent Vaccinated: 37.55')
+      expect(tooltipText(autauga)).toContain('County: Autauga Percent Vaccinated: 34.13')
+      expect(tooltipText(autauga)).not.toContain('County: Autauga County')
+      expect(tooltipText(baldwin)).toContain('County: Baldwin Percent Vaccinated: 37.55')
+      expect(tooltipText(baldwin)).not.toContain('County: Baldwin County')
 
       await performAndAssert(
         'Autauga County hover shows its mapped vaccination value',
         () => visibleTooltipText(canvasElement),
         async () => user.hover(autauga),
-        (_before, after) => after.includes('County: Autauga') && after.includes('Percent Vaccinated: 34.13')
+        (_before, after) =>
+          after.includes('County: Autauga') &&
+          !after.includes('County: Autauga County') &&
+          after.includes('Percent Vaccinated: 34.13')
       )
       await user.unhover(autauga)
 
@@ -230,6 +249,8 @@ export const MAP006: Story = {
         (before, after) =>
           before.outlines > 0 && after.outlines === 0 && before.counties === 67 && after.counties === 67
       )
+      expect(activeHideUnselected).toBeChecked()
+      await waitFor(() => expect(latestConfig.general.hideUnselectedStates).toBe(true))
 
       columnsSection = await openSection(canvas, canvasElement, 'Columns')
       expect(
@@ -239,6 +260,8 @@ export const MAP006: Story = {
         columnsSection.querySelector<HTMLSelectElement>('[data-required-field-control="map-data-column"]')
       ).toHaveValue('Percent Vaccinated')
       expect(latestConfig.general.statesPicked).toEqual([{ fipsCode: '01', stateName: 'Alabama' }])
+      expect(topologyRequests).toBe(1)
+      expect(unexpectedRequests).toEqual([])
       expect(consoleErrors).toEqual([])
       expect(unhandledRejections).toEqual([])
       expect(windowErrors).toEqual([])
