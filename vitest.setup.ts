@@ -26,6 +26,9 @@ configure({
 // - Lazy imports depend on Storybook dev server availability
 // - In sharded test mode (--shard=1/4), concurrent module requests can timeout
 // - Pre-caching eliminates race conditions between module fetch and render
+//
+// NOTE: Only run for Storybook tests (browser environment) to avoid interfering
+// with unit test mocking setup
 const prewarmLazyModules = async () => {
   const modules = [
     // Chart package
@@ -58,8 +61,9 @@ const prewarmLazyModules = async () => {
   await Promise.allSettled(modules.map(importer => importer()))
 }
 
-// Run pre-warming before Storybook setup
-if (typeof window !== 'undefined') {
+// Run pre-warming in browser context before Storybook tests
+// Check for __vitest_browser_runner__ which indicates we're in Storybook browser test mode
+if (typeof window !== 'undefined' && typeof globalThis !== 'undefined' && '__vitest_browser_runner__' in globalThis) {
   prewarmLazyModules().catch(err => {
     // Log any systematic issues, but don't fail test setup
     console.debug('[Lazy Module Pre-warming] Some modules failed to load:', err)
