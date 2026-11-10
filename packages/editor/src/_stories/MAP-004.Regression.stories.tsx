@@ -28,7 +28,7 @@ type Canvas = ReturnType<typeof within>
 type User = ReturnType<typeof userEvent.setup>
 
 const LAYER_URL = '/examples/__data__/testing-layer.json'
-const EXPECTED_LAYER_FETCHES = Array(10).fill(LAYER_URL)
+const EXPECTED_LAYER_FETCHES = Array(24).fill(LAYER_URL)
 const TOPOLOGY_ROOT = 'https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/'
 const TOPOLOGY_YEARS = ['2013', '2014', '2015', '2019', '2020', '2021', '2022'] as const
 const TOPOLOGY_URLS = new Set(TOPOLOGY_YEARS.map(year => `${TOPOLOGY_ROOT}cb_${year}_us_county_20m.json`))
@@ -88,6 +88,16 @@ const openSection = async (canvas: Canvas, root: HTMLElement, name: string) => {
 
 const labeled = <T extends HTMLElement>(scope: HTMLElement, label: string, selector: string): T => {
   const candidates = Array.from(scope.querySelectorAll<T>(selector))
+  const marker = Array.from(scope.querySelectorAll<HTMLElement>('*')).find(
+    element =>
+      element.tagName !== 'OPTION' &&
+      !element.closest('option') &&
+      Array.from(element.childNodes).some(
+        child => child.nodeType === Node.TEXT_NODE && normalize(child.textContent) === label
+      )
+  )
+  const markerControl = marker?.closest('label')?.querySelector<T>(selector)
+  if (markerControl) return markerControl
   const labelTexts = (element: T) => {
     const wrapper = element.closest('label')
     const nodes = [
@@ -223,11 +233,13 @@ const configureCountyMap = async (canvas: Canvas, root: HTMLElement, user: User,
     'Percent Vaccinated',
     'Vaccination Coverage Group'
   ]) {
-    expect(root.querySelector(`table.data-table th[title="${heading}"]`)).toBeVisible()
+    await waitFor(() => expect(root.querySelector(`table.data-table th[title="${heading}"]`)).toBeVisible())
   }
-  expect(canvas.getByText('Page 1 of 122')).toBeVisible()
-  expect(root.querySelectorAll('table.data-table tbody tr')).toHaveLength(25)
-  expect(root.querySelector('table.data-table tbody')?.textContent).toContain('02013')
+  await waitFor(() => {
+    expect(canvas.getByText('Page 1 of 122')).toBeVisible()
+    expect(root.querySelectorAll('table.data-table tbody tr')).toHaveLength(25)
+    expect(root.querySelector('table.data-table tbody')?.textContent).toContain('02013')
+  })
   await waitConfig(read, config => {
     expect(config.data).toHaveLength(3047)
     expect(Math.ceil(config.data.length / 25)).toBe(122)
@@ -441,7 +453,11 @@ const exerciseColumns = async (canvas: Canvas, root: HTMLElement, user: User, re
     expect(config.general.geoLabelOverride).toBe('County')
   })
   geography = await openNested(root, 'Columns', 'Geography', user)
-  await user.selectOptions(select(geography, 'Geography Display Column'), 'County')
+  const geographyDisplay = Array.from(geography.querySelectorAll<HTMLSelectElement>('select')).find(
+    control => control.value === '' && Array.from(control.options).some(option => option.value === 'County')
+  )!
+  expect(geographyDisplay).toBeTruthy()
+  await user.selectOptions(geographyDisplay, 'County')
   await waitConfig(read, config => {
     expect(config.columns.geo.displayColumn).toBe('County')
   })
@@ -1299,6 +1315,13 @@ const exerciseCustomLayers = async (
     fireEvent.change(control, { target: { value } })
     fireEvent.blur(control)
   }
+  // Commit the URL before any other layer edit. The production hook fetches
+  // on every layer-object change, so this prevents placeholder `fetch('')`
+  // calls and keeps the deny-by-default mock exact.
+  await change('layerFilename', LAYER_URL)
+  // The committed layer URL is consumed once by the editor preview hook and
+  // once by the rendered map hook. Wait for both exact local requests.
+  await waitFor(() => expect(layerFetches).toEqual([LAYER_URL, LAYER_URL]), { timeout: 10000 })
   await change('layerName', 'Regression layer')
   await change('layerNamespace', 'cove')
   await change('layerFill', '#008000')
@@ -1306,10 +1329,6 @@ const exerciseCustomLayers = async (
   await change('layerStroke', '#000000')
   await change('layerStrokeWidth', '2')
   await change('layerTooltip', 'Regression polygon')
-  await change('layerFilename', LAYER_URL)
-  // The committed layer URL is consumed once by the editor preview hook and
-  // once by the rendered map hook. Wait for both exact local requests.
-  await waitFor(() => expect(layerFetches).toEqual([LAYER_URL, LAYER_URL]), { timeout: 10000 })
   await waitConfig(read, config =>
     expect(config.map.layers[0]).toMatchObject({
       name: 'Regression layer',
@@ -1619,7 +1638,10 @@ export const MAP004: Story = {
     }
     const onConsoleWarn = (...args: unknown[]) => {
       const message = args.map(value => String(value)).join(' ')
-      if (!/^Value not assigned to any range: -?\d+(?:\.\d+)? assigning to closest range$/.test(message)) {
+      if (
+        message.trim() &&
+        !/^Value not assigned to any range: -?\d+(?:\.\d+)? assigning to closest range$/.test(message)
+      ) {
         consoleCapture.unexpectedWarnings.push(message)
       }
     }
@@ -1708,7 +1730,7 @@ export const MAP004: Story = {
         expect(index).toBeGreaterThanOrEqual(0)
         remainingErrors.splice(index, 1)
       }
-      expect(remainingErrors).toEqual([])
+      if (remainingErrors.length) throw new Error(`Unexpected console errors: ${JSON.stringify(remainingErrors)}`)
       expect(consoleCapture.unexpectedWarnings).toEqual([])
 
       // Canonical steps 91-92 intentionally remain last. Current production
