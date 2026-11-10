@@ -52,12 +52,14 @@ Required workflow
    `<RegressionID>.Regression.stories.tsx`, replacing each run of non-ASCII letters or digits in the ID with one
    hyphen and trimming hyphens. Do not use `*.smoke.stories.*` because quick mode excludes it.
 5. Normalize the script's `Visualization > Type` to one of the canonical display labels in step 4. Set the Storybook
-   meta title to `Regression Tests/<Visualization>` and give the single exported story the visible name
+   meta title to `Regression Tests/<Visualization> Scripts` and give the single exported story the visible name
    `<Regression ID> — <short title>`. Replace `/` in the visible short title with `–` so it cannot create an unintended
    Storybook hierarchy. Use the tracking ID stripped to ASCII letters and digits as the exported symbol, prefixed
    with `Regression` if it would begin with a digit. Before writing, search existing regression story filenames and
    exports; if either normalized value collides with a different tracking ID, stop and ask. This produces a uniquely
    selectable regression beneath the top-level `Regression Tests` sidebar group without an extra story-name level.
+   Map regressions always use the `Regression Tests/Map Scripts` sidebar area, including workflows that begin in
+   the chooser or Data Import editor; do not place them under the regular component or editor-test story groups.
 6. Add `// Source regression: docs/qa/regression-scripts/<title>.md` to the story file and update the script's Notes
    with `Automated story: <package-relative story path>`. Keep both references synchronized on moves or renames.
 7. Use accessible queries by role, label, or visible text. Use CSS selectors only when the rendered visualization

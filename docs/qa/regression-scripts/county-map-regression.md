@@ -91,7 +91,7 @@ another control.
 | 22 | Exercise every `Title Style` | `Small (h3)`, `Large (h2)`, `Legacy`; finish on `Small (h3)` | The visible title changes to the corresponding heading treatment each time. It ends as the small/h3 treatment. |
 | 23 | Toggle `Show Title` off and on | Off, then on | The map title and its super title are absent while off and return while on. |
 | 24 | Set `Super Title` | `County sample coverage` | `County sample coverage` appears directly above the main title while `Show Title` is on. |
-| 25 | Set `Message`, `Subtext`, and the General `Footnotes` field | `Use the state and county selectors.`; `Vaccination values are sample data.`; `General county note.` | The message appears above the map, the subtext below the visualization, and `General county note.` below the data-table area; none replaces the dedicated Footnotes entries added later. |
+| 25 | Set `Message`, `Subtext`, and the General `Footnotes` field with HTML | `<a href="https://www.cdc.gov/">County map guidance</a>`; `Vaccination values are <em>sample data</em>.`; `General county note.<sup>1</sup>` | The message appears above the map as a focusable link named `County map guidance` with the CDC destination, `sample data` renders with emphasis below the visualization, and `1` renders as superscript below the data-table area. No raw HTML tags are printed, and none replaces the dedicated Footnotes entries added later. |
 | 26 | Exercise `Language` | `Spanish (es-MX)`, then `English (en-US)` | The configuration locale changes to `es-MX` and then `en-US`; number/date and built-in map labels use the selected locale where translated. Authored title/content remains unchanged. End on English. |
 | 27 | Set `Alt Text Description` | `Static (manual text)`; `Description Text: County vaccination coverage varies across the sample counties.` | The preview displays the exact description and the Canvas image name becomes `United States county map with the title: County vaccination regression. County vaccination coverage varies across the sample counties.` |
 | 28 | Exercise the other alt-text choices | `None`, then `Data File Metadata`, then restore Static | `None` removes the preview. Because the CSV has no file metadata, `Data File Metadata` shows the explicit no-metadata message and does not reveal `Description Metadata Field`. Restoring Static restores the exact preview text. |
@@ -321,4 +321,8 @@ another control.
 - The topology itself may be loaded by the application, but the Custom Map Layers test must use the repository fixture
   through a local deterministic interception and must never call an arbitrary live layer.
 - Screenshots may be retained for diagnosis, but they are not the pass/fail oracle.
-- Automated story: not created; automation requires separate approval.
+- Automated story: `packages/editor/src/_stories/MAP-004.Regression.stories.tsx`.
+- The automated story exercises the deterministic editor checkpoint ledger through every panel before preserving the
+  canonical county location-highlighter assertion. Canvas-only pixel semantics remain manual where the renderer has
+  no stable per-county DOM oracle; the story still asserts the corresponding authored configuration and Canvas
+  lifecycle. The current county-highlighter product mismatch is intentionally reported as a reproduced defect.
