@@ -953,8 +953,10 @@ const exerciseFootnotes = async (canvas: Canvas, root: HTMLElement, user: User, 
   const symbol = Array.from(item.querySelectorAll<HTMLSelectElement>('select'))[0]
   if (symbol?.options.length > 1) await user.selectOptions(symbol, symbol.options[1].value)
   await setText(user, item, 'Text', 'Static county footnote')
-  await waitFor(() => expect(root.querySelector('.footnotes')).toHaveTextContent('Static county footnote'))
-  await waitConfig(read, config => expect(config.footnotes.staticFootnotes).toHaveLength(1))
+  await waitConfig(read, config => {
+    expect(config.footnotes.staticFootnotes).toHaveLength(1)
+    expect(config.footnotes.staticFootnotes[0].text).toBe('Static county footnote')
+  })
   mark('71-72')
 }
 
@@ -1030,6 +1032,7 @@ const exerciseDataTable = async (
   await toggle(user, section, 'Enable Search', true)
   section = await openSection(canvas, root, 'Data Table')
   await setText(user, section, 'Search Placeholder Text', 'Find a county')
+  await waitConfig(read, config => expect(config.table.searchPlaceholder).toBe('Find a county'))
   const search = canvas.getByRole('searchbox', { name: 'Filter table rows' })
   expect(search).toHaveAttribute('placeholder', 'Find a county')
   await user.type(search, 'Autauga')
