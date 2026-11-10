@@ -2,7 +2,7 @@ import { useContext, useState, useRef } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Filters from './DashboardFilters'
 import { changeFilterActive } from '../../helpers/changeFilterActive'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { FilterBehavior } from '../../helpers/FilterBehavior'
 import { getFilteredData } from '../../helpers/getFilteredData'
 import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
@@ -156,7 +156,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
     const dashboardConfig = {
       ...state.config.dashboard,
-      sharedFilters: _.cloneDeep(state.config.dashboard.sharedFilters)
+      sharedFilters: cloneDeep(state.config.dashboard.sharedFilters)
     }
 
     const queryParams = getQueryParams()

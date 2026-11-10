@@ -33,8 +33,6 @@ const SingleStateMap: React.FC = () => {
   const {
     config,
     isDashboard,
-    setSharedFilterValue,
-    isFilterValueSupported,
     runtimeFilters,
     runtimeData,
     tooltipId,
@@ -160,8 +158,6 @@ const SingleStateMap: React.FC = () => {
         key='cities'
         geoClickHandler={geoClickHandler}
         titleCase={titleCase}
-        setSharedFilterValue={setSharedFilterValue}
-        isFilterValueSupported={isFilterValueSupported}
         tooltipId={tooltipId}
       />
     )

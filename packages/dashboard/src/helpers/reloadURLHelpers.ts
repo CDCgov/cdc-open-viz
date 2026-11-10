@@ -1,7 +1,7 @@
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from '../types/SharedFilter'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
-import _ from 'lodash'
+import uniq from 'lodash/uniq'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
 import { getDashboardConditionDatasetKeys } from './dashboardConditions'
@@ -73,7 +73,7 @@ export const getDatasetKeys = (
     .map(viz => viz.footnotes?.dataKey)
     .filter(Boolean)
   // ensure to only load datasets for the specific dashboard tab.
-  const datasetsUsedByDashboard = _.uniq([
+  const datasetsUsedByDashboard = uniq([
     ...vizDataKeys,
     ...rowDataKeys,
     ...dashboardConditionDataKeys,

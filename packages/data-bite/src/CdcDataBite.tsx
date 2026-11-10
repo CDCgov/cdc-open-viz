@@ -1,12 +1,11 @@
 import { useEffect, useCallback, useMemo, useReducer, useRef } from 'react'
-import { Fragment } from 'react'
+import { Fragment, Suspense, lazy } from 'react'
 
 // contexts & initial state
 import defaults from './data/initial-state'
 import Context from './context'
 
 // internal components
-import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import Button from '@cdc/core/components/elements/Button'
@@ -63,6 +62,8 @@ import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 // styles
 import './scss/main.scss'
 
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
+
 type CdcDataBiteProps = {
   config: Config
   configUrl: string
@@ -114,7 +115,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     enableMarkupVariables
   } = config
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
+  const { innerContainerClasses, contentClasses: rawContentClasses } = useDataVizClasses(config)
+  const contentClasses =
+    biteStyle === 'tp5'
+      ? rawContentClasses.filter(
+          className =>
+            className !== 'component--has-accent' &&
+            className !== 'component--has-background' &&
+            className !== 'component--hide-background-color' &&
+            className !== 'component--has-legacy-border' &&
+            className !== 'component--has-border-color-theme'
+        )
+      : rawContentClasses
 
   const transform = new DataTransform()
 
@@ -666,12 +678,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const shouldShowTp5CalloutFlag = !config.visual?.whiteBackground && dataColorResolution.state !== 'resolved'
+    const circleStyle = config.visual?.circleStyle
+    const shouldUseCircleStyle = isTp5 && (circleStyle === 'light' || circleStyle === 'dark')
+    const circleFontSizeValue = Number(config.visual?.circleFontSize)
+    const circleFontSize = Number.isFinite(circleFontSizeValue) && circleFontSizeValue > 0 ? circleFontSizeValue : 36
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
+      shouldUseCircleStyle ? 'cdc-callout__body--circle-value' : '',
       shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
       shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
     ]
@@ -712,14 +730,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
                 !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
-              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
+              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''} ${
+                shouldShowTp5CalloutFlag ? 'cdc-callout--has-flag' : ''
+              }`}
               style={
                 dataColorResolution.state === 'resolved'
                   ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
                   : undefined
               }
             >
-              {!config.visual?.whiteBackground && dataColorResolution.state !== 'resolved' && (
+              {shouldShowTp5CalloutFlag && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 
@@ -732,7 +752,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && (
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
-                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      {shouldUseCircleStyle ? (
+                        <span className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}>
+                          <span className='cdc-callout__value' style={{ fontSize: `${circleFontSize}px` }}>
+                            {calculateDataBite(true)}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      )}
                       {!shouldUseTrendBelow && hasTrendArrow && (
                         <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
                           {renderTrendArrow({
@@ -847,7 +875,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           config={config}
           isEditor={isEditor}
           currentViewport={currentViewport}
-          editorPanel={<EditorPanel />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel />
+              </Suspense>
+            ) : null
+          }
         >
           {body}
         </VisualizationContainer>
@@ -858,7 +892,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           config={config}
           isEditor={isEditor}
           currentViewport={currentViewport}
-          editorPanel={<EditorPanel />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel />
+              </Suspense>
+            ) : null
+          }
         >
           <VisualizationContent
             bodyClassName={[...innerContainerClasses, ...contentClasses, 'bite__style--gradient']

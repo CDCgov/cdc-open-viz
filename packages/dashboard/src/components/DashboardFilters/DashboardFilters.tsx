@@ -10,7 +10,6 @@ import { getNestedOptions } from '@cdc/core/components/Filters/helpers/getNested
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import Button from '@cdc/core/components/elements/Button'
-import _ from 'lodash'
 import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
 import FilterNote from '@cdc/core/components/Filters/components/FilterNote'

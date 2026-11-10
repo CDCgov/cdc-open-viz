@@ -55,16 +55,19 @@ export const createStyles = (props: StyleProps): Style[] => {
   }
 
   data.forEach((d, index) => {
-    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    const matchingPd = getMatchingPd(d)
+    const preserveAdjacentSegments =
+      matchingPd && !matchingPd.style.includes('Circles') && matchingPd.lineEffectScope !== 'outgoing'
+    const hasStyledSegment = matchingPd && (preserveAdjacentSegments || index < data.length - 1)
 
-    let style: Style = matchingPd
+    const style: Style = hasStyledSegment
       ? createStyle(handleLineType(matchingPd.style), matchingPd.weight)
       : createStyle(handleLineType(lineType))
 
     styles.push(style)
 
-    // If matchingPd exists, update the previous style if there is a previous element
-    if (matchingPd && index > 0) {
+    // Existing rules also style the incoming segment, including a preliminary final point.
+    if (preserveAdjacentSegments && index > 0) {
       styles[index - 1] = createStyle(handleLineType(matchingPd.style), matchingPd.weight)
     }
   })

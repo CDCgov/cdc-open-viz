@@ -8,6 +8,8 @@ import {
 import dashboardGallery from '@cdc/dashboard/examples/dashboard-gallery.json'
 import staleDatasetKeysDashboard from '@cdc/dashboard/examples/dashboard-stale-dataset-keys.json'
 import { addVisualization } from '@cdc/dashboard/src/helpers/addVisualization'
+import dashboardDefaults from '@cdc/dashboard/src/data/initial-state'
+import chartDefaults from '@cdc/chart/src/data/initial-state'
 
 const getDateModernizationOptionIds = (
   dateDisplayFormat: string | null | undefined,
@@ -39,7 +41,11 @@ describe('modernizationRecipes', () => {
     ['US map', 'map', 'us'],
     ['World map', 'map', 'world'],
     ['Single-state map', 'map', 'single-state'],
-    ['Waffle chart', 'waffle-chart', 'Waffle']
+    ['Waffle chart', 'waffle-chart', 'Waffle'],
+    ['Data bite', 'data-bite', ''],
+    ['Markup include', 'markup-include', ''],
+    ['Dashboard filters', 'dashboardFilters', ''],
+    ['Data table', 'table', '']
   ])('does not offer modernization for a newly created dashboard %s', (_label, type, subType) => {
     const child = addVisualization(type, subType)
     const childId = child.uid as string
@@ -48,6 +54,34 @@ describe('modernizationRecipes', () => {
       dashboard: { titleStyle: 'small' },
       rows: [{ columns: [{ width: 12, widget: childId }] }],
       visualizations: { [childId]: child }
+    }
+
+    const recipe = getModernizationRecipe(dashboard)
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).toEqual([])
+  })
+
+  it('does not offer modernization after adding one of each dashboard visualization type', () => {
+    const choices = [
+      ['chart', 'Bar'],
+      ['map', 'us'],
+      ['data-bite', ''],
+      ['waffle-chart', 'Waffle'],
+      ['markup-include', ''],
+      ['dashboardFilters', ''],
+      ['table', '']
+    ]
+    const children: ReturnType<typeof addVisualization>[] = []
+    choices.forEach(([type, subType]) => {
+      children.push(addVisualization(type, subType, { existingIds: children.map(child => child.uid as string) }))
+    })
+    const dashboard = {
+      ...dashboardDefaults,
+      type: 'dashboard',
+      datasets: {},
+      visualizations: Object.fromEntries(children.map(child => [child.uid, child])),
+      rows: children.map(child => ({ columns: [{ width: 12, widget: child.uid }] }))
     }
 
     const recipe = getModernizationRecipe(dashboard)
@@ -259,33 +293,28 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
-    expect(getModernizationOptions(recipe).find(option => option.id === 'chart-y-axis-num-ticks')?.label).toBe(
-      'Use about four Y-axis ticks'
-    )
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-num-ticks')
     expect(recipe.editorLocations).toEqual([
       'General > Title Style',
       'Left Value Axis > Label Placement',
-      'Left Value Axis > Number Of Ticks',
       'Left Value Axis > Show Gridlines',
       'Left Value Axis > Number Formatting > Add Commas',
       'Left Value Axis > Hide Axis',
       'Left Value Axis > Hide Ticks',
-      'Left Value Axis > Value Axis Domain > Axis Min Value',
       'Left Value Axis > Value Axis Domain > Automatic Max Strategy',
       'Date/Category Axis > Axis Date Display Format',
       'Date/Category Axis > Hover Date Display Format',
+      'Date/Category Axis > Use Responsive Ticks',
+      'Date/Category Axis > Tick Rotation (Degrees)',
       'Date/Category Axis > Number Of Ticks',
       'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
       'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
-      'Date/Category Axis > Use Responsive Ticks',
-      'Date/Category Axis > Tick Rotation (Degrees)',
       'Legend > Position',
       'Legend > Single Row Legend',
       'Visual > Bar Thickness',
       'Data Table > Expanded by Default'
     ])
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'General > Title Style', value: 'Small' })
-    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Left Value Axis > Number Of Ticks', value: '4' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Date/Category Axis > Number Of Ticks', value: '6' })
     expect(recipe.editorLocationDetails).toContainEqual({
       path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
@@ -308,8 +337,8 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.yAxis.hideAxis).toBe(true)
     expect(modernizedConfig.yAxis.hideTicks).toBe(true)
     expect(modernizedConfig.yAxis.gridLines).toBe(true)
-    expect(modernizedConfig.yAxis.numTicks).toBe(4)
-    expect(modernizedConfig.yAxis.min).toBe(0)
+    expect(modernizedConfig.yAxis.numTicks).toBe(7)
+    expect(modernizedConfig.yAxis.min).toBe(-5)
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.singleRow).toBe(true)
@@ -407,6 +436,7 @@ describe('modernizationRecipes', () => {
 
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Dashboard Settings > Title Style', value: 'Small' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Charts > General > Title Style', value: 'Small' })
+    expect(recipe.editorLocations).not.toContain('Charts > Visual > Bar Borders')
     expect(recipe.editorLocationDetails).toContainEqual({
       path: 'Charts > Right Value Axis > Label Placement',
       value: 'Top'
@@ -421,11 +451,13 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.visualizations.chart1.titleStyle).toBe('small')
     expect(modernizedConfig.visualizations.chart1.yAxis.titlePlacement).toBe('top')
     expect(modernizedConfig.visualizations.chart1.yAxis.rightTitlePlacement).toBe('top')
-    expect(modernizedConfig.visualizations.chart1.yAxis.numTicks).toBe(4)
-    expect(modernizedConfig.visualizations.chart1.barHasBorder).toBe('true')
+    expect(modernizedConfig.visualizations.chart1.yAxis.numTicks).toBe(7)
+    expect(modernizedConfig.visualizations.chart1.barHasBorder).toBe('false')
     expect(modernizedConfig.visualizations.chart1.legend.position).toBe('top')
     expect(modernizedConfig.visualizations.chart1.legend.singleRow).toBe(true)
     expect(modernizedConfig.visualizations.chart1.xAxis.tickRotation).toBe(0)
+    expect(modernizedConfig.visualizations.chart1.xAxis.numTicks).toBe(6)
+    expect(modernizedConfig.visualizations.chart1.xAxis.viewportNumTicks).toEqual({ xs: 4, xxs: 4 })
     expect(modernizedConfig.visualizations.chart1.table.expanded).toBe(false)
     expect(modernizedConfig.visualizations.chart1.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.visualizations.nestedDashboard.dashboard.titleStyle).toBe('small')
@@ -445,11 +477,15 @@ describe('modernizationRecipes', () => {
   it('leaves non-legacy chart title styles unchanged', () => {
     const recipe = getModernizationRecipe({
       type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
       titleStyle: 'large',
       yAxis: { titlePlacement: 'side' }
     }) as ModernizationRecipe
     const modernizedConfig = applyModernizationRecipe(recipe, {
       type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
       titleStyle: 'large',
       yAxis: { titlePlacement: 'side' }
     })
@@ -605,6 +641,56 @@ describe('modernizationRecipes', () => {
     expect(config.barHasBorder).toBe('false')
   })
 
+  it.each([
+    ['stacked bars', { visualizationSubType: 'stacked' }],
+    ['lollipops', { isLollipopChart: true }],
+    ['small multiples', { smallMultiples: { mode: 'by-column' } }],
+    [
+      'multiple static bar series',
+      {
+        series: [
+          { dataKey: 'value', type: 'Bar' },
+          { dataKey: 'otherValue', type: 'Bar' }
+        ]
+      }
+    ],
+    ['dynamic-category bars', { series: [{ dataKey: 'value', type: 'Bar', dynamicCategory: 'category' }] }],
+    ['vertical bars thicker than the modern default', { barThickness: 0.9 }]
+  ])('does not recommend borders for %s', (_scenario, overrides) => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      titleStyle: 'small',
+      barHasBorder: 'false',
+      barThickness: chartDefaults.barThickness,
+      isLollipopChart: false,
+      series: [{ dataKey: 'value', type: 'Bar' }],
+      ...overrides
+    }) as ModernizationRecipe | undefined
+
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+    expect(optionIds).not.toContain('chart-bar-borders')
+  })
+
+  it('uses bar height rather than vertical bar thickness to qualify horizontal bar borders', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      barHasBorder: 'false',
+      barThickness: 0.9,
+      isLollipopChart: false,
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-bar-borders')
+  })
+
   it('does not modernize omitted bar borders because the chart runtime defaults them on', () => {
     const recipe = getModernizationRecipe({
       type: 'chart',
@@ -742,54 +828,21 @@ describe('modernizationRecipes', () => {
     expect(config.visualizations.chart1).not.toHaveProperty('barThickness')
   })
 
-  it.each([undefined, null, '', 0, '0'])(
-    'does not offer a zero minimum for a vertical bar chart with an automatic or zero minimum (%s)',
-    min => {
-      const recipe = getModernizationRecipe({
-        type: 'chart',
-        visualizationType: 'Bar',
-        orientation: 'vertical',
-        yAxis: min === undefined ? {} : { min }
-      }) as ModernizationRecipe
-
-      expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-min')
-    }
-  )
-
-  it('offers a zero minimum for a vertical bar chart with an explicit negative minimum', () => {
-    const recipe = getModernizationRecipe({
+  it.each([
+    ['Bar', -5],
+    ['Line', 10],
+    ['Combo', '0.1']
+  ])('preserves an explicitly configured Y-axis minimum for a %s chart', (visualizationType, min) => {
+    const config = {
       type: 'chart',
-      visualizationType: 'Bar',
+      visualizationType,
       orientation: 'vertical',
-      yAxis: { min: -5 }
-    }) as ModernizationRecipe
-
-    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
-  })
-
-  it.each([undefined, null, '', 0, '0'])(
-    'does not offer a zero minimum for a vertical line chart with an automatic or zero minimum (%s)',
-    min => {
-      const recipe = getModernizationRecipe({
-        type: 'chart',
-        visualizationType: 'Line',
-        orientation: 'vertical',
-        yAxis: min === undefined ? {} : { min }
-      }) as ModernizationRecipe
-
-      expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-min')
+      yAxis: { min }
     }
-  )
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
-  it('offers a zero minimum for a vertical line chart with an explicit negative minimum', () => {
-    const recipe = getModernizationRecipe({
-      type: 'chart',
-      visualizationType: 'Line',
-      orientation: 'vertical',
-      yAxis: { min: -5 }
-    }) as ModernizationRecipe
-
-    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-min')
+    expect(applyModernizationRecipe(recipe, config).yAxis.min).toBe(min)
   })
 
   it('offers clean top tick automatic max for a supported vertical chart without an explicit maximum', () => {
@@ -871,6 +924,74 @@ describe('modernizationRecipes', () => {
         'chart-y-axis-auto-max-strategy'
       ])
     )
+  })
+
+  it.each(['Area Chart', 'Bar', 'Combo', 'Forecasting', 'Line', 'Scatter Plot'])(
+    'offers the Cartesian axis suite to %s charts',
+    visualizationType => {
+      const recipe = getModernizationRecipe({
+        type: 'chart',
+        visualizationType,
+        orientation: 'vertical',
+        yAxis: { titlePlacement: 'side' }
+      }) as ModernizationRecipe
+
+      expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-title-placement')
+    }
+  )
+
+  it.each([
+    'Box Plot',
+    'Bump Chart',
+    'Deviation Bar',
+    'Forest Plot',
+    'HeatMap',
+    'Horizon Chart',
+    'Paired Bar',
+    'Pie',
+    'Radar',
+    'Sankey',
+    'Spark Line',
+    'Network',
+    'Dendrogram',
+    'Warming Stripes'
+  ])('does not offer the Cartesian axis suite to %s charts', visualizationType => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType,
+      orientation: 'vertical',
+      yAxis: {
+        titlePlacement: 'side',
+        numTicks: '',
+        gridLines: false,
+        hideAxis: false,
+        hideTicks: false,
+        autoMaxStrategy: 'default'
+      },
+      isResponsiveTicks: true,
+      xAxis: { type: 'date-time', tickRotation: 45, numTicks: '' },
+      dataFormat: { commas: false }
+    }) as ModernizationRecipe
+    const axisOptionIds = [
+      'chart-y-axis-title-placement',
+      'chart-y-axis-num-ticks',
+      'chart-y-axis-grid-lines',
+      'chart-data-format-commas',
+      'chart-y-axis-hide-axis',
+      'chart-y-axis-hide-ticks',
+      'chart-y-axis-auto-max-strategy',
+      'chart-date-display-format',
+      'chart-tooltip-date-display-format',
+      'chart-x-axis-num-ticks',
+      'chart-responsive-ticks',
+      'chart-x-axis-tick-rotation'
+    ]
+
+    expect(
+      getModernizationOptions(recipe)
+        .map(option => option.id)
+        .filter(optionId => axisOptionIds.includes(optionId))
+    ).toEqual([])
   })
 
   it('preserves the specialized Warming Stripes legend position', () => {
@@ -966,7 +1087,7 @@ describe('modernizationRecipes', () => {
         dateDisplayFormat: '%b. %-d %Y',
         tickRotation: 0,
         numTicks: '',
-        viewportNumTicks: { sm: 8, xs: 7, xxs: 5 }
+        viewportNumTicks: { sm: 8 }
       },
       table: { expanded: false },
       tooltips: { dateDisplayFormat: '%B %-d, %Y' },
@@ -992,7 +1113,54 @@ describe('modernizationRecipes', () => {
       viewportNumTicks: { sm: 8, xs: 4, xxs: 4 }
     })
     expect(config.xAxis.numTicks).toBe('')
-    expect(config.xAxis.viewportNumTicks).toEqual({ sm: 8, xs: 7, xxs: 5 })
+    expect(config.xAxis.viewportNumTicks).toEqual({ sm: 8 })
+  })
+
+  it('combines rotation removal with current X-axis tick-count defaults', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Line',
+      orientation: 'vertical',
+      xAxis: {
+        type: 'date-time',
+        tickRotation: 45,
+        numTicks: 9,
+        viewportNumTicks: { sm: 8, xs: 7, xxs: 5 }
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const option = options.find(option => option.id === 'chart-x-axis-tick-rotation')
+
+    expect(options.map(option => option.id)).not.toContain('chart-x-axis-num-ticks')
+    expect(option?.label).toBe('Use horizontal X-axis ticks with responsive tick counts')
+    expect(option?.editorLocationDetails).toEqual([
+      { path: 'Date/Category Axis > Tick Rotation (Degrees)', value: '0' },
+      { path: 'Date/Category Axis > Number Of Ticks', value: '6' },
+      { path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs', value: '4' },
+      { path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs', value: '4' }
+    ])
+    expect(option?.apply(config as any).xAxis).toEqual({
+      ...config.xAxis,
+      tickRotation: 0,
+      numTicks: 6,
+      viewportNumTicks: { sm: 8, xs: 4, xxs: 4 }
+    })
+  })
+
+  it('preserves custom X-axis tick counts when labels are already horizontal', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Line',
+      orientation: 'vertical',
+      xAxis: { type: 'date-time', tickRotation: 0, numTicks: 9, viewportNumTicks: { xs: 7, xxs: 5 } }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const optionIds = getModernizationOptions(recipe).map(option => option.id)
+
+    expect(optionIds).not.toContain('chart-x-axis-num-ticks')
+    expect(optionIds).not.toContain('chart-x-axis-tick-rotation')
+    expect(applyModernizationRecipe(recipe, config).xAxis).toMatchObject(config.xAxis)
   })
 
   it.each([
@@ -1000,8 +1168,12 @@ describe('modernizationRecipes', () => {
     ['heat map', { orientation: 'vertical', visualizationType: 'HeatMap', xAxis: {} }],
     ['spark line', { orientation: 'vertical', visualizationType: 'Spark Line', xAxis: {} }],
     [
-      'manual categorical axis',
-      { orientation: 'vertical', visualizationType: 'Bar', xAxis: { type: 'categorical', manual: true } }
+      'manual date-time axis',
+      {
+        orientation: 'vertical',
+        visualizationType: 'Bar',
+        xAxis: { type: 'date-time', manual: true, tickRotation: 45, numTicks: 7, viewportNumTicks: { xs: 4, xxs: 4 } }
+      }
     ]
   ])('does not modernize X-axis tick counts for a %s', (_scenario, axisConfig) => {
     const modernConfig = {
@@ -1032,6 +1204,11 @@ describe('modernizationRecipes', () => {
     expect(getModernizationRecipe(modernConfig)?.editorLocations ?? []).not.toContain(
       'Date/Category Axis > Number Of Ticks'
     )
+    if (axisConfig.xAxis?.manual) {
+      expect(
+        getModernizationOptions(getModernizationRecipe(modernConfig) as ModernizationRecipe).map(option => option.id)
+      ).not.toContain('chart-x-axis-tick-rotation')
+    }
   })
 
   it('moves single-series horizontal bar labels to the date/category axis', () => {
@@ -1134,13 +1311,12 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
-    expect(
-      getModernizationOptions(recipe).find(option => option.id === 'chart-horizontal-value-axis-num-ticks')?.label
-    ).toBe('Use about four horizontal value-axis ticks')
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain(
+      'chart-horizontal-value-axis-num-ticks'
+    )
     expect(recipe.editorLocations).toEqual([
       'General > Title Style',
       'General > Label Placement',
-      'Value Axis > Number Of Ticks',
       'Value Axis > Use Responsive Ticks',
       'Value Axis > Show Gridlines',
       'Value Axis > Number Formatting > Add Commas',
@@ -1157,7 +1333,7 @@ describe('modernizationRecipes', () => {
       titlePlacement: 'top',
       labelPlacement: 'On Date/Category Axis',
       gridLines: true,
-      numTicks: 4,
+      numTicks: 7,
       autoMaxStrategy: 'clean-top-tick'
     })
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
@@ -1244,7 +1420,7 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
     const optionIds = getModernizationOptions(recipe).map(option => option.id)
 
-    expect(optionIds).toContain('chart-horizontal-value-axis-num-ticks')
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-num-ticks')
     expect(optionIds).toContain('chart-horizontal-value-axis-grid-lines')
     expect(optionIds).toContain('chart-horizontal-axis-title-placement')
     expect(optionIds).not.toContain('chart-y-axis-num-ticks')
@@ -1814,6 +1990,7 @@ describe('modernizationRecipes', () => {
       'Type > Show State Labels',
       'Legend > Legend Position',
       'Legend > Legend Style',
+      'Legend > Hide Legend Box',
       'Legend > Show Special Classes Last',
       'Data Table > Map loads with data table expanded'
     ])
@@ -1952,6 +2129,7 @@ describe('modernizationRecipes', () => {
       'Maps > General > Title Style',
       'Maps > Type > Show State Labels',
       'Maps > Legend > Legend Position',
+      'Maps > Legend > Hide Legend Box',
       'Maps > Legend > Show Special Classes Last'
     ])
   })
@@ -2011,7 +2189,11 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
-    expect(recipe.editorLocations).toEqual(['Legend > Legend Position'])
+    expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Hide Legend Box'])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'Legend > Legend Position', value: 'Top' },
+      { path: 'Legend > Hide Legend Box', value: 'On' }
+    ])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.hideBorder).toBe(true)
   })
@@ -2062,8 +2244,8 @@ describe('modernizationRecipes', () => {
     expect(recipe).toBeUndefined()
   })
 
-  it('modernizes numeric map legend style when the legend can fit as a gradient', () => {
-    const recipe = getModernizationRecipe({
+  it('offers one selectable upgrade for a side numeric legend', () => {
+    const config = {
       type: 'map',
       general: { titleStyle: 'small' },
       legend: {
@@ -2075,30 +2257,96 @@ describe('modernizationRecipes', () => {
         singleRow: false,
         showSpecialClassesLast: true
       }
-    }) as ModernizationRecipe
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const styleOption = options.find(option => option.id === 'map-legend-style')
 
-    const modernizedConfig = applyModernizationRecipe(recipe, {
-      type: 'map',
-      general: { titleStyle: 'small' },
-      legend: {
-        type: 'equalnumber',
-        numberOfItems: 5,
-        position: 'side',
-        hideBorder: true,
-        style: 'circles',
-        singleRow: false,
-        showSpecialClassesLast: true
-      }
-    })
+    expect(options.map(option => option.id)).toEqual(['map-legend-style'])
+    expect(styleOption?.editorLocationDetails).toEqual([
+      { path: 'Legend > Legend Position', value: 'Top' },
+      { path: 'Legend > Legend Style', value: 'Gradient' }
+    ])
+    const modernizedConfig = styleOption?.apply(config as any)
 
-    expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
-    expect(modernizedConfig.legend.position).toBe('top')
-    expect(modernizedConfig.legend.hideBorder).toBe(true)
-    expect(modernizedConfig.legend.style).toBe('gradient')
-    expect(modernizedConfig.legend.singleRow).toBe(false)
+    expect(modernizedConfig?.legend.position).toBe('top')
+    expect(modernizedConfig?.legend.hideBorder).toBe(true)
+    expect(modernizedConfig?.legend.style).toBe('gradient')
+    expect(modernizedConfig?.legend.singleRow).toBe(false)
   })
 
-  it('quietly removes the legend box when moving an eligible map legend to a gradient at the top', () => {
+  it('offers one selectable upgrade for a side qualitative legend', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small', palette: { name: 'qualitative_standard' } },
+      legend: {
+        type: 'category',
+        position: 'side',
+        hideBorder: false,
+        style: 'circles',
+        singleRow: false,
+        showSpecialClassesLast: true
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const rowOption = options.find(option => option.id === 'map-legend-single-row')
+
+    expect(options.map(option => option.id)).toEqual(['map-legend-single-row'])
+    expect(rowOption?.editorLocationDetails).toEqual([
+      { path: 'Legend > Legend Position', value: 'Top' },
+      { path: 'Legend > Single Row Legend', value: 'On' },
+      { path: 'Legend > Hide Legend Box', value: 'On' }
+    ])
+    expect(rowOption?.apply(config as any).legend).toMatchObject({
+      position: 'top',
+      style: 'circles',
+      singleRow: true,
+      hideBorder: true
+    })
+  })
+
+  it('moves a legacy right numeric legend to a top gradient in one pass', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: {
+        type: 'equalinterval',
+        position: 'right',
+        style: 'circles',
+        hideBorder: false,
+        showSpecialClassesLast: true
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toEqual(['map-legend-style'])
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+    expect(modernizedConfig.legend).toMatchObject({ position: 'top', style: 'gradient', hideBorder: true })
+    expect(getModernizationRecipe(modernizedConfig)).toBeUndefined()
+  })
+
+  it('includes a missing legend position in the gradient upgrade', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: {
+        type: 'equalnumber',
+        style: 'circles',
+        singleRow: false,
+        hideBorder: false,
+        showSpecialClassesLast: true
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toEqual(['map-legend-style'])
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+    expect(modernizedConfig.legend).toMatchObject({ position: 'top', style: 'gradient', hideBorder: true })
+    expect(getModernizationRecipe(modernizedConfig)).toBeUndefined()
+  })
+
+  it('reports the legend box change when moving an eligible map legend to a gradient at the top', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2115,10 +2363,15 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
-    expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
+    expect(recipe.editorLocations).toEqual([
+      'Legend > Legend Position',
+      'Legend > Legend Style',
+      'Legend > Hide Legend Box'
+    ])
     expect(recipe.editorLocationDetails).toEqual([
       { path: 'Legend > Legend Position', value: 'Top' },
-      { path: 'Legend > Legend Style', value: 'Gradient' }
+      { path: 'Legend > Legend Style', value: 'Gradient' },
+      { path: 'Legend > Hide Legend Box', value: 'On' }
     ])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.style).toBe('gradient')
@@ -2147,7 +2400,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.legend.style).toBe('gradient')
   })
 
-  it('quietly removes the legend box when an eligible top map legend becomes a gradient', () => {
+  it('reports the legend box change when an eligible top map legend becomes a gradient', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2164,13 +2417,17 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
-    expect(recipe.editorLocations).toEqual(['Legend > Legend Style'])
+    expect(recipe.editorLocations).toEqual(['Legend > Legend Style', 'Legend > Hide Legend Box'])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'Legend > Legend Style', value: 'Gradient' },
+      { path: 'Legend > Hide Legend Box', value: 'On' }
+    ])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.style).toBe('gradient')
     expect(modernizedConfig.legend.hideBorder).toBe(true)
   })
 
-  it('modernizes map legend style regardless of configured item count when the palette is not qualitative', () => {
+  it('modernizes a map legend with no more than eight configured items', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2187,7 +2444,37 @@ describe('modernizationRecipes', () => {
     expect(getModernizationOptions(recipe).map(option => option.id)).toContain('map-legend-style')
   })
 
-  it('modernizes categorical map legend style without examining its data', () => {
+  it('does not offer legend recommendations for navigation maps', () => {
+    const config = {
+      type: 'map',
+      general: { type: 'navigation', titleStyle: 'small' },
+      legend: {
+        type: 'equalnumber',
+        position: 'side',
+        style: 'circles',
+        singleRow: false,
+        hideBorder: false,
+        showSpecialClassesLast: false
+      },
+      table: { expanded: false }
+    }
+
+    expect(getModernizationRecipe(config)).toBeUndefined()
+  })
+
+  it('keeps unrelated modernization available for navigation maps', () => {
+    const config = {
+      type: 'map',
+      general: { type: 'navigation', titleStyle: 'legacy' },
+      legend: { position: 'side', style: 'circles', showSpecialClassesLast: false }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toEqual(['map-title-style'])
+    expect(applyModernizationRecipe(recipe, config).legend).toEqual(config.legend)
+  })
+
+  it('modernizes a categorical map legend when its item count is unknown', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2207,7 +2494,11 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
-    expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
+    expect(recipe.editorLocations).toEqual([
+      'Legend > Legend Position',
+      'Legend > Legend Style',
+      'Legend > Hide Legend Box'
+    ])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.style).toBe('gradient')
     expect(modernizedConfig.legend.singleRow).toBe(false)
@@ -2234,6 +2525,107 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
     expect(getModernizationOptions(recipe).map(option => option.id)).toContain('map-legend-style')
+  })
+
+  it('leaves every legend setting alone when embedded category data has more than eight values', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'legacy' },
+      columns: { primary: { name: 'outbreak' } },
+      legend: {
+        type: 'category',
+        position: 'bottom',
+        style: 'circles',
+        singleRow: false,
+        hideBorder: false,
+        showSpecialClassesLast: false
+      },
+      data: Array.from({ length: 9 }, (_, index) => ({ outbreak: `Category ${index}` }))
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toEqual(['map-title-style'])
+    expect(applyModernizationRecipe(recipe, config).legend).toEqual(config.legend)
+  })
+
+  it('uses embedded categories instead of a stale configured order to count legend items', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      columns: { primary: { name: 'category' } },
+      legend: {
+        type: 'category',
+        position: 'top',
+        style: 'boxes',
+        hideBorder: true,
+        showSpecialClassesLast: true,
+        categoryValuesOrder: Array.from({ length: 20 }, (_, index) => `Category ${index}`)
+      },
+      data: Array.from({ length: 8 }, (_, index) => ({ category: `Category ${index}` }))
+    }
+
+    expect(
+      getModernizationOptions(getModernizationRecipe(config) as ModernizationRecipe).map(option => option.id)
+    ).toEqual(['map-legend-style'])
+  })
+
+  it('uses configured category order when remote map data is unavailable', () => {
+    const config = {
+      type: 'map',
+      dataUrl: 'https://example.com/remote-map-data.json',
+      general: { titleStyle: 'small' },
+      columns: { primary: { name: 'category' } },
+      legend: {
+        type: 'category',
+        position: 'bottom',
+        style: 'boxes',
+        showSpecialClassesLast: false,
+        categoryValuesOrder: Array.from({ length: 9 }, (_, index) => `Category ${index}`)
+      },
+      data: []
+    }
+
+    expect(getModernizationRecipe(config)).toBeUndefined()
+  })
+
+  it('does not double-count a special class already present among eight categories', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      columns: { primary: { name: 'category' } },
+      legend: {
+        type: 'category',
+        position: 'top',
+        style: 'boxes',
+        showSpecialClassesLast: true,
+        specialClasses: [{ key: 'category', value: 'Category 0', label: 'Special' }]
+      },
+      data: Array.from({ length: 8 }, (_, index) => ({ category: `Category ${index}` }))
+    }
+
+    expect(
+      getModernizationOptions(getModernizationRecipe(config) as ModernizationRecipe).map(option => option.id)
+    ).toEqual(['map-legend-style'])
+  })
+
+  it.each([
+    ['equalnumber', { numberOfItems: 9 }],
+    ['manual', { breakpoints: Array.from({ length: 8 }, (_, index) => index) }]
+  ])('leaves a %s map legend alone when its configured class count exceeds eight', (type, classSettings) => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: {
+        type,
+        ...classSettings,
+        position: 'side',
+        style: 'boxes',
+        singleRow: false,
+        showSpecialClassesLast: false
+      }
+    }
+
+    expect(getModernizationRecipe(config)).toBeUndefined()
   })
 
   it('does not modernize categorical map legend style when the palette is qualitative', () => {
@@ -2305,7 +2697,7 @@ describe('modernizationRecipes', () => {
     expect(recipe).toBeUndefined()
   })
 
-  it('does not let data or special classes block a gradient for a non-qualitative palette', () => {
+  it('allows a gradient when category data and special classes stay below the item limit', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2744,12 +3136,12 @@ describe('modernizationRecipes', () => {
     const originalConfig = {
       type: 'chart',
       visualizationType: 'Line',
+      series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
       general: {
         palette: {
-          name: 'qualitative_standard',
+          name: 'sequential_blue',
           version: '2.0',
           isReversed: true,
-          customColors: ['#123456'],
           colorAssignmentMode: 'by-value',
           colorAssignments: [{ key: 'Series A', color: '#654321' }],
           backups: [{ name: 'qualitative-bold', version: '1.0' }]
@@ -2775,10 +3167,10 @@ describe('modernizationRecipes', () => {
           name: 'sequential_blue',
           version: '2.0',
           isReversed: false,
-          customColorsOrdered: ['#123456', '#654321'],
           backups: [{ name: 'bluegreen', version: '1.0' }]
         }
-      }
+      },
+      legend: { type: 'equalinterval', numberOfItems: 5 }
     }
     const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
     const option = getModernizationOptions(recipe).find(change => change.id === 'map-palette-version-2-1')
@@ -2788,6 +3180,39 @@ describe('modernizationRecipes', () => {
     expect(option?.editorLocationDetails).toEqual([{ path: 'Visual > Map Color Palette', value: '2.1' }])
     expect(modernizedConfig.general.palette).toEqual({ ...originalConfig.general.palette, version: '2.1' })
     expect(originalConfig.general.palette.version).toBe('2.0')
+  })
+
+  it.each([
+    [
+      'chart',
+      {
+        visualizationType: 'Line',
+        series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
+        general: {
+          titleStyle: 'small',
+          palette: { name: 'qualitative_standard', version: '2.0', customColors: ['#123456'] }
+        },
+        table: { expanded: false }
+      },
+      'chart-palette-version-2-1'
+    ],
+    [
+      'map',
+      {
+        general: {
+          titleStyle: 'small',
+          palette: { name: 'sequential_blue', version: '2.0', customColorsOrdered: ['#123456'] }
+        },
+        legend: { type: 'equalinterval', numberOfItems: 5, showSpecialClassesLast: true },
+        table: { expanded: false }
+      },
+      'map-palette-version-2-1'
+    ]
+  ])('does not offer the Palette 2.1 upgrade to %s configs with custom colors', (type, config, optionId) => {
+    const recipe = getModernizationRecipe({ type, ...config })
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).not.toContain(optionId)
   })
 
   it.each([
@@ -2820,10 +3245,19 @@ describe('modernizationRecipes', () => {
   })
 
   it('keeps chart and map palette upgrades separate across nested and multidashboard visualizations', () => {
-    const paletteConfig = (type: 'chart' | 'map', version: '1.0' | '2.0') => ({
-      type,
-      general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } }
-    })
+    const paletteConfig = (type: 'chart' | 'map', version: '1.0' | '2.0') =>
+      type === 'chart'
+        ? {
+            type,
+            visualizationType: 'Line',
+            series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
+            general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } }
+          }
+        : {
+            type,
+            general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } },
+            legend: { type: 'equalinterval', numberOfItems: 5 }
+          }
     const originalConfig = {
       type: 'dashboard',
       dashboard: { titleStyle: 'small' },
@@ -2921,7 +3355,7 @@ describe('modernizationRecipes', () => {
       titleStyle: 'small',
       yAxis: { titlePlacement: 'top', numTicks: 4, min: 0, hideAxis: true, hideTicks: true, gridLines: true },
       isResponsiveTicks: false,
-      xAxis: { type: 'date-time', numTicks: 3, viewportNumTicks: { xs: 2, xxs: 1 } },
+      xAxis: { type: 'date-time', numTicks: '', viewportNumTicks: {} },
       table: { expanded: false },
       legend: { position: 'top', singleRow: true },
       dataFormat: { commas: true }

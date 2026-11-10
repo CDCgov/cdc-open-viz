@@ -2,8 +2,10 @@ import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
 import { MapConfig } from '../types/MapConfig'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { withDotDensityColumns } from '../helpers/dotDensityConfig'
 
-export const createTooltipBuilder = (config: MapConfig) => {
+export const createTooltipBuilder = (sourceConfig: MapConfig) => {
+  const config = withDotDensityColumns(sourceConfig)
   /**
    * On county maps there's a need to append the state name
    * @param {String} toolTipText - previous tooltip text to build upon
@@ -63,10 +65,11 @@ export const createTooltipBuilder = (config: MapConfig) => {
 
     const prefix = handleTooltipPrefix('')
 
-    if (hideGeoColumnInTooltip) return `<strong>${displayGeoName(geoName, displayOverride)}</strong>`
+    if (hideGeoColumnInTooltip) return `<strong>${displayGeoName(geoName, displayOverride, config.locale)}</strong>`
     return `<p class="tooltip-heading" style="text-transform: none;">${prefix}${displayGeoName(
       geoName,
-      displayOverride
+      displayOverride,
+      config.locale
     )}</p>`
   }
 
@@ -103,7 +106,7 @@ export const createTooltipBuilder = (config: MapConfig) => {
 
     if (column.name === config.columns.geo.name) {
       const displayOverride = row?.[config.columns.geo?.displayColumn]
-      return displayGeoName(row[column.name], displayOverride)
+      return displayGeoName(row[column.name], displayOverride, config.locale)
     }
 
     return displayDataAsText(row[column.name], columnKey, config)

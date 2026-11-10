@@ -47,13 +47,13 @@
   }
 
   .viewport-overrides {
-    button {
+    & button {
       width: 100%;
       padding: 1em;
       margin-top: 1em;
       text-align: left;
 
-      span {
+      & span {
         float: right;
       }
     }

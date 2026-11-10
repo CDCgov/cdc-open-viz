@@ -313,4 +313,41 @@ export const HeatMap_Horizontal_Scroll_Bottom_Axis_Demo: Story = {
   }
 }
 
+export const HeatMap_QA_Spacing_And_Cell_Values: Story = {
+  args: {
+    config: {
+      ...heatMapAverageAgeCategoricalConfig,
+      heights: { ...heatMapAverageAgeCategoricalConfig.heights, vertical: 600 },
+      xAxis: { ...heatMapAverageAgeCategoricalConfig.xAxis, size: 0, tickRotation: 0, maxTickRotation: 0 },
+      heatmap: {
+        ...heatMapAverageAgeCategoricalConfig.heatmap,
+        rowLabelGap: 18,
+        columnLabelGap: 20,
+        xAxisPosition: 'bottom',
+        showCellValues: true
+      }
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cdc-heatmap__cell-value', canvasElement)
+    const cell = canvasElement.querySelector('.visx-heatmap-rect') as SVGRectElement
+    const svg = cell.ownerSVGElement as SVGSVGElement
+    const rowLabel = svg.querySelector('.visx-axis-left text') as SVGTextElement
+    const title = getSvgText(svg, 'Community Type') as SVGTextElement
+    const values = Array.from(svg.querySelectorAll<SVGTextElement>('.cdc-heatmap__cell-value'))
+
+    expect(Number(cell.getAttribute('x'))).toBe(0)
+    expect(Number(rowLabel.getAttribute('x'))).toBe(-26)
+    expect(svg.getBoundingClientRect().bottom - title.getBoundingClientRect().bottom).toBeLessThan(16)
+    expect(title.getBoundingClientRect().bottom).toBeLessThan(svg.getBoundingClientRect().bottom)
+    expect(values.length).toBeGreaterThan(0)
+    for (const value of values) {
+      expect(Number(value.getAttribute('font-size'))).toBe(16)
+      expect(value.getBoundingClientRect().width).toBeLessThan(cell.getBoundingClientRect().width)
+    }
+  }
+}
+
 export default meta

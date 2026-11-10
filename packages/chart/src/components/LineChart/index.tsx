@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useId } from 'react'
 
 // VisX library imports
 import * as allCurves from '@visx/curve'
@@ -26,6 +26,7 @@ import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
 
 const LineChart = (props: LineChartProps) => {
+  const lineRaceMaskPrefix = `line-race-reveal-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
   // prettier-ignore
   const {
     getXAxisData,
@@ -63,6 +64,8 @@ const LineChart = (props: LineChartProps) => {
   const { yScaleRight } = useRightAxis({ config, yMax, data: dataForRightAxis, updateConfig })
   const showSingleSeries = config.tooltips.singleSeries
   const isLineRace = typeof lineRaceProgress === 'number'
+  const normalizedLineRaceProgress =
+    isLineRace && Number.isFinite(lineRaceProgress) ? Math.min(Math.max(lineRaceProgress, 0), 1) : 0
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
@@ -84,6 +87,7 @@ const LineChart = (props: LineChartProps) => {
           const seriesData = config.runtime.series.find(item => item.dataKey === seriesKey)
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
+          const lineRaceMaskId = `${lineRaceMaskPrefix}-${index}`
           const seriesAxis = seriesData.axis || 'left'
           const seriesColor = colorScale(config.runtime.seriesLabels[seriesKey])
           const displayArea =
@@ -116,18 +120,19 @@ const LineChart = (props: LineChartProps) => {
           )
 
           // Prepare sorted data for line and area rendering
-          const sortedData =
-            config.visualizationType == 'Bump Chart'
-              ? _data
-              : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
-              ? _data.sort((d1, d2) => {
-                  let x1 = getXAxisData(d1)
-                  let x2 = getXAxisData(d2)
-                  if (x1 < x2) return -1
-                  if (x2 < x1) return 1
-                  return 0
-                })
-              : _data
+          const sortedData = isLineRace
+            ? [..._data].sort((d1, d2) => xPos(d1) - xPos(d2))
+            : config.visualizationType == 'Bump Chart'
+            ? _data
+            : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
+            ? _data.sort((d1, d2) => {
+                let x1 = getXAxisData(d1)
+                let x2 = getXAxisData(d2)
+                if (x1 < x2) return -1
+                if (x2 < x1) return 1
+                return 0
+              })
+            : _data
 
           return (
             <Group
@@ -396,8 +401,31 @@ const LineChart = (props: LineChartProps) => {
                     })}
 
                   {/* STANDARD LINE */}
+                  {isLineRace && (
+                    <mask id={lineRaceMaskId} maskUnits='userSpaceOnUse'>
+                      <LinePath
+                        data-line-race-reveal-path
+                        pathLength={1}
+                        curve={allCurves[seriesData.lineType]}
+                        data={sortedData}
+                        x={d => xPos(d)}
+                        y={d =>
+                          seriesAxis === 'Right'
+                            ? yScaleRight(getYAxisData(d, _seriesKey))
+                            : yScale(Number(getYAxisData(d, _seriesKey)))
+                        }
+                        fill='none'
+                        stroke='white'
+                        strokeWidth={(seriesData.weight || 2) + 2}
+                        strokeDasharray={`${normalizedLineRaceProgress} 1`}
+                        defined={(item, i) => {
+                          return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                        }}
+                      />
+                    </mask>
+                  )}
                   <LinePath
-                    pathLength={isLineRace ? 1 : undefined}
+                    data-line-race-series-path={isLineRace ? true : undefined}
                     curve={allCurves[seriesData.lineType]}
                     data={sortedData}
                     x={d => xPos(d)}
@@ -410,7 +438,8 @@ const LineChart = (props: LineChartProps) => {
                     strokeWidth={seriesData.weight || 2}
                     strokeOpacity={1}
                     shapeRendering='geometricPrecision'
-                    strokeDasharray={isLineRace ? `${lineRaceProgress} 1` : lineType ? handleLineType(lineType) : 0}
+                    strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                    mask={isLineRace ? `url(#${lineRaceMaskId})` : undefined}
                     defined={(item, i) => {
                       return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}

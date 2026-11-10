@@ -1,5 +1,10 @@
+import {
+  getLocationHighlighter,
+  isLocationHighlighterEligible,
+  buildLocationOptions
+} from './helpers/locationHighlighter'
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import parse from 'html-react-parser'
@@ -28,7 +33,6 @@ import './cdcMapComponent.styles.css'
 
 // Core Helpers
 import {
-  getQueryStringFilterValue,
   isFilterHiddenByQuery,
   removeQueryParam,
   updateQueryParam,
@@ -39,6 +43,7 @@ import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
 // Map Helpers
 import { addUIDs } from './helpers/addUIDs'
@@ -61,20 +66,27 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { normalizeDotDensityLegend, withDotDensityColumns } from './helpers/dotDensityConfig'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
-import { getTimePlaybackEligibility, projectTimePlaybackFrame } from './helpers/timePlayback'
+import {
+  DEFAULT_TIME_PLAYBACK_NOTE,
+  getTimePlaybackEligibility,
+  projectTimePlaybackFrame
+} from './helpers/timePlayback'
 
 // Child Components
 import Annotation from './components/Annotation'
 import ConfigContext, { MapDispatchContext } from './context'
-import EditorPanel from './components/EditorPanel'
 import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
-import { TimePlaybackSlider, TimePlaybackTransport } from './components/TimePlaybackControls'
+import LocationHighlighter from './components/LocationHighlighter'
+import { getLocationLinks, hasLocationLinkColumn } from './helpers/locationLinks'
+import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
+import { useLocationHighlighterData } from './hooks/useLocationHighlighterData'
 import useResizeObserver from './hooks/useResizeObserver'
 import useLegendMemo from './hooks/useLegendMemo'
 import usePrefersReducedMotion from '@cdc/core/hooks/usePrefersReducedMotion'
@@ -94,7 +106,12 @@ import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
-import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
+import {
+  getMissingRequiredMapFields,
+  getMapDensitySourceColumns,
+  type MissingRequiredMapField
+} from './helpers/getMissingRequiredMapFields'
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcMapComponent = {
   config: MapConfig
@@ -132,8 +149,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
-  const initialState = getInitialState(effectiveConfig)
+  const normalizedConfig = normalizeDotDensityLegend(configObj)
+  const effectiveConfig = configIsPrepared ? normalizedConfig : applyConfigDefaults(normalizedConfig, defaults)
+  const initialState = getInitialState({ ...effectiveConfig, ...(configObj.data ? { data: configObj.data } : {}) })
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
@@ -144,6 +162,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
     config,
     modal,
     accessibleStatus,
@@ -166,12 +185,19 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     [config, runtimeFilters]
   )
   const playbackFrames = timePlaybackEligibility.frames
+  const initialTimeFrameIndex = timePlaybackEligibility.eligible
+    ? Math.max(
+        0,
+        playbackFrames.findIndex(frame => String(frame) === String(timePlaybackEligibility.initialFrame))
+      )
+    : 0
+  const [selectedLocationId, setSelectedLocationId] = useState('')
   const [timeFrameIndex, setTimeFrameIndex] = useState<number | null>(null)
   const [isTimePlaybackPlaying, setIsTimePlaybackPlaying] = useState(false)
   const [hasTimePlaybackStarted, setHasTimePlaybackStarted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
   const resolvedTimeFrameIndex = timePlaybackEligibility.eligible
-    ? Math.min(timeFrameIndex ?? playbackFrames.length - 1, playbackFrames.length - 1)
+    ? Math.min(timeFrameIndex ?? initialTimeFrameIndex, playbackFrames.length - 1)
     : 0
   const currentTimeFrame = playbackFrames[resolvedTimeFrameIndex]
   const playbackFrameData = useMemo(
@@ -214,16 +240,42 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const editorContext = useContext(EditorContext)
 
   const setConfig = (newMapConfig: MapConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
+    const normalized = normalizeDotDensityLegend(newMapConfig)
+    dispatch({ type: 'SET_CONFIG', payload: normalized })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newMapConfig)
+      editorContext.setTempConfig(normalized)
     }
   }
 
+  const synchronizedConfig = useRef({
+    data: configObj.data,
+    dataMetadata: configObj.dataMetadata,
+    configIsPrepared,
+    filtersHash: hashObj(configObj.filters)
+  })
   useEffect(() => {
-    const configClone = cloneConfig(configObj)
+    const previous = synchronizedConfig.current
+    if (
+      previous.data === configObj.data &&
+      previous.dataMetadata === configObj.dataMetadata &&
+      previous.configIsPrepared === configIsPrepared
+    )
+      return
+
+    const filtersHash = hashObj(configObj.filters)
+    synchronizedConfig.current = {
+      data: configObj.data,
+      dataMetadata: configObj.dataMetadata,
+      configIsPrepared,
+      filtersHash
+    }
+    const configClone = normalizeDotDensityLegend(cloneConfig(configObj))
     const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
-    const _newConfig = getInitialState(effectiveConfig).config
+    // Refresh data/metadata without reapplying load defaults. Explicit incoming filter changes still win.
+    const _newConfig = {
+      ...effectiveConfig,
+      filters: filtersHash === previous.filtersHash ? config.filters : effectiveConfig.filters
+    }
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
@@ -261,10 +313,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    setTimeFrameIndex(timePlaybackEligibility.eligible ? playbackFrames.length - 1 : null)
+    setTimeFrameIndex(timePlaybackEligibility.eligible ? initialTimeFrameIndex : null)
     setIsTimePlaybackPlaying(false)
     setHasTimePlaybackStarted(false)
-  }, [playbackSignature])
+  }, [initialTimeFrameIndex, playbackSignature, timePlaybackEligibility.eligible])
 
   useEffect(() => {
     if (!timePlaybackEligibility.eligible || !isTimePlaybackPlaying) return
@@ -278,7 +330,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
     const timer = window.setInterval(() => {
       setTimeFrameIndex(currentIndex => {
-        const index = currentIndex ?? playbackFrames.length - 1
+        const index = currentIndex ?? initialTimeFrameIndex
         if (index >= playbackFrames.length - 1) {
           setIsTimePlaybackPlaying(false)
           return index
@@ -292,6 +344,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return () => window.clearInterval(timer)
   }, [
     config.timePlayback?.secondsPerFrame,
+    initialTimeFrameIndex,
     isTimePlaybackPlaying,
     playbackFrames.length,
     timePlaybackEligibility.eligible
@@ -321,7 +374,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipId = 'tooltipId'
 
   // hooks
-  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
+  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(
+    isEditor,
+    config.showEditorPanel
+  )
 
   useEffect(() => {
     const mapContainer = mapSvg.current as HTMLElement | null
@@ -373,10 +429,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
       if (filters) {
         filters.forEach((filter: VizFilter, index: number) => {
-          const queryStringFilterValue = getQueryStringFilterValue(filter)
-          if (queryStringFilterValue) {
-            filters[index].active = queryStringFilterValue
-          }
           if (isFilterHiddenByQuery(filter)) {
             filters[index].showDropdown = false
           }
@@ -524,6 +576,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   let title = config.general.title
   let processedSuperTitle = general.superTitle
   let processedSubtext = subtext
+  let processedTimePlaybackNote = config.timePlayback?.note ?? DEFAULT_TIME_PLAYBACK_NOTE
   let processedIntroText = introText
   let processedFootnotes = general.footnotes
 
@@ -558,6 +611,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         markupOptions
       ).processedContent
     }
+    if (processedTimePlaybackNote) {
+      processedTimePlaybackNote = processMarkupVariables(
+        processedTimePlaybackNote,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
     if (introText) {
       processedIntroText = processMarkupVariables(
         introText,
@@ -582,6 +643,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   if (!table.label || table.label === '') table.label = 'Data Table'
   const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
+  const mapDataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
+  const mediaFilenameFallback = resolveCsvDownloadFileName({
+    config,
+    dataConfig: mapDataConfig,
+    vizTitle: general.title
+  }).replace(/\.csv$/i, '')
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
 
   const sharedTitleProps = {
@@ -644,7 +711,34 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
+  const densitySourceColumns = useMemo(
+    () => getMapDensitySourceColumns({ data: config.data, dataKey: config.dataKey }, datasets),
+    [config.data, config.dataKey, datasets]
+  )
+
+  const locationLinks = getLocationLinks(config)
+  const highlighterSettings = getLocationHighlighter(config)
+  const locationHighlighterData = useLocationHighlighterData({
+    config,
+    runtimeData,
+    sourceData: playbackFrameData ?? [],
+    runtimeFilters: timePlaybackEligibility.eligible
+      ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+      : runtimeFilters
+  })
+  const highlightedLocationId =
+    isLocationHighlighterEligible(config) &&
+    highlighterSettings.enabled &&
+    highlighterSettings.highlightSelectedLocation &&
+    locationHighlighterData &&
+    buildLocationOptions(locationHighlighterData.config, locationHighlighterData.runtimeData).some(
+      option => option.id === selectedLocationId
+    )
+      ? selectedLocationId
+      : ''
+
   const mapProps = {
+    selectedLocationId: highlightedLocationId,
     setParentConfig,
     container,
     content: modal,
@@ -666,6 +760,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
+    hiddenDensitySeries,
+    densitySourceColumns,
     scale,
     setConfig,
     setFilteredStateCountyCode,
@@ -701,6 +797,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     preparedConfig = preparedBubbleTable.config
     preparedColumns = preparedBubbleTable.columns
     preparedRuntimeData = preparedBubbleTable.runtimeData
+    preparedConfig = withDotDensityColumns(preparedConfig)
+    preparedColumns = preparedConfig.columns
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
@@ -776,18 +874,40 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const showLocationHighlighter = isLocationHighlighterEligible(config) && highlighterSettings.enabled
+
+  const locationHighlighter =
+    showLocationHighlighter && locationHighlighterData ? (
+      <LocationHighlighter
+        config={locationHighlighterData.config}
+        runtimeData={locationHighlighterData.runtimeData}
+        sourceData={locationHighlighterData.sourceData}
+        runtimeFilters={locationHighlighterData.runtimeFilters}
+        isEditor={isEditor}
+        onSelectionChange={setSelectedLocationId}
+      />
+    ) : null
+
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
 
   const revealRequiredMapField = ({ target, subsectionTarget }: MissingRequiredMapField) => {
     const revealTarget = () => {
+      if (target === 'map-dot-density-count') {
+        const densityButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-dot-density']")
+        if (densityButton?.getAttribute('aria-expanded') !== 'true') densityButton?.click()
+        window.requestAnimationFrame(() =>
+          container?.querySelector<HTMLElement>("[data-required-field-control='map-dot-density-count']")?.focus()
+        )
+        return
+      }
       const columnsButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-columns']")
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 
       window.requestAnimationFrame(() => {
-        const subsectionButton = container?.querySelector<HTMLElement>(
-          `[data-required-field-subsection='${subsectionTarget}']`
-        )
+        const subsectionButton = subsectionTarget
+          ? container?.querySelector<HTMLElement>(`[data-required-field-subsection='${subsectionTarget}']`)
+          : null
         if (subsectionButton?.getAttribute('aria-expanded') !== 'true') subsectionButton?.click()
 
         window.requestAnimationFrame(() => {
@@ -847,7 +967,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             ref={outerContainerRef}
             currentViewport={currentViewport}
             imageId={imageId}
-            editorPanel={<EditorPanel datasets={datasets} />}
+            editorPanel={
+              isEditor ? (
+                <Suspense fallback={null}>
+                  <EditorPanel datasets={datasets} />
+                </Suspense>
+              ) : null
+            }
           >
             {isEditor && missingRequiredMapFields.length > 0 && (
               <section className='map-required-fields-alerts' aria-label='Required map fields'>
@@ -878,6 +1004,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
+                beforeContent={highlighterSettings.position === 'above' ? locationHighlighter : null}
+                beforeFooter={highlighterSettings.position === 'below' ? locationHighlighter : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,
@@ -911,6 +1039,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 bodySubtext={
                   processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
                 }
+                bodyAnnotations={config.annotations?.length > 0 ? <Annotation.Dropdown /> : null}
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -919,11 +1048,19 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {mapDataTableIsRendered ? (
                       <DataTable
+                        mapLinkSettings={
+                          general.type === 'data'
+                            ? {
+                                enabled: hasLocationLinkColumn(config) && locationLinks.enableDataTableLinks,
+                                target: general.navigationTarget
+                              }
+                            : undefined
+                        }
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
-                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
-                        displayGeoName={displayGeoName}
+                        dataConfig={mapDataConfig}
+                        displayGeoName={(key, displayOverride) => displayGeoName(key, displayOverride, config.locale)}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
                           formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
@@ -962,6 +1099,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                             {showDownloadPdfButton && (
@@ -972,14 +1110,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                           </MediaControls.Section>
                         </div>
                       )
                     )}
-
-                    {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                     {processedFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
@@ -1000,16 +1137,22 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
 
                   {timePlaybackEligibility.eligible && currentTimeFrame !== undefined && (
-                    <TimePlaybackTransport
+                    <TimePlaybackControls
                       currentFrame={currentTimeFrame}
+                      frameIndex={resolvedTimeFrameIndex}
+                      frames={playbackFrames}
                       isAtEnd={hasTimePlaybackStarted && resolvedTimeFrameIndex === playbackFrames.length - 1}
                       isAtLast={resolvedTimeFrameIndex === playbackFrames.length - 1}
                       isAtStart={resolvedTimeFrameIndex === 0}
                       isPlaying={isTimePlaybackPlaying}
+                      isMobileLayout={currentViewport === 'xs' || currentViewport === 'xxs'}
+                      note={processedTimePlaybackNote || undefined}
                       showPreviousNextButtons={config.timePlayback?.showPreviousNextButtons ?? true}
+                      showSlider={config.timePlayback?.showSlider ?? true}
                       onNext={() => handleTimeScrub(resolvedTimeFrameIndex + 1)}
                       onPlayback={handleTimePlayback}
                       onPrevious={() => handleTimeScrub(resolvedTimeFrameIndex - 1)}
+                      onScrub={handleTimeScrub}
                     />
                   )}
 
@@ -1053,21 +1196,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     )}
                   </div>
 
-                  {timePlaybackEligibility.eligible &&
-                    currentTimeFrame !== undefined &&
-                    (config.timePlayback?.showSlider ?? true) && (
-                      <TimePlaybackSlider
-                        currentFrame={currentTimeFrame}
-                        frameIndex={resolvedTimeFrameIndex}
-                        frames={playbackFrames}
-                        onScrub={handleTimeScrub}
-                      />
-                    )}
-
                   {'navigation' === general.type && (
                     <NavigationMenu
                       mapTabbingID={tabId}
-                      displayGeoName={displayGeoName}
+                      displayGeoName={(key, displayOverride) => displayGeoName(key, displayOverride, config.locale)}
                       data={runtimeData}
                       options={general}
                       columns={config.columns}

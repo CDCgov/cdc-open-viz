@@ -1,21 +1,31 @@
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { createDefaultDotDensityConfig } from '../helpers/dotDensityConfig'
 
-// Dynamic initial state based on migration flag
 const createInitialState = () => {
-  const paletteDefaults = USE_V2_MIGRATION
-    ? {
-        isReversed: false,
-        name: 'sequential_blue',
-        version: '2.1'
-      }
-    : {
-        isReversed: true,
-        name: 'bluegreen',
-        version: '1.0'
-      }
+  const paletteDefaults = {
+    isReversed: false,
+    name: 'sequential_blue',
+    version: '2.1'
+  }
 
   return {
+    dotDensity: createDefaultDotDensityConfig(),
     annotations: [],
+    locationLinks: {
+      enableMapNavigation: false,
+      enableDataTableLinks: true
+    },
+    locationHighlighter: {
+      enabled: false,
+      position: 'above',
+      highlightSelectedLocation: true,
+      note: '',
+      showResetButton: true,
+      resetButtonLabel: 'Reset',
+      details: '',
+      dropdownLabel: 'Select a location for more information',
+      placeholder: '- Select -',
+      filterColumn: ''
+    },
     general: {
       navigationTarget: '_self',
       noDataMessage: 'No State Selected',
@@ -103,7 +113,7 @@ const createInitialState = () => {
       caption: '',
       showDownloadUrl: false,
       downloadUrlLabel: '',
-      showDataTableLink: true,
+      showDataTableLink: false,
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
@@ -137,28 +147,7 @@ const createInitialState = () => {
       geoCodeCircleSize: 8
     },
     bubble: {
-      layers: [
-        {
-          label: '',
-          locationSource: 'data-column',
-          minBubbleSize: 12,
-          maxBubbleSize: 20,
-          extraBubbleBorder: true,
-          showBubbleZeros: false,
-          legend: {
-            show: true,
-            size: {
-              show: true
-            }
-          },
-          columns: {
-            geo: { name: '' },
-            latitude: { name: '' },
-            longitude: { name: '' },
-            primary: { name: '' }
-          }
-        }
-      ]
+      layers: []
     },
     mapPosition: { coordinates: [0, 30], zoom: 1 },
     map: {

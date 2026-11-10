@@ -1,3 +1,4 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import type { GeoGeometryObjects } from 'd3-geo'
@@ -10,10 +11,15 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import usExtendedGeography from '../data/us-extended-geography.json'
 import useMapLayers from '../../../hooks/useMapLayers'
-import ConfigContext from '../../../context'
+import ConfigContext, { MapDispatchContext } from '../../../context'
+import { CountyDotDensityContext } from '../../../context/CountyDotDensityContext'
+import { drawCountyDotDensity } from '../../../helpers/countyDotDensityLayer'
+import type { DotDensityGeometry } from '../../../helpers/dotDensity'
+import useCountyDotDensity from '../../../hooks/useCountyDotDensity'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { isLegendItemDisabled } from '../../../helpers/isLegendItemDisabled'
@@ -27,10 +33,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
+import { isCountyGeographyIncluded, isCountyShapeSupported } from '../../../helpers/countyGeography'
 import {
   getCountyTerritoryVisibility,
   type CountyTerritoryVisibility,
-  US_TERRITORY_STATE_FIPS_PREFIXES
+  isCountyTerritoryGeographyIncluded
 } from '../../../helpers/countyTerritories'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
@@ -76,7 +83,9 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        response = unwrapJsonModule(
+          await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        )
       } else {
         response = await response.json()
       }
@@ -101,39 +110,12 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
       )
       topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
       // Additional filtering removes territory features that may still be present in the topology data when territories are hidden.
-      if (!territoryVisibility.showTerritories) {
-        topoData.states = topoData.states.filter(state => {
-          const statePrefix = state.id?.substring(0, 2)
-          if (statePrefix === '72') return showPuertoRico
-          return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
-        })
-        topoData.counties = topoData.counties.filter(county => {
-          const countyPrefix = county.id?.substring(0, 2)
-          if (countyPrefix === '72') return showPuertoRico
-          if (showPuertoRico) {
-            return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
-          }
-
-          return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
-        })
-      } else if (!territoryVisibility.showAllTerritories) {
-        topoData.states = topoData.states.filter(state => {
-          const statePrefix = state.id?.substring(0, 2)
-          return (
-            !statePrefix ||
-            !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix) ||
-            territoryVisibility.statePrefixes.has(statePrefix)
-          )
-        })
-        topoData.counties = topoData.counties.filter(county => {
-          const countyPrefix = county.id?.substring(0, 2)
-          return (
-            !countyPrefix ||
-            !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix) ||
-            territoryVisibility.countyIds.has(county.id)
-          )
-        })
-      }
+      topoData.states = topoData.states.filter(state =>
+        isCountyTerritoryGeographyIncluded(state.id, territoryVisibility, showPuertoRico)
+      )
+      topoData.counties = topoData.counties.filter(county =>
+        isCountyTerritoryGeographyIncluded(county.id, territoryVisibility, showPuertoRico)
+      )
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
@@ -159,7 +141,7 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
       }
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
-      topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
+      topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => isCountyShapeSupported(geo.id))
       topoData.states.forEach(state => {
         let minIndex = topoData.mapData.length - 1
         let maxIndex = 0
@@ -235,6 +217,8 @@ const isTopoReady = (topoData, config: MapConfig, runtimeFilters) => {
 }
 
 const CountyMap = () => {
+  const previewDotDensity = useContext(CountyDotDensityContext)
+  const dispatch = useContext(MapDispatchContext)
   const {
     container,
     containerEl,
@@ -245,11 +229,15 @@ const CountyMap = () => {
     filteredStateCode,
     setFilteredStateCountyCode,
     filteredCountyCode,
+    hiddenDensitySeries = [],
+    densitySourceColumns,
     config,
     tooltipId,
     tooltipRef,
     interactionLabel
   } = useContext(ConfigContext)
+
+  const initialStateCode = previewDotDensity?.initialStateCode
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -258,6 +246,18 @@ const CountyMap = () => {
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [topoData, setTopoData] = useState<TopoData>({} as TopoData)
+  const { dotDensity, densityLayer } = useCountyDotDensity(
+    config,
+    runtimeData as unknown as Record<string, Record<string, unknown>>,
+    topoData.mapData as unknown as DotDensityGeometry[],
+    previewDotDensity,
+    hiddenDensitySeries,
+    densitySourceColumns
+  )
+  useEffect(() => {
+    if (initialStateCode !== undefined)
+      dispatch({ type: 'SET_FILTERED_STATE_COUNTY_CODE', payload: { stateCode: initialStateCode, countyCode: '' } })
+  }, [initialStateCode, dispatch])
   const focus = useMemo(() => {
     if (!isTopoReady(topoData, config, runtimeFilters) || !filteredStateCode) return {} as Focus
     const stateGeo = topoData.states.find(state => state.id === filteredStateCode)
@@ -292,7 +292,7 @@ const CountyMap = () => {
       currentYear,
       config.general.showHSABoundaries,
       territoryVisibility,
-      config.migrations.showPuertoRico
+      config.migrations?.showPuertoRico
     ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
@@ -354,6 +354,7 @@ const CountyMap = () => {
   const zoomTransformRef = useRef(d3ZoomIdentity)
   const zoomBehaviorRef = useRef()
   const zoomFrameRef = useRef<number | null>(null)
+  const renderFrameRef = useRef<() => void>(() => {})
   const geoPathCacheRef = useRef<Map<string, Path2D>>(new Map())
   const geoPathCacheKeyRef = useRef('')
 
@@ -438,17 +439,18 @@ const CountyMap = () => {
     strokeWidth?: number,
     strokeColor?: string
   ) => {
+    const backgroundFill = dotDensity ? '#F5F6F7' : DEFAULT_MAP_BACKGROUND
     const legendValues =
       geoData !== undefined
-        ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo, backgroundFill)
         : false
 
     const baseFill =
       legendValues && config.general.type !== 'us-geocode'
         ? legendValues[0] === '#000000'
-          ? DEFAULT_MAP_BACKGROUND
+          ? backgroundFill
           : legendValues[0]
-        : DEFAULT_MAP_BACKGROUND
+        : backgroundFill
 
     context.fillStyle = baseFill
     context.fill(path2d)
@@ -458,7 +460,7 @@ const CountyMap = () => {
 
       if (patternInfo) {
         const { pattern, size, color } = patternInfo
-        const patternColor = color || '#000000'
+        const patternColor = resolvePatternColor(color, baseFill)
         const patternSize = size ?? 10
         const patternStrokeWidth = canvasWidth < 200 ? 1.75 : canvasWidth < 375 ? 1.25 : 0.75
         const cacheKey = `${pattern}-${patternColor}-${patternSize}-${patternStrokeWidth}`
@@ -567,7 +569,7 @@ const CountyMap = () => {
     if (zoomFrameRef.current) return
     zoomFrameRef.current = window.requestAnimationFrame(() => {
       zoomFrameRef.current = null
-      renderFrame()
+      renderFrameRef.current()
     })
   }
 
@@ -886,7 +888,9 @@ const CountyMap = () => {
   // Sets up canvas dimensions and projection, rebuilds the Path2D cache only when geometry changes, then renders.
   // Called on data change, resize, focus change — NOT during zoom/pan.
   const drawCanvas = () => {
-    if (canvasRef.current && runtimeLegend.items.length > 0) {
+    // Zoom listeners also need the latest closure when every layer is disabled.
+    renderFrameRef.current = renderFrame
+    if (canvasRef.current && (runtimeLegend.items?.length > 0 || densityLayer)) {
       const canvas = canvasRef.current
       const canvasWidth = canvas.clientWidth
       if (canvasWidth <= 0) return
@@ -920,7 +924,7 @@ const CountyMap = () => {
   // Fast render using cached Path2D objects — called during zoom/pan for smooth performance.
   // Skips canvas resize and projection setup; only applies the current zoom transform and redraws.
   const renderFrame = () => {
-    if (!canvasRef.current || !runtimeLegend.items.length || !topoData.mapData) return
+    if (!canvasRef.current || (!runtimeLegend.items?.length && !densityLayer) || !topoData.mapData) return
 
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
@@ -949,10 +953,7 @@ const CountyMap = () => {
     let countyHighlight = null
     topoData.mapData.forEach(geo => {
       if (!geo.id) return
-      const hideCounty =
-        !config.general.showNeighboringStates && focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0
-      if (hideCounty) return
-      if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
+      if (!isCountyGeographyIncluded(config, geo.id, focus.id)) return
 
       const path2d = cache.get(geo.id)
       if (!path2d) return
@@ -970,6 +971,35 @@ const CountyMap = () => {
       }
       paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
+
+    if (densityLayer && dotDensity) {
+      // Paint selection fill before dots; keep the existing boundary layers above them.
+      if (countyHighlight) {
+        const { context, path2d, geoData, canvasWidth, strokeWidth, strokeColor } = countyHighlight
+        paintCountyGeo(context, path2d, geoData, canvasWidth, strokeWidth, strokeColor)
+        countyHighlight = null
+      }
+      drawCountyDotDensity(
+        context,
+        topoData.projection,
+        densityLayer,
+        dotDensity.radius,
+        zoomScale,
+        dotDensity.hiddenSeries,
+        id => !focus.id || config.general.showNeighboringStates || id.startsWith(focus.id)
+      )
+      const densityCanvas = context.canvas as HTMLCanvasElement
+      densityCanvas.dataset.zoomScale = String(zoomScale)
+      densityCanvas.dataset.zoomTransform = getZoomTransformString()
+      if (filteredCountyCode) {
+        const selected = cache.get(filteredCountyCode)
+        if (selected) {
+          context.strokeStyle = '#000000'
+          context.lineWidth = 2 * strokeScale
+          context.stroke(selected)
+        }
+      }
+    }
 
     let hsaHighlight = null
     if (config.general.showHSABoundaries) {
@@ -1149,7 +1179,40 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
+  }, [
+    isLoading,
+    topoData,
+    focus,
+    runtimeLegend,
+    runtimeData,
+    featureArray,
+    config,
+    filteredCountyCode,
+    densityLayer,
+    dotDensity
+  ])
+
+  const previousDensityRef = useRef(false)
+  useEffect(() => {
+    if (previousDensityRef.current && !densityLayer && canvasRef.current) {
+      const canvas = canvasRef.current as HTMLCanvasElement
+      if (!runtimeLegend.items?.length) canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
+      ;['drawnDots', 'seriesCounts', 'positionSignature', 'densityError'].forEach(key => delete canvas.dataset[key])
+    }
+    previousDensityRef.current = Boolean(densityLayer)
+  }, [densityLayer, runtimeLegend])
+
+  const densityStatus =
+    densityLayer && dotDensity
+      ? densityLayer.error ||
+        (!Number.isFinite(dotDensity.radius) || dotDensity.radius <= 0
+          ? 'Choose a positive, finite dot radius.'
+          : dotDensity.hiddenSeries.length === dotDensity.settings.series.length
+          ? previewDotDensity
+            ? 'No diseases selected.'
+            : 'No count series selected.'
+          : '')
+      : ''
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
@@ -1158,6 +1221,10 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
+      {densityStatus && <p role='status'>{densityStatus}</p>}
+      {densityLayer?.skippedValues > 0 && (
+        <p role='status'>{densityLayer.skippedValues.toLocaleString()} missing or invalid count values omitted.</p>
+      )}
       {isLoading && (
         <div style={{ height: 300 }}>
           <Loading />

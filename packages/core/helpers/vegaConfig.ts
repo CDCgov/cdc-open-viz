@@ -1,9 +1,11 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
-import _ from 'lodash'
-import { compile as vegaLiteCompile } from 'vega-lite'
+import difference from 'lodash/difference'
+import lodashGroupBy from 'lodash/groupBy'
 import { parse as vegaParse, View as vegaView } from 'vega'
 import { CURRENT_COVE_CONFIG_VERSION } from './coveUpdateWorker'
+
+export { parseVegaConfig } from './parseVegaConfig'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -107,13 +109,6 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
   return warnings
 }
 
-export const parseVegaConfig = vegaConfig => {
-  try {
-    vegaConfig = vegaLiteCompile(vegaConfig).spec
-  } catch {}
-  return vegaConfig
-}
-
 export const getVegaConfigType = vegaConfig => {
   if (vegaConfig.projections) {
     return 'Map'
@@ -169,14 +164,14 @@ const getStack = vegaConfig => {
 }
 
 const groupByMultiple = (array, keys) => {
-  return _.groupBy(array, item => keys.map(key => item[key]).join('-'))
+  return lodashGroupBy(array, item => keys.map(key => item[key]).join('-'))
 }
 
 const getGroupedData = (data, groupBy) => {
   if (groupBy.length > 1) {
     return groupByMultiple(data, groupBy)
   }
-  return _.groupBy(data, groupBy[0])
+  return lodashGroupBy(data, groupBy[0])
 }
 
 const getMaxGroupSize = (data, groupBy) => {
@@ -212,7 +207,7 @@ export const extractCoveData = vegaConfig => {
 
   if (!facetName) {
     const otherNames = [...new Set(getMarks(vegaConfig).map(m => m.from?.data))].filter(n => n)
-    _.difference(otherNames, [name]).forEach(on => {
+    difference(otherNames, [name]).forEach(on => {
       let mergedData
       const otherData = getVegaData(vegaConfig, on)
       const keys1 = Object.keys(data[0]).filter(k => new Set(data.map(d => d[k])).size === data.length)
@@ -290,9 +285,9 @@ const getSeriesKey = (vegaConfig, data, xField, yField) => {
 
   const stack = getStack(vegaConfig)
   if (stack) {
-    const groupBy = _.difference(stack.groupby, [xField, yField])
+    const groupBy = difference(stack.groupby, [xField, yField])
     if (getMaxGroupSize(data, groupBy) > 1) {
-      let possibleKeys = _.difference(Object.keys(data[0]), [xField, yField])
+      let possibleKeys = difference(Object.keys(data[0]), [xField, yField])
       const groupSizes = Object.fromEntries(possibleKeys.map(k => [k, getMaxGroupSize(data, [...groupBy, ...[k]])]))
       possibleKeys = possibleKeys.filter(k => groupSizes[k] > 1 && isValidSeriesKey(k, data))
       if (possibleKeys.length) {

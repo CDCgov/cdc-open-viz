@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import pick from 'lodash/pick'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
@@ -27,7 +28,7 @@ const getFootnotesVizConfig = (
   visualizationKey: string
 ) => {
   if (!visualizationConfig?.footnotes) return visualizationConfig
-  const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
+  const data = cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
   const dataColumns = data?.length ? Object.keys(data[0]) : []
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
@@ -65,7 +66,7 @@ export const getVizConfig = (
   }
   if (rowData?.dataKey) {
     // data configured on the row
-    Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
+    Object.assign(visualizationConfig, pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
 
   const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {

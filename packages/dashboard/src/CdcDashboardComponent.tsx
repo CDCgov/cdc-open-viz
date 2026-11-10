@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo, useReducer, useContext, useRef } from 'react'
+import React, { Suspense, lazy, useState, useEffect, useCallback, useMemo, useReducer, useContext, useRef } from 'react'
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
-
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import parse from 'html-react-parser'
 
@@ -19,14 +16,11 @@ import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
-import Grid from './components/Grid'
-import Header from './components/Header'
 import MediaControls from '@cdc/core/components/MediaControls'
 import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
 import './scss/main.scss'
 
-import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'
 import { isFilterAtResetState, isQueryStringUrlFilter } from './helpers/filterData'
@@ -62,10 +56,13 @@ import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
-import DashboardEditors from './components/DashboardEditors'
-import { DashboardCopyPasteProvider } from './DashboardCopyPasteContext'
 import { updateChildFilters } from './helpers/updateChildFilters'
 import { getColumnWidgetEntries } from './helpers/dashboardColumnWidgets'
+const VisualizationsPanel = lazy(() => import('./components/VisualizationsPanel'))
+const DashboardEditors = lazy(() => import('./components/DashboardEditors'))
+const DashboardEditorProviders = lazy(() => import('./components/DashboardEditorProviders'))
+const Grid = lazy(() => import('./components/Grid'))
+const Header = lazy(() => import('./components/Header'))
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -549,19 +546,21 @@ export default function CdcDashboard({
         body = (
           <>
             <Header visualizationKey={visualizationKey} subEditor={true} />
-            <DashboardEditors
-              key={visualizationKey}
-              visualizationKey={visualizationKey}
-              visualizationConfig={visualizationConfig}
-              _updateConfig={_updateConfig}
-              isDebug={isDebug}
-              setSharedFilter={setSharedFilter}
-              clearSharedFilter={clearSharedFilter}
-              hasActiveSharedFilter={hasActiveSharedFilter}
-              apiFilterDropdowns={apiFilterDropdowns}
-              state={state}
-              interactionLabel={interactionLabel}
-            />
+            <Suspense fallback={null}>
+              <DashboardEditors
+                key={visualizationKey}
+                visualizationKey={visualizationKey}
+                visualizationConfig={visualizationConfig}
+                _updateConfig={_updateConfig}
+                isDebug={isDebug}
+                setSharedFilter={setSharedFilter}
+                clearSharedFilter={clearSharedFilter}
+                hasActiveSharedFilter={hasActiveSharedFilter}
+                apiFilterDropdowns={apiFilterDropdowns}
+                state={state}
+                interactionLabel={interactionLabel}
+              />
+            </Suspense>
           </>
         )
       }
@@ -569,14 +568,16 @@ export default function CdcDashboard({
 
     if (!subVisualizationEditing) {
       body = (
-        <DashboardCopyPasteProvider>
-          <DndProvider backend={HTML5Backend}>
+        <Suspense fallback={null}>
+          <DashboardEditorProviders>
             {apiLoading && <Loader fullScreen={true} />}
             <Header displayMode='tabs' />
             <Header displayMode='body' />
             <div className='dashboard-editor-layout'>
               <div className='header-container'>
-                <VisualizationsPanel />
+                <Suspense fallback={null}>
+                  <VisualizationsPanel />
+                </Suspense>
               </div>
 
               <div className='dashboard-editor-workspace'>
@@ -585,8 +586,8 @@ export default function CdcDashboard({
                 </div>
               </div>
             </div>
-          </DndProvider>
-        </DashboardCopyPasteProvider>
+          </DashboardEditorProviders>
+        </Suspense>
       )
     }
   } else {
@@ -775,7 +776,7 @@ export default function CdcDashboard({
             ref={outerContainerRef}
             renderResponsive={false}
           >
-            {body}
+            <Suspense fallback={null}>{body}</Suspense>
           </VisualizationContainer>
           <OverlayFrame />
         </DashboardDispatchContext.Provider>

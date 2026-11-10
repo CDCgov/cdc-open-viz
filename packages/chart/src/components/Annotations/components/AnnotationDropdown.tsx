@@ -3,12 +3,10 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
-  const isMobile = isMobileAnnotationViewport(viewport)
 
   const limitHeight: React.CSSProperties = {
     maxHeight: config.table.limitHeight ? `${config.table.height}px` : undefined,
@@ -24,24 +22,9 @@ const AnnotationDropdown = () => {
     return classNames.join(' ')
   }
 
-  const handleSectionClasses = () => {
-    const classes = [`data-table-container`, viewport, `w-100`]
-
-    // When mobile annotations show full text on the chart, the auto mobile dropdown is suppressed.
-    // The dropdown then follows showAnnotationDropdown only (matching desktop behavior).
-    const mobileShowsText = config.general?.mobileAnnotationDisplay === 'text'
-
-    if ((isMobile && !mobileShowsText) || config.general.showAnnotationDropdown) {
-      classes.push('d-block')
-    } else {
-      classes.push('d-none')
-    }
-    return classes.join(' ')
-  }
-
   return (
     <>
-      <section className={handleSectionClasses()}>
+      <section className={`data-table-container ${viewport} w-100`}>
         <button
           type='button'
           className={handleAccordionClassName()}

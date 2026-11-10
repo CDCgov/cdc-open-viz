@@ -1,5 +1,5 @@
 import React from 'react'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { isCoveDeveloperMode } from '../../helpers/queryStringUtils'
 import {
   hasPaletteBackup, 
@@ -63,7 +63,7 @@ const DeveloperPaletteRollback: React.FC<DeveloperPaletteRollbackProps> = ({
     const confirmRollback = window.confirm(confirmMessage)
 
     if (confirmRollback) {
-      const configCopy = _.cloneDeep(config)
+      const configCopy = cloneDeep(config)
       console.log('Config before rollback:', JSON.stringify(configCopy, null, 2))
       
       let success = false

@@ -124,7 +124,7 @@ const generateMedia = (
   const normalizeImageFileNameBase = value => value.replace(/\s+/g, '-').toLowerCase()
 
   const handleFileName = state => {
-    const title = getTitle(state)
+    const title = getTitle(state)?.trim()
     if (title) return `${normalizeImageFileNameBase(title)}-${timestamp}`
 
     if (imageFilenameFallback) return `${normalizeImageFileNameBase(imageFilenameFallback)}-${timestamp}`
@@ -163,7 +163,7 @@ const generateMedia = (
         try {
           await waitForClonedImages(container)
 
-          const html2canvas = (await import(/* webpackChunkName: "html2canvas" */ 'html2canvas')).default
+          const html2canvas = (await import(/* webpackChunkName: "html2canvas" */ '@cdc/core/helpers/html2canvas.js')).default
           const canvas = await html2canvas(container, {
             ignoreElements: el => shouldIgnoreScreenshotElement(el, container),
             useCORS: true,

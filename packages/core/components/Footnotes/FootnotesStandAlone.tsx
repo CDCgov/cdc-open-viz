@@ -1,6 +1,6 @@
 import Footnotes from './Footnotes'
 import FootnotesConfig, { Footnote } from '../../types/Footnotes'
-import _ from 'lodash'
+import pick from 'lodash/pick'
 import { useMemo } from 'react'
 import { filterVizData } from '../../helpers/filterVizData'
 import { VizFilter } from '../../types/VizFilter'
@@ -57,7 +57,7 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({
     const configData = filters && filters.length > 0 ? filterVizData(filters, config.data) : config.data
     if (configData && config.dataKey && config.dynamicFootnotes) {
       const { symbolColumn, textColumn, orderColumn } = config.dynamicFootnotes
-      const _data = configData.map(row => _.pick(row, [symbolColumn, textColumn, orderColumn]))
+      const _data = configData.map(row => pick(row, [symbolColumn, textColumn, orderColumn]))
       _data.sort((a, b) => a[orderColumn] - b[orderColumn])
       return _data.map(row => ({
         symbol: row[symbolColumn],

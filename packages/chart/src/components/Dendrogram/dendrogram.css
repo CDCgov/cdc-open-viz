@@ -1,4 +1,12 @@
 .dendrogram-chart__container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.dendrogram-chart__plot {
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
 }
 
@@ -63,15 +71,30 @@
 }
 
 .dendrogram-chart__label {
-  dominant-baseline: middle;
   fill: currentcolor;
-  font-size: 0.75rem;
+  font-size: 16px;
   pointer-events: none;
 }
 
-.dendrogram-chart__label--vertical {
-  dominant-baseline: hanging;
-  text-anchor: middle;
+.dendrogram-chart__link-key {
+  align-items: center;
+  display: flex;
+  flex: 0 0 32px;
+  font-size: 12px;
+  gap: 1rem;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.dendrogram-chart__link-key-item {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.35rem;
 }
 
 .dendrogram-chart__message {

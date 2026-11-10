@@ -38,6 +38,7 @@ export const MapImageDownloadUsesTableFilenameFallback: Story = {
       { path: ['general', 'showDownloadImgButton'], value: true },
       { path: ['table', 'download'], value: true },
       { path: ['table', 'downloadFileName'], value: 'Map Table Report.csv' },
+      { path: ['table', 'forceDisplay'], value: false },
       { path: ['table', 'showDownloadLinkBelow'], value: false }
     ])
   },
@@ -49,6 +50,33 @@ export const MapImageDownloadUsesTableFilenameFallback: Story = {
     const downloadName = await captureImageDownloadName(downloadButton)
 
     expect(downloadName).toMatch(/^map-table-report-\d{4}-\d{2}-\d{2}\.png$/)
+  }
+}
+
+export const DashboardMapImageDownloadUsesDatasetFilenameFallback: Story = {
+  args: {
+    config: editConfigKeys(cityStateConfig, [
+      { path: ['general', 'title'], value: '' },
+      { path: ['general', 'showTitle'], value: false },
+      { path: ['general', 'showDownloadImgButton'], value: true },
+      { path: ['dataKey'], value: 'map-dataset' },
+      { path: ['table', 'downloadFileName'], value: '' },
+      { path: ['table', 'forceDisplay'], value: false }
+    ]),
+    datasets: {
+      'map-dataset': {
+        dataUrl: '/wcms/vizdata/dashboard-map.json'
+      }
+    } as any
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const canvas = within(canvasElement)
+    const downloadButton = await canvas.findByRole('button', { name: 'Download Map as Image' })
+    const downloadName = await captureImageDownloadName(downloadButton)
+
+    expect(downloadName).toMatch(/^dashboard-map-\d{4}-\d{2}-\d{2}\.png$/)
   }
 }
 

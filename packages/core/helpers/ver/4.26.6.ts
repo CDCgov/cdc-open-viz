@@ -1,6 +1,7 @@
 import cloneConfig from '../cloneConfig'
 import type { CoveMigrationContext } from './migrationContext'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import isEqual from 'lodash/isEqual'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import { SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { sanitizeToSvgId } from '../cove/string'
@@ -284,9 +285,9 @@ const hasRuntimeActiveDashboard = (config: DashboardLike) => {
   }
 
   return (
-    _.isEqual(activeDashboard?.dashboard, config.dashboard) &&
-    _.isEqual(activeDashboard?.rows, config.rows) &&
-    _.isEqual(activeDashboard?.visualizations, config.visualizations)
+    isEqual(activeDashboard?.dashboard, config.dashboard) &&
+    isEqual(activeDashboard?.rows, config.rows) &&
+    isEqual(activeDashboard?.visualizations, config.visualizations)
   )
 }
 
@@ -303,9 +304,9 @@ const runDashboardTableMigration = (config: DashboardLike) => {
   migrateDashboardDownloads(config)
 
   if (hasActiveDashboard) {
-    config.dashboard = _.cloneDeep(config.dashboard)
-    config.rows = _.cloneDeep(config.rows)
-    config.visualizations = _.cloneDeep(config.visualizations)
+    config.dashboard = cloneDeep(config.dashboard)
+    config.rows = cloneDeep(config.rows)
+    config.visualizations = cloneDeep(config.visualizations)
     migrateDashboardTables(config)
   }
 

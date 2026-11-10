@@ -8,6 +8,11 @@ import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { getBridgedData } from '../../helpers/getBridgedData'
 import { buildForecastPaletteMappings } from '../../helpers/buildForecastPaletteMappings'
+import {
+  getForecastConfidenceIntervalKey,
+  getForecastLegendKey,
+  isForecastLegendSelectionActive
+} from '../../helpers/forecastLegend'
 
 // visx & d3
 import { curveMonotoneX } from '@visx/curve'
@@ -148,10 +153,6 @@ const Forecasting = ({ xScale, yScale, height, width, yAxisWidth, handleTooltipM
             if (!group || !group.stages) return false
             return group.stages.map((stage, stageIndex) => {
               const { behavior } = legend
-              let transparentArea =
-                behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stage.key) === -1
-              let displayArea =
-                behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stage.key) !== -1
               const bridgedData = getBridgedData(stage.key, group.stageColumn, rawData)
 
               return (
@@ -162,6 +163,10 @@ const Forecasting = ({ xScale, yScale, height, width, yAxisWidth, handleTooltipM
                   {group.confidenceIntervals?.map((ciGroup, ciGroupIndex) => {
                     const palette = forecastingPalettes[stage.color] || false
                     const isReversed = stage.color?.toLowerCase().includes('reverse')
+                    const intervalKey = getForecastConfidenceIntervalKey(group.confidenceIntervals, ciGroupIndex)
+                    const isActive = isForecastLegendSelectionActive(seriesHighlight, stage.key, intervalKey)
+                    const transparentArea = behavior === 'highlight' && seriesHighlight.length > 0 && !isActive
+                    const displayArea = behavior === 'highlight' || isActive
 
                     const getFill = () => {
                       if (displayArea) return palette?.[2] || 'transparent'
@@ -186,6 +191,10 @@ const Forecasting = ({ xScale, yScale, height, width, yAxisWidth, handleTooltipM
                           / /g,
                           '—'
                         )}--group-${stageIndex}-${ciGroupIndex}`}
+                        data-forecast-legend-key={
+                          intervalKey ? getForecastLegendKey(stage.key, intervalKey) : stage.key
+                        }
+                        data-forecast-active={isActive ? 'true' : 'false'}
                       >
                         {dataSegments.map((segment, segmentIndex) => (
                           <Group key={`segment-${segmentIndex}`}>

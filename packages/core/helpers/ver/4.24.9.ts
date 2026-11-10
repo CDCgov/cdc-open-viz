@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 import { AnyVisualization } from '../../types/Visualization'
 import { VizFilter } from '../../types/VizFilter'

@@ -15,6 +15,7 @@ describe('createNewMapConfig', () => {
     expect(config).toMatchObject({
       type: 'map',
       version: CURRENT_COVE_CONFIG_VERSION,
+      locationHighlighter: { enabled: false, highlightSelectedLocation: true },
       general: {
         geoType: 'us',
         equalNumberOptIn: true,
@@ -29,9 +30,10 @@ describe('createNewMapConfig', () => {
       legend: {
         position: 'top',
         style: 'gradient',
+        singleRow: false,
         showSpecialClassesLast: true
       },
-      table: { download: true, expanded: false, stickyFirstColumn: false },
+      table: { download: true, expanded: false, showDataTableLink: false, stickyFirstColumn: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -67,10 +69,22 @@ describe('createNewMapConfig', () => {
     expect(config.bubble.layers).not.toBe(layers)
   })
 
+  it.each([{}, { bubble: { layers: [] } }])('starts with no bubble layers: %j', starter => {
+    const config = createNewMapConfig({ type: 'map', ...starter })
+    expect(config.bubble.layers).toEqual([])
+    expect(createNewMapConfig(JSON.parse(JSON.stringify(config))).bubble.layers).toEqual([])
+  })
+
   it('preserves an explicit table download opt-out', () => {
     const config = createNewMapConfig({ type: 'map', table: { download: false } })
 
     expect(config.table.download).toBe(false)
+  })
+
+  it('preserves an explicit dashboard data table link opt-in', () => {
+    const config = createNewMapConfig({ type: 'map', table: { showDataTableLink: true } })
+
+    expect(config.table.showDataTableLink).toBe(true)
   })
 
   it('preserves an explicit palette instead of replacing it with the map default', () => {
@@ -81,5 +95,6 @@ describe('createNewMapConfig', () => {
 
     expect(config.general.palette).toMatchObject({ name: 'qualitative_bold', isReversed: true, version: '2.1' })
     expect(defaults.general.palette.name).toBe('sequential_blue')
+    expect(defaults.general.palette.version).toBe('2.1')
   })
 })

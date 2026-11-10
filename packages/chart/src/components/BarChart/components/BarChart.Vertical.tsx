@@ -1,3 +1,4 @@
+import { isBarLegendSelectionActive } from '../../../helpers/barLegendHighlight'
 import React, { useContext } from 'react'
 // Local contexts
 import ConfigContext from '../../../ConfigContext'
@@ -33,6 +34,7 @@ const BarChartVertical = () => {
     barBorderWidth,
     getAdditionalColumn,
     formatTooltipValue,
+    getCustomValueLabel,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
     labelFontSize,
@@ -179,14 +181,9 @@ const BarChartVertical = () => {
                     config.xAxis.type === 'date'
                       ? HighLightedBarUtils.formatDates(highlightedBarValues)
                       : highlightedBarValues
-                  const transparentBar =
-                    config.legend.behavior === 'highlight' &&
-                    seriesHighlight.length > 0 &&
-                    seriesHighlight.indexOf(bar.key) === -1
-                  const displayBar =
-                    config.legend.behavior === 'highlight' ||
-                    seriesHighlight.length === 0 ||
-                    seriesHighlight.indexOf(bar.key) !== -1
+                  const isSelected = isBarLegendSelectionActive(config, seriesHighlight, bar.key, dataValue)
+                  const transparentBar = config.legend.behavior === 'highlight' && !isSelected
+                  const displayBar = config.legend.behavior === 'highlight' || isSelected
 
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
                   let defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
@@ -266,7 +263,15 @@ const BarChartVertical = () => {
                     ? barBorderWidth
                     : 0
 
-                  const barDefaultLabel = isSuppressed || absentDataLabel || !config.labels ? '' : yAxisValue
+                  const customValueLabel = getCustomValueLabel(bar.key, dataValue, barGroup.index)
+                  const hasCustomValueLabel = customValueLabel !== undefined && isNumber(bar.value) && !isSuppressed
+                  const barDefaultLabel = hasCustomValueLabel
+                    ? config.labels
+                      ? customValueLabel
+                      : ''
+                    : isSuppressed || absentDataLabel || !config.labels
+                    ? ''
+                    : yAxisValue
                   const barY = getBarY(defaultBarY, yScale(scaleVal))
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -493,7 +498,7 @@ const BarChartVertical = () => {
                           textAnchor='middle'
                           fontSize={labelFontSize}
                         >
-                          {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                          {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
                         <Text // prettier-ignore
                           display={displayBar ? 'block' : 'none'}
@@ -504,7 +509,7 @@ const BarChartVertical = () => {
                           textAnchor='middle'
                           fontSize={config.isLollipopChart ? null : labelFontSize}
                         >
-                          {absentDataLabel}
+                          {hasCustomValueLabel ? '' : absentDataLabel}
                         </Text>
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle

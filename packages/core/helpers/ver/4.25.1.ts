@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 
 const removeTerritoriesLabel = config => {

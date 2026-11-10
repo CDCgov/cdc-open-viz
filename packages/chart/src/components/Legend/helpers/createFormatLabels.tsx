@@ -23,6 +23,8 @@ import sortBy from 'lodash/sortBy'
 import { scaleSequential } from 'd3-scale'
 import { interpolateRgbBasis } from 'd3-interpolate'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import chroma from 'chroma-js'
+import { getForecastConfidenceIntervalGroups, getForecastLegendKey } from '../../../helpers/forecastLegend'
 
 export const createFormatLabels =
   (
@@ -253,6 +255,7 @@ export const createFormatLabels =
     // get forecasting items inside of combo
     if (runtime?.forecastingSeriesKeys?.length > 0) {
       let seriesLabels = []
+      let hasExpandedForecastIntervals = false
 
       // Create palette lookup map - use version-specific palettes
       // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
@@ -278,19 +281,43 @@ export const createFormatLabels =
 
       //store unique values to Set by colorCode
       // loop through each stage/group/area on the chart and create a label
-      config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
-        return outerGroup?.stages?.map((stage, index) => {
+      config.runtime?.forecastingSeriesKeys?.map(outerGroup => {
+        const confidenceIntervalLabels =
+          legend.expandForecastConfidenceIntervals === true
+            ? getForecastConfidenceIntervalGroups(outerGroup?.confidenceIntervals)
+            : []
+
+        const stages = outerGroup?.stages || []
+
+        if (confidenceIntervalLabels.length) {
+          hasExpandedForecastIntervals = true
+          confidenceIntervalLabels.forEach(confidenceInterval => {
+            stages.forEach(stage => {
+              const palette = forecastingPalettes[stage.color] || false
+              const colorValue = palette?.[2] || '#ccc'
+
+              seriesLabels.push({
+                datum: getForecastLegendKey(stage.key, confidenceInterval.key),
+                index: seriesLabels.length,
+                text: `${confidenceInterval.label} ${stage.key}`,
+                value: chroma(colorValue).alpha(confidenceInterval.opacity).css()
+              })
+            })
+          })
+
+          return
+        }
+
+        return stages.map(stage => {
           const palette = forecastingPalettes[stage.color] || false
           let colorValue = palette?.[2] || '#ccc'
 
-          const newLabel = {
+          seriesLabels.push({
             datum: stage.key,
-            index: index,
+            index: seriesLabels.length,
             text: stage.key,
             value: colorValue
-          }
-
-          seriesLabels.push(newLabel)
+          })
         })
       })
 
@@ -312,7 +339,7 @@ export const createFormatLabels =
           seriesLabels.push(newLabel)
         })
 
-      return reverseLabels(seriesLabels)
+      return hasExpandedForecastIntervals ? seriesLabels : reverseLabels(seriesLabels)
     }
 
     // For Radar charts, use the entity names from runtime.seriesKeys (set from xAxis.dataKey values)

@@ -1,17 +1,64 @@
 // Content Align Classes
-@mixin align($propNames, $className, $valueName) {
-  @each $propName in $propNames {
-    #{'.align-' + $propName + '-' + $className} {
-      #{'align-' + $propName}: #{$valueName} !important;
-    }
-  }
+.align-content-start {
+  align-content: flex-start !important;
 }
 
-@include align(('content', 'items', 'self'), 'start', 'flex-start');
-@include align(('content', 'items', 'self'), 'end', 'flex-end');
-@include align(('content', 'items', 'self'), 'center', 'center');
-@include align(('content', 'items', 'self'), 'stretch', 'stretch');
+.align-items-start {
+  align-items: flex-start !important;
+}
 
-@include align(('items', 'self'), 'baseline', 'baseline');
-@include align('content', 'around', 'space-around');
-@include align('content', 'between', 'space-between');
+.align-self-start {
+  align-self: flex-start !important;
+}
+
+.align-content-end {
+  align-content: flex-end !important;
+}
+
+.align-items-end {
+  align-items: flex-end !important;
+}
+
+.align-self-end {
+  align-self: flex-end !important;
+}
+
+.align-content-center {
+  align-content: center !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.align-self-center {
+  align-self: center !important;
+}
+
+.align-content-stretch {
+  align-content: stretch !important;
+}
+
+.align-items-stretch {
+  align-items: stretch !important;
+}
+
+.align-self-stretch {
+  align-self: stretch !important;
+}
+
+.align-items-baseline {
+  align-items: baseline !important;
+}
+
+.align-self-baseline {
+  align-self: baseline !important;
+}
+
+.align-content-around {
+  align-content: space-around !important;
+}
+
+.align-content-between {
+  align-content: space-between !important;
+}

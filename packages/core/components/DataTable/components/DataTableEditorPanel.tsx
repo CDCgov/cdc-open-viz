@@ -11,7 +11,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
 import VizFilterEditor from '../../EditorPanel/VizFilterEditor'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import FootnotesEditor from '../../EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 
@@ -25,7 +25,7 @@ type DataTableEditorProps = {
 const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig, datasets, isDashboard = false }) => {
   const updateField = useMemo(() => updateFieldFactory(config, updateConfig), [JSON.stringify(config)])
   const deleteColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     delete newColumns[columnName]
 

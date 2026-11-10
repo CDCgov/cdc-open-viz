@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import uniq from 'lodash/uniq'
 import { timeParse } from 'd3-time-format'
 import {
   MarkupVariable,
@@ -156,7 +157,7 @@ export const processMarkupVariables = (
   }
 
   // Early return for invalid inputs
-  if (_.isEmpty(markupVariables) || !content) {
+  if (isEmpty(markupVariables) || !content) {
     return {
       processedContent: content || '',
       shouldHideSection: false,
@@ -173,7 +174,7 @@ export const processMarkupVariables = (
       sourceColumn: string,
       mappings: NonNullable<MarkupVariable['svgMappings']>
     ): SvgRegistryId[] => {
-      const uniqueValues = _.uniq(
+      const uniqueValues = uniq(
         (dataRows || [])
           .map(row => row?.[sourceColumn])
           .filter(value => value !== undefined && value !== null)
@@ -298,7 +299,7 @@ export const processMarkupVariables = (
         }
 
         // Extract values with error handling
-        const variableValues: string[] = _.uniq(
+        const variableValues: string[] = uniq(
           (conditionFilteredData || []).map(dataObject => {
             try {
               const dataObjectValue = dataObject[effectiveColumnName]

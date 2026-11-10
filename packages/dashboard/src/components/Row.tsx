@@ -19,7 +19,7 @@ import { DashboardConditionSummary } from './DashboardConditionSummary'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Button from '@cdc/core/components/elements/Button'
 import { iconHash } from '../helpers/iconHash'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
@@ -34,7 +34,7 @@ type RowMenuProps = {
 const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
-  const rows = _.cloneDeep(config.rows)
+  const rows = cloneDeep(config.rows)
   const row = config.rows[rowIdx]
 
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
@@ -49,7 +49,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }, [row])
 
   const setRowLayout = (layout: number[], toggle = undefined) => {
-    const newRows = _.cloneDeep(rows)
+    const newRows = cloneDeep(rows)
     newRows[rowIdx].toggle = toggle
     const rowColumns = newRows[rowIdx].columns
     const columnsWithWidgets = rowColumns.filter(c => getColumnWidgetKeys(c).length > 0)
@@ -79,7 +79,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   }
 
   const toggleEqualHeight = () => {
-    const newRows = _.cloneDeep(rows)
+    const newRows = cloneDeep(rows)
     newRows[rowIdx].equalHeight = !newRows[rowIdx].equalHeight
     updateConfig({ ...config, rows: newRows })
   }

@@ -54,7 +54,7 @@ Core repo areas:
 | `scripts/` | Repo utility scripts such as package usage CSV export. |
 | `patches/` | `patch-package` patches applied after install. |
 | `.vscode/` | Discoverable tasks and MCP server definitions for Storybook and Playwright. |
-| `.agents/` and `_bmad/` | AI/BMad workflow support files for this repo. |
+| `.agents/` and `_bmad/` | SI/BMad workflow support files for this repo. |
 
 The monorepo is managed by root `package.json` workspaces (`packages/*`) and `lerna.json`
 with independent package versions.

@@ -1,5 +1,7 @@
-import { cloneDeep, mergeWith } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import mergeWith from 'lodash/mergeWith'
 
+import { normalizeDotDensityLegend } from './dotDensityConfig'
 import defaults from '../data/initial-state'
 import { MapConfig } from '../types/MapConfig'
 import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
@@ -10,8 +12,10 @@ import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
  * backfill paths instead of using this helper.
  */
 export const createNewMapConfig = (starterConfig: Partial<MapConfig> & Record<string, any>): MapConfig => {
-  const config = mergeWith(cloneDeep(defaults), cloneDeep(starterConfig), (_defaultValue, starterValue) =>
-    Array.isArray(starterValue) ? starterValue : undefined
+  const config = mergeWith(
+    cloneDeep(defaults),
+    cloneDeep(normalizeDotDensityLegend(starterConfig as MapConfig)),
+    (_defaultValue, starterValue) => (Array.isArray(starterValue) ? starterValue : undefined)
   ) as MapConfig
   config.table.download = starterConfig.table?.download ?? true
   config.version = CURRENT_COVE_CONFIG_VERSION

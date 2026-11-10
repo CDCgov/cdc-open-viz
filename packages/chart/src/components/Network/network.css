@@ -1,4 +1,12 @@
 .network-chart__container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.network-chart__plot {
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
 }
 
@@ -53,10 +61,34 @@
   stroke-dasharray: 12 8;
 }
 
+.network-chart__link-key-line {
+  fill: none;
+}
+
 .network-chart__label {
-  dominant-baseline: middle;
-  font-size: 0.75rem;
+  font-size: 16px;
   pointer-events: none;
+}
+
+.network-chart__link-key {
+  align-items: center;
+  display: flex;
+  flex: 0 0 32px;
+  font-size: 12px;
+  gap: 1rem;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.network-chart__link-key-item {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.35rem;
 }
 
 .network-chart__message {

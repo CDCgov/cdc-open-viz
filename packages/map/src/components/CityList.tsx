@@ -1,3 +1,6 @@
+import useMapHighlight from '../hooks/useMapHighlight'
+import { MAP_DIMMED_OPACITY } from '../helpers/mapHighlight'
+import { canNavigateMap } from '../helpers/locationLinks'
 import { useContext, useMemo } from 'react'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
@@ -12,14 +15,14 @@ import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { getColumnNames } from '../helpers/getColumnNames'
 
 type CityListProps = {
-  setSharedFilterValue: string
-  isFilterValueSupported: boolean
   tooltipId: string
   projection: any
+  highlightedOnly?: boolean
 }
 
-const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
+const CityList: React.FC<CityListProps> = ({ tooltipId, projection, highlightedOnly }) => {
   const { config, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
+  const { isDimmed, isHighlighted } = useMapHighlight()
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -33,7 +36,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     return Object.keys(runtimeData).reduce((acc, key) => {
       const city = runtimeData[key]
       if (city && city[geoColumnName]) {
-        acc[city[geoColumnName]] = city
+        acc[key] = city
       }
       return acc
     }, {})
@@ -50,19 +53,22 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   }
 
   // Early exit if no cities to render
-  if (!cityList.length) {
+  if (!cityList.length || (highlightedOnly === true && !isDimmed())) {
     return null
   }
 
   // Cities output
-  return cityList.map((city, i) => {
+  return cityList.map(cityId => {
     // Get the city data directly from our memoized citiesData
-    const geoData = citiesData[city]
+    const geoData = citiesData[cityId]
+    if (highlightedOnly !== undefined && isHighlighted(cityId, geoData?.[geoColumnName]) !== highlightedOnly)
+      return null
 
     if (!geoData) {
       return null
     }
 
+    const city = String(geoData[geoColumnName])
     const cityDisplayName = displayGeoName(city)
 
     const legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -84,7 +90,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       fillOpacity: 1
     }
 
-    const geoStrokeColor = getGeoStrokeColor(config)
+    const highlighted = isHighlighted(cityId, geoData[geoColumnName])
+    const geoStrokeColor = highlighted ? '#000000' : getGeoStrokeColor(config)
+    const markerStrokeWidth = highlighted ? '3px' : '2px'
 
     const pin = (
       <g>
@@ -97,7 +105,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
           data-tooltip-html={toolTip}
           transform={`scale(${radius / 7.5})`}
           stroke={geoStrokeColor}
-          strokeWidth={'2px'}
+          strokeWidth={markerStrokeWidth}
           tabIndex={-1}
           {...additionalProps}
         />
@@ -128,8 +136,18 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       // We just need to project the coordinates and apply zoom adjustment
       const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       const projectedCoords = projection(coords)
+
+      if (
+        !Array.isArray(projectedCoords) ||
+        projectedCoords.length < 2 ||
+        !projectedCoords.slice(0, 2).every(Number.isFinite)
+      ) {
+        return null
+      }
+
+      const [projectedX, projectedY] = projectedCoords
       const zoomScale = (position as any).zoom > 1 ? 1 / (position as any).zoom : 1
-      transform = `translate(${projectedCoords}) scale(${zoomScale})`
+      transform = `translate(${projectedX},${projectedY}) scale(${zoomScale})`
       needsPointer = true
     }
 
@@ -139,14 +157,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const styles = {
       fill: legendColors[0],
-      opacity: !isFilterValueSupported || (isFilterValueSupported && city === setSharedFilterValue) ? 1 : 0.5,
-      stroke:
-        setSharedFilterValue &&
-        isFilterValueSupported &&
-        runtimeData[city] &&
-        runtimeData[city][config.columns.geo.name] === setSharedFilterValue
-          ? 'rgba(0, 0, 0, 1)'
-          : 'rgba(0, 0, 0, 0.4)',
+      // Match the canonical runtime ID, independently of source casing or display labels.
+      opacity: isDimmed(cityId, geoData[geoColumnName]) ? MAP_DIMMED_OPACITY : 1,
+      stroke: geoStrokeColor,
       '&:hover': {
         fill: legendColors[1],
         outline: 0
@@ -160,7 +173,10 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     // If we need to add a cursor pointer
     if (
-      (config.columns.navigate && geoData?.[config.columns.navigate.name] && geoData[config.columns.navigate.name]) ||
+      (canNavigateMap(config) &&
+        config.columns.navigate &&
+        geoData?.[config.columns.navigate.name] &&
+        geoData[config.columns.navigate.name]) ||
       config.tooltips.appearanceType === 'click'
     ) {
       styles.cursor = 'pointer'
@@ -172,7 +188,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
       stroke: geoStrokeColor,
-      strokeWidth: '2px',
+      strokeWidth: markerStrokeWidth,
       tabIndex: -1,
       ...additionalProps
     }
@@ -203,7 +219,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     // Render the city marker
     return (
-      <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
+      <g key={cityId} data-city-id={cityId} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
         {cityStyleShapes[shapeToUse]}
       </g>
     )

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 
 export const removeMultiSelectPropFromMultiselect = newConfig => {

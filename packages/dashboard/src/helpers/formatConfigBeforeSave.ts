@@ -2,7 +2,8 @@ import Footnotes from '@cdc/core/types/Footnotes'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { removeDashboardFilter } from './removeDashboardFilter'
-import _ from 'lodash'
+import omit from 'lodash/omit'
+import uniq from 'lodash/uniq'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 const cleanDashboardFootnotes = (config: DashboardConfig) => {
@@ -30,7 +31,7 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
   }
   if (config.visualizations) {
     Object.keys(config.visualizations).forEach(vizKey => {
-      config.visualizations[vizKey] = _.omit(config.visualizations[vizKey], [
+      config.visualizations[vizKey] = omit(config.visualizations[vizKey], [
         'runtime',
         'formattedData',
         'data',
@@ -44,7 +45,7 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
   if (config.rows) {
     config.rows.forEach((row, i) => {
       if (row.dataKey) {
-        config.rows[i] = _.omit(row, ['data', 'formattedData'])
+        config.rows[i] = omit(row, ['data', 'formattedData'])
       }
     })
   }
@@ -53,7 +54,7 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
 export const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
     const recursiveRemoveFilters = (sharedFilters, visualizations: Record<string, AnyVisualization>) => {
-      const usedFilters = _.uniq(
+      const usedFilters = uniq(
         Object.values(visualizations ?? {}).reduce((acc: number[], viz) => {
           if (viz.type === 'dashboardFilters') {
             acc = acc.concat((viz.sharedFilterIndexes ?? []).map(Number))

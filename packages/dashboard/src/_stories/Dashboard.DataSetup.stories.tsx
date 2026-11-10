@@ -164,7 +164,7 @@ export const MultiVizConfigurationWorkflow: Story = {
       // ========================================================================
       await sleep(500)
 
-      const gearMultiButton = canvas.getByRole('button', { name: /gearMulti/i })
+      const gearMultiButton = await canvas.findByRole('button', { name: /gearMulti/i }, { timeout: 5000 })
       await user.click(gearMultiButton)
       await sleep(500)
 

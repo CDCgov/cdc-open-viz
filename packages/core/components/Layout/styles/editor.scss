@@ -1,8 +1,5 @@
 @import '../../../styles/utils/properties';
 
-$editorAnimationTimer: 400ms;
-$mediumGray: #e6e6e6;
-
 @import 'editor-grid-view.scss';
 
 .cove-editor {
@@ -14,17 +11,15 @@ $mediumGray: #e6e6e6;
   max-height: 100%;
   overflow: hidden;
   isolation: isolate;
-
-  @at-root {
-    .cove-dashboard #{&} {
-      height: calc(100vh - 3rem);
-    }
-
-    .cove-tabs #{&} {
-      // height: calc(100vh - #{$wizardTabsHeight});
-    }
-  }
 }
+
+.cove-dashboard .cove-editor {
+  height: calc(100vh - 3rem);
+}
+
+// .cove-tabs .cove-editor {
+//   height: calc(100vh - #{$wizardTabsHeight});
+// }
 
 .cove-editor__toggle {
   position: absolute;
@@ -74,16 +69,14 @@ $mediumGray: #e6e6e6;
   // padding-top: 2.5rem;
   background-color: #fff;
   //border-right: 1px solid #c2c2c2;
-  transition: width $editorAnimationTimer ease;
+  transition: width var(--editorAnimationTimer) ease;
   overflow: hidden;
   box-shadow: 1px 0 0 rgb(0 0 0 / 15%);
   z-index: 7;
+}
 
-  @at-root {
-    .cove-editor {
-      width: var(--editorWidth);
-    }
-  }
+.cove-editor {
+  width: var(--editorWidth);
 }
 
 // .cove-editor__panel-heading {
@@ -129,9 +122,8 @@ $mediumGray: #e6e6e6;
   overflow: hidden auto;
   width: calc(100% - var(--editorWidth));
   left: var(--editorWidth);
-  @at-root {
-    .cove-editor.panel-shown #{&} {
-      background-color: #e7e7e7;
-    }
-  }
+}
+
+.cove-editor.panel-shown .cove-editor__content {
+  background-color: #e7e7e7;
 }

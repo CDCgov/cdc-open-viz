@@ -10,7 +10,7 @@ describe('layoutNetwork', () => {
     ],
     { source: 'source', target: 'target', weight: 'weight' }
   )
-  const options = { width: 480, height: 320, nodeRadius: 8, linkDistance: 80, chargeStrength: -200, showLabels: true }
+  const options = { width: 480, height: 320, nodeRadius: 8, linkDistance: 80, chargeStrength: -200 }
 
   it('produces stable coordinates within responsive bounds', () => {
     const first = layoutNetwork(prepared, options)
@@ -36,13 +36,12 @@ describe('layoutNetwork', () => {
       ...options,
       nodeRadius: 0,
       linkDistance: 0,
-      chargeStrength: 0,
-      showLabels: false
+      chargeStrength: 0
     })
 
     result.nodes.forEach(node => {
-      expect(node.x).toBeGreaterThanOrEqual(10)
-      expect(node.x).toBeLessThanOrEqual(470)
+      expect(node.x).toBeGreaterThanOrEqual(80)
+      expect(node.x).toBeLessThanOrEqual(400)
     })
     expect(result.links).toHaveLength(3)
   })
@@ -55,6 +54,15 @@ describe('layoutNetwork', () => {
       expect(node.x).toBeLessThanOrEqual(80)
       expect(node.y).toBeGreaterThanOrEqual(20)
       expect(node.y).toBeLessThanOrEqual(140)
+    })
+  })
+
+  it('uses the exact plot height after the link-style key reserves outer chart space', () => {
+    const result = layoutNetwork(prepared, { ...options, height: 128 })
+
+    result.nodes.forEach(node => {
+      expect(node.y).toBeGreaterThanOrEqual(20)
+      expect(node.y).toBeLessThanOrEqual(108)
     })
   })
 })

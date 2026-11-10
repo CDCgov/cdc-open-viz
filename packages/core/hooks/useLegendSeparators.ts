@@ -1,4 +1,4 @@
-import { clamp } from 'lodash'
+import clamp from 'lodash/clamp'
 
 // TODO: generalize this to be used in legends other than linear block gradient
 

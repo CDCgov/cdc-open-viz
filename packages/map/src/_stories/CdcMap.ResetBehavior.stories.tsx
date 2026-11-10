@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import worldDataZoomFilters from './_mock/world-data-zoom-filters.json'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Reset Behavior',
@@ -26,6 +27,7 @@ export const WorldDataZoomWithFilters: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-country-code]', canvasElement)
   }

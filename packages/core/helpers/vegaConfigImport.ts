@@ -1,14 +1,8 @@
 /**
  * Shared Vega-to-COVE conversion helper for stories.
  */
-import {
-  convertVegaConfig,
-  getVegaConfigType,
-  getVegaErrors,
-  getVegaWarnings,
-  isVegaConfig,
-  parseVegaConfig
-} from './vegaConfig'
+import { convertVegaConfig, getVegaConfigType, getVegaErrors, getVegaWarnings, isVegaConfig } from './vegaConfig'
+import { parseVegaConfig } from './parseVegaConfig'
 
 /** Chart-type "button" definitions used to seed new COVE configs. */
 const buttons = [

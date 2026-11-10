@@ -177,7 +177,9 @@ export const waitForTextContent = async (el: HTMLElement | null, expected: strin
  */
 export const waitForEditor = async (canvas: any) => {
   await waitForWithDelay(() => {
-    const accordionButtons = canvas.getAllByRole('button', { name: /general|data|visual/i })
+    const accordionButtons = canvas
+      .getAllByRole('button', { name: /general|data|visual/i })
+      .filter((button: HTMLElement) => button.closest('.editor-panel, .accordion'))
     expect(accordionButtons.length).toBeGreaterThan(0)
     for (const button of accordionButtons) {
       expect(button).toBeVisible()
@@ -192,20 +194,20 @@ export const waitForEditor = async (canvas: any) => {
  * @param sectionName Name of the accordion section (case-insensitive)
  */
 export const openAccordion = async (canvas: any, sectionName: string) => {
-  // Get all buttons with matching name and filter to only accordion buttons
-  const allButtons = canvas.getAllByRole('button', { name: new RegExp(sectionName, 'i') })
-  const accordion = allButtons.find(
-    (button: HTMLElement) =>
-      button.classList.contains('accordion__button') || button.closest('.editor-panel, .accordion')
-  )
-
-  if (!accordion) {
-    throw new Error(`Could not find accordion button for "${sectionName}"`)
-  }
-
-  await userEvent.click(accordion)
+  let accordion: HTMLElement | undefined
   await waitForWithDelay(() => {
-    const accordionContent = accordion.closest('.accordion-item, .accordion-section, [class*="accordion"]')
+    // A lazy editor can mount after the visualization and its other controls.
+    const allButtons = canvas.getAllByRole('button', { name: new RegExp(sectionName, 'i') })
+    accordion = allButtons.find(
+      (button: HTMLElement) =>
+        button.classList.contains('accordion__button') || button.closest('.editor-panel, .accordion')
+    )
+    expect(accordion).toBeTruthy()
+  })
+
+  await userEvent.click(accordion!)
+  await waitForWithDelay(() => {
+    const accordionContent = accordion!.closest('.accordion-item, .accordion-section, [class*="accordion"]')
     expect(accordionContent).toBeTruthy()
   })
 }

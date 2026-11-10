@@ -3,17 +3,16 @@
   "visualizationType": "Dendrogram",
   "title": "Public Health Programs",
   "data": [
-    { "node": "Public Health", "parent": "" },
-    { "node": "Programs", "parent": "Public Health" },
-    { "node": "Partners", "parent": "Public Health" },
-    { "node": "Immunization", "parent": "Programs" }
+    { "node": "Public Health", "parent": "", "linkStyle": "solid" },
+    { "node": "Programs", "parent": "Public Health", "linkStyle": "solid" },
+    { "node": "Partners", "parent": "Public Health", "linkStyle": "dashed" },
+    { "node": "Immunization", "parent": "Programs", "linkStyle": "solid" }
   ],
   "dendrogram": {
-    "alignment": "left",
-    "verticalAlignment": "top",
     "columns": {
       "node": "node",
-      "parent": "parent"
+      "parent": "parent",
+      "style": "linkStyle"
     }
   }
 }

@@ -4,7 +4,7 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import parse from 'html-react-parser'
-import _ from 'lodash'
+import capitalize from 'lodash/capitalize'
 import { hashObj } from '../../../helpers/hashObj'
 import { sanitizeToSvgId } from '../../../helpers/cove/string'
 import { getMapDataTableColumnKeys } from './getMapDataTableColumnKeys'
@@ -47,7 +47,7 @@ export const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, r
       }
     }
 
-    labelValue = String(labelValue).startsWith('region') ? _.capitalize(labelValue) : labelValue
+    labelValue = String(labelValue).startsWith('region') ? capitalize(labelValue) : labelValue
   } else {
     labelValue = formatLegendLocation(row)
   }
@@ -114,6 +114,7 @@ const mapCellArray = ({
   displayGeoName,
   formatLegendLocation,
   navigationHandler,
+  mapLinkSettings,
   setFilteredCountryCode,
   legendMemo,
   legendSpecialClassLastMemo,
@@ -176,6 +177,8 @@ const mapCellArray = ({
               columns={columns}
               navigationHandler={navigationHandler}
               mapZoomHandler={mapZoomHandler}
+              linksEnabled={mapLinkSettings?.enabled ?? true}
+              navigationTarget={mapLinkSettings?.target ?? '_blank'}
             />
           </div>
         )

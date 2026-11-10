@@ -1,12 +1,39 @@
-import React from 'react'
-import Annotate from './Panel.Annotate'
-import PatternSettings from './Panel.PatternSettings'
-import SmallMultiples from './Panel.SmallMultiples'
+import BubbleLayers from './BubbleLayersPanel'
+import Columns from './ColumnsPanel'
+import CustomMapLayers from './CustomMapLayersPanel'
+import DataTable from './DataTablePanel'
+import DotDensity from '../DotDensityEditorSection'
+import Filters from './FiltersPanel'
+import Footnotes from './FootnotesPanel'
+import General from './GeneralPanel'
+import Interactivity from './InteractivityPanel'
+import Legend from './LegendPanel'
+import MarkupVariables from './MarkupVariablesPanel'
+import PatternSettings from './PatternSettingsPanel'
+import SmallMultiples from './SmallMultiplesPanel'
+import TextAnnotations from './TextAnnotationsPanel'
+import TimePlayback from './TimePlaybackPanel'
+import Type from './TypePanel'
+import Visual from './VisualPanel'
 
 const Panels = {
-  Annotate,
+  BubbleLayers,
+  Columns,
+  CustomMapLayers,
+  DataTable,
+  DotDensity,
+  Filters,
+  Footnotes,
+  General,
+  Interactivity,
+  Legend,
+  MarkupVariables,
   PatternSettings,
-  SmallMultiples
+  SmallMultiples,
+  TextAnnotations,
+  TimePlayback,
+  Type,
+  Visual
 }
 
 export default Panels

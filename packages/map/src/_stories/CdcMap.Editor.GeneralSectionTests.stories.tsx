@@ -4,6 +4,7 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
+import altTextConfig from './_mock/alt_text_metadata.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
@@ -29,11 +30,40 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    const documentCanvas = within(canvasElement.ownerDocument.body)
+
+    const expectTooltipContent = async (field: HTMLElement, expectedText: string) => {
+      const tooltipTarget = field.closest('label')?.querySelector('.cove-tooltip--target') as HTMLElement
+      expect(tooltipTarget).toBeTruthy()
+
+      await userEvent.hover(tooltipTarget)
+
+      const tooltipContent = await documentCanvas.findByText(expectedText)
+      expect(tooltipContent).toBeTruthy()
+
+      await userEvent.unhover(tooltipTarget)
+    }
 
     await waitForEditor(canvas)
     await waitForPresence('.map-container', canvasElement)
 
     await openAccordion(canvas, 'General')
+
+    // ========================================================================
+    // TEST: Language dropdown
+    // Verifies: Locale selection is available for translated visualization labels
+    // ========================================================================
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    await performAndAssert(
+      'Language → Spanish (es-MX)',
+      () => languageSelect.value,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (_before, after) => after === 'es-MX'
+    )
 
     // ==========================================================================
     // TEST: Title field
@@ -103,6 +133,11 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const superTitleInput = canvas.getByLabelText(/Super Title/i) as HTMLInputElement
     expect(superTitleInput).toBeTruthy()
+
+    await expectTooltipContent(
+      superTitleInput,
+      'To keep the main title as short as possible, consider adding extra details in a super title, which displays in small font just above the main title in the visualization’s title bar. (If you hide the regular title, the super title does not display.)'
+    )
 
     const getSuperTitleVisual = () => {
       const titleElement = canvasElement.querySelector('.cove-title, .map-title')
@@ -182,6 +217,11 @@ export const GeneralSectionTests: Story = {
     const messageInput = canvas.getByLabelText(/Message/i) as HTMLTextAreaElement
     expect(messageInput).toBeTruthy()
 
+    await expectTooltipContent(
+      messageInput,
+      'Explain how to use the map, introduce any special concepts, etc. This text displays above the visualization (and below the title bar, if displayed).'
+    )
+
     const getIntroTextVisual = () => {
       const introSection = canvasElement.querySelector('.introText')
       return {
@@ -238,6 +278,11 @@ export const GeneralSectionTests: Story = {
     const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
     expect(footnotesInput).toBeTruthy()
 
+    await expectTooltipContent(
+      footnotesInput,
+      'Use this text element for any supplemental information that should display below the data table.'
+    )
+
     const getFootnotesVisual = () => {
       const footnotesSection = canvasElement.querySelector('.footnotes')
       return {
@@ -257,6 +302,134 @@ export const GeneralSectionTests: Story = {
         !before.footnotesContent.includes('Test footnote text') &&
         after.footnotesContent.includes('Test footnote text') &&
         after.hasFootnotes
+    )
+  }
+}
+
+export const AltTextAuthoring: Story = {
+  args: {
+    isEditor: true,
+    config: altTextConfig
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    const altTextTypeSelect = canvas.getByRole('combobox', { name: /Alt Text Description/i }) as HTMLSelectElement
+
+    await performAndAssert(
+      'Alt Text Description → Show static description field',
+      () => Boolean(canvas.queryByLabelText(/Description Text/i)),
+      async () => {
+        await userEvent.selectOptions(altTextTypeSelect, 'static')
+      },
+      (before, after) => !before && after
+    )
+
+    const staticDescription = canvas.getByLabelText(/Description Text/i) as HTMLTextAreaElement
+    const authoredDescription = 'Static description authored in the General section.'
+    const getAccessibleDescription = () => ({
+      preview: canvasElement.querySelector('[data-testid="alt-text-desc-preview"]')?.textContent || '',
+      ariaLabel: canvasElement.querySelector('.map-container svg[role="img"]')?.getAttribute('aria-label') || ''
+    })
+
+    await performAndAssert(
+      'Static description → Update accessible output and preview',
+      getAccessibleDescription,
+      async () => {
+        await userEvent.clear(staticDescription)
+        await userEvent.type(staticDescription, authoredDescription)
+      },
+      (before, after) =>
+        !before.preview.includes(authoredDescription) &&
+        after.preview.includes(authoredDescription) &&
+        after.ariaLabel.includes(authoredDescription)
+    )
+
+    await performAndAssert(
+      'Alt Text Description → Show metadata field',
+      () => Boolean(canvas.queryByLabelText(/Description Metadata Field/i)),
+      async () => {
+        await userEvent.selectOptions(altTextTypeSelect, 'metadata')
+      },
+      (before, after) => !before && after
+    )
+
+    const metadataField = canvas.getByLabelText(/Description Metadata Field/i) as HTMLSelectElement
+    const metadataDescription = altTextConfig.dataMetadata.altDescription
+
+    await performAndAssert(
+      'Metadata description → Update accessible output and preview',
+      getAccessibleDescription,
+      async () => {
+        await userEvent.selectOptions(metadataField, 'altDescription')
+      },
+      (before, after) =>
+        !before.preview.includes(metadataDescription) &&
+        !before.ariaLabel.includes(metadataDescription) &&
+        after.preview.includes(metadataDescription) &&
+        after.ariaLabel.includes(metadataDescription)
+    )
+  }
+}
+
+export const AltTextMetadataUnavailable: Story = {
+  args: {
+    isEditor: true,
+    config: {
+      ...altTextConfig,
+      dataMetadata: {},
+      altText: { type: 'metadata' }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    expect(
+      canvas.getByText(/No metadata fields are available\. Your data file must be a JSON object with a/i)
+    ).toBeTruthy()
+    expect(canvas.queryByLabelText(/Description Metadata Field/i)).toBeNull()
+  }
+}
+
+export const SpanishGeographyLocalization: Story = {
+  args: {
+    isEditor: true,
+    config: {
+      ...usaStateGradientConfig,
+      locale: 'en-US',
+      general: {
+        ...usaStateGradientConfig.general,
+        displayStateLabels: true
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    const getMapLabelText = () => canvasElement.textContent || ''
+
+    await performAndAssert(
+      'Language → Spanish geography labels',
+      getMapLabelText,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (before, after) => !before.includes('Nuevo México') && after.includes('Nuevo México')
     )
   }
 }

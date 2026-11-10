@@ -1,4 +1,8 @@
 import GenerateViteConfig from '@cdc/core/generateViteConfig.js'
 import { moduleName } from './package.json'
+import sharedMapData from './viteSharedData.js'
 
-export default GenerateViteConfig(moduleName)
+const config = GenerateViteConfig(moduleName)
+config.plugins.push(sharedMapData())
+
+export default config

@@ -329,6 +329,7 @@ export const Dashboard_Conditions: Story = {
       }
     }
 
+    await waitFor(() => expect(getState().incompleteVisible).toBe(true), { timeout: 5000 })
     const initialState = getState()
     expect(initialState.incompleteVisible).toBe(true)
     expect(initialState.componentVisible).toBe(false)
