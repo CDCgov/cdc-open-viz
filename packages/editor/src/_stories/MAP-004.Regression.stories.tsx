@@ -85,6 +85,13 @@ const openSection = async (canvas: Canvas, root: HTMLElement, name: string) => {
 
 const labeled = <T extends HTMLElement>(scope: HTMLElement, label: string, selector: string): T => {
   const candidates = Array.from(scope.querySelectorAll<T>(selector))
+  const marker = Array.from(scope.querySelectorAll<HTMLElement>('*')).find(element =>
+    Array.from(element.childNodes).some(
+      child => child.nodeType === Node.TEXT_NODE && normalize(child.textContent) === label
+    )
+  )
+  const markerControl = marker?.closest('label')?.querySelector<T>(selector)
+  if (markerControl) return markerControl
   const labelTexts = (element: T) => {
     const wrapper = element.closest('label')
     const nodes = [
@@ -846,15 +853,18 @@ const exerciseFilters = async (canvas: Canvas, root: HTMLElement, user: User, re
   item = await openFilterItem(canvas, root, user)
   await user.click(checkbox(item, 'Create query parameters'))
   item = await openFilterItem(canvas, root, user)
-  const queryInputs = Array.from(item.querySelectorAll<HTMLInputElement>('input[type="text"]')).filter(input =>
+  let queryInputs = Array.from(item.querySelectorAll<HTMLInputElement>('input[type="text"]')).filter(input =>
     normalize(input.parentElement?.textContent).includes('Default Value Set By Query String Parameter')
   )
   expect(queryInputs).toHaveLength(2)
-  await user.clear(queryInputs[0])
-  await user.type(queryInputs[0], 'state')
-  await user.clear(queryInputs[1])
-  await user.type(queryInputs[1], 'county')
-  await user.tab()
+  fireEvent.change(queryInputs[0], { target: { value: 'state' } })
+  await waitConfig(read, config => expect(config.filters[0].setByQueryParameter).toBe('state'))
+  item = await openFilterItem(canvas, root, user)
+  queryInputs = Array.from(item.querySelectorAll<HTMLInputElement>('input[type="text"]')).filter(input =>
+    normalize(input.parentElement?.textContent).includes('Default Value Set By Query String Parameter')
+  )
+  fireEvent.change(queryInputs[1], { target: { value: 'county' } })
+  await waitConfig(read, config => expect(config.filters[0].subGrouping.setByQueryParameter).toBe('county'))
   item = await openFilterItem(canvas, root, user)
   await toggle(user, item, 'Display subgrouping only', true)
   item = await openFilterItem(canvas, root, user)
@@ -934,7 +944,10 @@ const exerciseFootnotes = async (canvas: Canvas, root: HTMLElement, user: User, 
   expect(dataset.options).toHaveLength(1)
   await user.click(within(section).getByRole('button', { name: 'Add Static Footnote' }))
   section = await openSection(canvas, root, 'Footnotes')
-  const noteButton = within(section).getByRole('button', { name: /Static Footnote|Footnote 1/ })
+  const noteButton = within(section)
+    .getAllByRole('button', { name: /Static Footnote|Footnote 1/ })
+    .find(button => button.hasAttribute('aria-expanded'))!
+  expect(noteButton).toBeTruthy()
   if (noteButton.getAttribute('aria-expanded') !== 'true') await user.click(noteButton)
   let item = noteButton.closest<HTMLElement>('[data-accordion-component="AccordionItem"]')!
   const symbol = Array.from(item.querySelectorAll<HTMLSelectElement>('select'))[0]
