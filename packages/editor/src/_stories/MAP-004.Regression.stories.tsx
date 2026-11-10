@@ -451,10 +451,7 @@ const exerciseColumns = async (canvas: Canvas, root: HTMLElement, user: User, re
     expect(config.general.geoLabelOverride).toBe('County')
   })
   geography = await openNested(root, 'Columns', 'Geography', user)
-  const geographyDisplay = Array.from(geography.querySelectorAll<HTMLSelectElement>('select')).find(
-    control => control.value === '' && Array.from(control.options).some(option => option.value === 'County')
-  )!
-  expect(geographyDisplay).toBeTruthy()
+  const geographyDisplay = select(geography, 'Geography Display Column')
   await user.selectOptions(geographyDisplay, 'County')
   await waitConfig(read, config => {
     expect(config.columns.geo.displayColumn).toBe('County')
@@ -651,7 +648,10 @@ const exerciseLegend = async (canvas: Canvas, root: HTMLElement, user: User, rea
     const current = buttons.at(-1)!
     if (current.getAttribute('aria-expanded') !== 'true') await user.click(current)
     const item = current.closest<HTMLElement>('[data-accordion-component="AccordionItem"]')!
-    await setText(user, item, 'Upper Bound', value)
+    const upperBound = textControl(item, 'Upper Bound')
+    await user.clear(upperBound)
+    await user.type(upperBound, value)
+    await user.tab()
     await waitConfig(read, config => expect(config.legend.breakpoints).toContain(Number(value)))
   }
   await waitConfig(read, config => expect(config.legend.manualBreakpoints || config.legend.breakpoints).toBeTruthy())
