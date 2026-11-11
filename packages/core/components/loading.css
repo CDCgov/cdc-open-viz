@@ -1,0 +1,73 @@
+/* Loading */
+/*!
+ * Load Awesome v1.1.0 (http://github.danielcardoso.net/load-awesome/)
+ * Copyright 2015 Daniel Cardoso <@DanielCardoso>
+ * Licensed under MIT
+ */
+@keyframes ball-beat {
+  50% {
+    opacity: 0.2;
+    -webkit-transform: scale(0.75);
+    -moz-transform: scale(0.75);
+    -o-transform: scale(0.75);
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+.cove-visualization .loading {
+  background: rgba(255, 255, 255, 0.5);
+  bottom: 0;
+  left: 0;
+  min-height: 30%;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  z-index: 3;
+}
+.cove-visualization .loading span {
+  display: block;
+  font-size: 1.3em;
+  margin-bottom: 1em;
+}
+.cove-visualization .loading .la-ball-beat {
+  align-items: center;
+  box-sizing: border-box;
+  color: #777;
+  display: flex;
+  font-size: 0;
+  height: 36px;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  transform: scale(1.3);
+  width: 108px;
+}
+.cove-visualization .loading .la-ball-beat.sm,
+.cove-visualization .loading .la-ball-beat.xs,
+.cove-visualization .loading .la-ball-beat.xxs {
+  transform: scale(0.7);
+}
+.cove-visualization .loading .la-ball-beat div + div {
+  margin-left: 10px;
+}
+.cove-visualization .loading .la-ball-beat > div {
+  animation: ball-beat 0.7s -0.15s infinite linear;
+  background-color: currentColor;
+  border: 0 solid currentColor;
+  border-radius: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 20px;
+  position: relative;
+  width: 20px;
+}
+.cove-visualization .loading .la-ball-beat > div:nth-child(2n-1) {
+  animation-delay: -0.5s;
+}

@@ -25,7 +25,6 @@
   "devDependencies": {
     "@rollup/plugin-dsv": "^3.0.2",
     "@vitejs/plugin-react": "^5.1.2",
-    "sass": "^1.89.2",
     "vite": "^7.3.7",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^4.2.0"
@@ -40,7 +39,7 @@
   },
   "repository": "CDCgov/cdc-open-viz.git",
   "scripts": {
-    "build": "sass styles/cove-main.scss dist/cove-main.css",
+    "build": "cp styles/cove-main.css dist/cove-main.css",
     "test": "vitest run --environment jsdom --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
     "test-watch:ui": "vitest --ui"

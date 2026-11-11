@@ -1,0 +1,119 @@
+.cove-visualization {
+  font-family: var(--app-font-main);
+  font-size: 1em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  text-rendering: optimizeLegibility;
+}
+.cove-visualization .outline-none {
+  outline: none !important;
+}
+
+.cove-visualization applet,
+.cove-visualization object,
+.cove-visualization iframe,
+.cove-visualization h1,
+.cove-visualization h2,
+.cove-visualization h3,
+.cove-visualization h4,
+.cove-visualization h5,
+.cove-visualization h6,
+.cove-visualization p,
+.cove-visualization blockquote,
+.cove-visualization pre,
+.cove-visualization a,
+.cove-visualization abbr,
+.cove-visualization acronym,
+.cove-visualization address,
+.cove-visualization big,
+.cove-visualization cite,
+.cove-visualization code,
+.cove-visualization del,
+.cove-visualization dfn,
+.cove-visualization em,
+.cove-visualization img,
+.cove-visualization ins,
+.cove-visualization kbd,
+.cove-visualization q,
+.cove-visualization s,
+.cove-visualization samp,
+.cove-visualization small,
+.cove-visualization strike,
+.cove-visualization strong,
+.cove-visualization sub,
+.cove-visualization sup,
+.cove-visualization tt,
+.cove-visualization var,
+.cove-visualization b,
+.cove-visualization u,
+.cove-visualization i,
+.cove-visualization center,
+.cove-visualization dl,
+.cove-visualization dt,
+.cove-visualization dd,
+.cove-visualization ol,
+.cove-visualization ul,
+.cove-visualization li,
+.cove-visualization fieldset,
+.cove-visualization legend,
+.cove-visualization caption,
+.cove-visualization article,
+.cove-visualization aside,
+.cove-visualization canvas,
+.cove-visualization details,
+.cove-visualization embed,
+.cove-visualization figure,
+.cove-visualization figcaption,
+.cove-visualization footer,
+.cove-visualization header,
+.cove-visualization hgroup,
+.cove-visualization menu,
+.cove-visualization nav,
+.cove-visualization output,
+.cove-visualization ruby,
+.cove-visualization section,
+.cove-visualization summary,
+.cove-visualization time,
+.cove-visualization mark,
+.cove-visualization audio,
+.cove-visualization video {
+  border: 0;
+  font-family: var(--app-font-main);
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+.cove-visualization * {
+  box-sizing: border-box;
+}
+.cove-visualization .row::before,
+.cove-visualization .row::after {
+  content: unset !important;
+}
+.cove-visualization sub,
+.cove-visualization sup {
+  /* Specified in % so that the sup/sup is the
+    right size relative to the surrounding text */
+  font-size: 75%;
+  /* Zero out the line-height so that it doesn't
+    interfere with the positioning that follows */
+  line-height: 0;
+  /* Where the magic happens: makes all browsers position
+    the sup/sup properly, relative to the surrounding text */
+  position: relative;
+  /* Note that if you're using Eric Meyer's reset.css, this
+    is already set and you can emove this rule */
+  vertical-align: baseline;
+}
+.cove-visualization sup {
+  /* Move the superscripted text up */
+  top: -0.5em;
+}
+.cove-visualization sub {
+  /* Move the subscripted text down, but only
+    half as far down as the superscript moved up */
+  bottom: -0.25em;
+}

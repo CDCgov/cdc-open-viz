@@ -9,7 +9,7 @@ import {
   DATA_TABLE_SINGLE_ROW,
   DATA_TABLE_MULTI_ROW
 } from '../../templates/dataDesignerTables'
-import './data-designer.scss'
+import './data-designer.css'
 import { ConfigureData } from '../../types/ConfigureData'
 
 type DataDesignerProps = {

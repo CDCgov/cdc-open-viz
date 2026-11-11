@@ -1,7 +1,7 @@
 import React from 'react'
 import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 import CdcWaffleChart from './CdcWaffleChart'
 

@@ -28,7 +28,7 @@ import { type MapConfig } from './types/MapConfig'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 // Sass
-import './scss/main.scss'
+import './css/main.css'
 import './cdcMapComponent.styles.css'
 
 // Core Helpers

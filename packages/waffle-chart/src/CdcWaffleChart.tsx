@@ -28,7 +28,7 @@ import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
-import './scss/main.scss'
+import './css/main.css'
 import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import TrendArrow from '@cdc/core/components/ui/TrendArrow'
