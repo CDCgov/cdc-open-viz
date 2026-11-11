@@ -1,0 +1,80 @@
+.kpi-container {
+  border: 1px solid rgba(0, 0, 0, 0.25) !important;
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: flex;
+  display: flex;
+  min-height: 70px;
+  padding: 5px !important;
+  position: relative;
+  width: 100%;
+}
+
+.kpi-content {
+  background: linear-gradient(90deg, rgb(8, 132, 136) 19%, rgb(255, 255, 255) 74%);
+  border-radius: 10px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.kpi-main {
+  display: flex;
+  min-height: 70px;
+}
+
+.label-container,
+.value-container {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.label-container {
+  padding-left: 30px !important;
+}
+
+.value-container {
+  justify-content: center;
+}
+
+.label {
+  color: white;
+  font-size: 18px;
+}
+
+.value {
+  color: brown;
+  font-size: 24px;
+}
+
+.kpi-subtext {
+  font-size: 0.9em;
+  font-style: italic;
+  padding: 0 1rem 1rem 30px;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .label {
+    font-size: 14px;
+  }
+  .value {
+    font-size: 20px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .label-container {
+    justify-content: flex-start;
+    padding-left: 10px !important;
+  }
+  .label {
+    font-size: 10px;
+  }
+  .value {
+    font-size: 14px;
+  }
+  .kpi-subtext {
+    padding-left: 10px;
+  }
+}

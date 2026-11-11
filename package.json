@@ -86,7 +86,6 @@
     "react-visibility-sensor": "^5.1.1",
     "resize-observer-polyfill": "^1.5.1",
     "rollup-plugin-node-externals": "^6.1.2",
-    "sass": "^1.89.2",
     "storybook": "^10.3.3",
     "storybook-addon-fetch-mock": "^2.0.1",
     "stylelint": "^17.3.0",
@@ -107,9 +106,6 @@
     ],
     "packages/**/*.css": [
       "stylelint --fix",
-      "npx prettier --write"
-    ],
-    "packages/**/*.scss": [
       "npx prettier --write"
     ]
   },

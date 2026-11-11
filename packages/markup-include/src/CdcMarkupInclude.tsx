@@ -24,7 +24,7 @@ import markupIncludeReducer from './store/markupInclude.reducer'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
-import './scss/main.scss'
+import './css/main.css'
 
 type CdcMarkupIncludeProps = {
   config: MarkupIncludeConfig

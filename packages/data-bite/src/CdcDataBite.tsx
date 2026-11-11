@@ -60,7 +60,7 @@ import {
 import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 
 // styles
-import './scss/main.scss'
+import './css/main.css'
 
 const EditorPanel = lazy(() => import('./components/EditorPanel'))
 

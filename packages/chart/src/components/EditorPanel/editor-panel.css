@@ -1,0 +1,52 @@
+.cove-visualization.type-chart .axis-domain-group {
+  border: 1px solid var(--lightGray);
+  border-radius: 4px;
+  margin-top: 1em;
+  padding: 0.75em;
+}
+.cove-visualization.type-chart .axis-domain-group > label,
+.cove-visualization.type-chart .axis-domain-group > .checkbox {
+  margin-top: 0.9em;
+}
+.cove-visualization.type-chart .axis-domain-group__title {
+  display: block;
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 0.75em;
+  text-transform: uppercase;
+}
+.cove-visualization.type-chart .axis-domain-group__row {
+  display: flex;
+  gap: 0.75em;
+}
+.cove-visualization.type-chart .axis-domain-group__field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.cove-visualization.type-chart .axis-domain-group__field > label {
+  margin-top: 0 !important;
+}
+.cove-visualization.type-chart .axis-domain-number {
+  max-width: 96px;
+  min-width: auto;
+  width: 100%;
+}
+.cove-visualization.type-chart .axis-domain-warning {
+  color: red;
+  display: block;
+  font-size: 0.85em;
+  margin-top: 0.25em;
+}
+.cove-visualization.type-chart .viewport-overrides button {
+  margin-top: 1em;
+  padding: 1em;
+  text-align: left;
+  width: 100%;
+}
+.cove-visualization.type-chart .viewport-overrides button span {
+  float: right;
+}
+.cove-visualization.type-chart .viewport-overrides .edit-block {
+  margin-top: 0;
+  padding: 1em;
+}

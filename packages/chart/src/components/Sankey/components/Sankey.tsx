@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 
 // Cdc
-import './../sankey.scss'
+import './../sankey.css'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'
