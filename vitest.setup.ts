@@ -35,6 +35,7 @@ const prewarmLazyModules = async () => {
     () => import('@cdc/chart/src/components/EditorPanel'),
     // Map package
     () => import('@cdc/map/src/components/EditorPanel'),
+    () => import('@cdc/map/src/components/UsaMap/data/us-topo.json'),
     // Data Bite package
     () => import('@cdc/data-bite/src/components/EditorPanel'),
     // Data Table package
