@@ -34,6 +34,15 @@ type PanelProps = {
 }
 
 const PATTERN_TYPES = ['circles', 'waves', 'diagonalLines']
+const DEFAULT_PATTERN: PatternSelection = {
+  dataKey: '',
+  dataValue: '',
+  pattern: 'circles',
+  label: '',
+  size: 'medium',
+  color: '',
+  contrastCheck: true
+}
 
 // Checks contrast and logs warning if needed
 const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
@@ -53,7 +62,6 @@ const checkAndLogContrast = (fill: string, patternColor: string, geoName: string
 const PatternSettingsPanel = ({ name }: PanelProps) => {
   const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
-  const defaultPattern = 'circles'
 
   const {
     map: { patterns },
@@ -88,7 +96,7 @@ const PatternSettingsPanel = ({ name }: PanelProps) => {
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     const patterns = cloneDeep(config.map.patterns)
-    patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
+    patterns.push({ ...DEFAULT_PATTERN })
     setConfig({
       ...config,
       map: {

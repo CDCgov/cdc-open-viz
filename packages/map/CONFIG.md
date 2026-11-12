@@ -281,6 +281,10 @@ Categorical bubble sizing maps ordered categories evenly across `minBubbleSize` 
 
 Custom overlay or base layers added by the editor.
 
+New editor-created layers use `New Custom Layer` as the name and initialize the optional authoring inputs to empty
+values. An empty or whitespace-only `url` is not fetched, and a layer does not render until both `url` and `namespace`
+identify usable TopoJSON geometry.
+
 | Field         | Type               | Required | Default                                     | Description                                               | Allowed values / Notes                                                                                             |
 | ------------- | ------------------ | -------- | ------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`        | `string`           | No       | None                                        | Display name for the layer.                               | Editor-label metadata used in the accordion label; runtime rendering depends on `url` and `namespace`, not `name`. |

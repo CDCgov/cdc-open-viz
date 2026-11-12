@@ -133,6 +133,7 @@ const SingleStateMap: React.FC = () => {
     geosJsx.push(
       // prettier-ignore
       <SingleState.CountyOutput
+        key='counties'
         counties={counties}
         scale={scale}
         geoStrokeColor={geoStrokeColor}
@@ -144,6 +145,7 @@ const SingleStateMap: React.FC = () => {
     geosJsx.push(
       // prettier-ignore
       <SingleState.StateOutput
+        key='states'
         topoData={topoData}
         path={path}
         scale={scale}
