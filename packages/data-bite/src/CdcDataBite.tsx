@@ -505,14 +505,27 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     prevFiltersRef.current = currentFiltersJson
   }, [currentFiltersJson])
 
-  if (
-    configObj &&
-    config &&
-    (JSON.stringify(configObj.data) !== JSON.stringify(config.data) ||
-      JSON.stringify(configObj.dataMetadata || {}) !== JSON.stringify(config.dataMetadata || {}))
-  ) {
-    loadConfig()
-  }
+  // Reload only when parent-provided data or metadata changes. Comparing props with the
+  // internally hydrated config would never converge for dataUrl-only configs.
+  const currentDataJson = JSON.stringify(configObj?.data)
+  const currentDataMetadataJson = JSON.stringify(configObj?.dataMetadata)
+  const previousDataPropsRef = useRef({
+    data: currentDataJson,
+    dataMetadata: currentDataMetadataJson
+  })
+
+  useEffect(() => {
+    const previousDataProps = previousDataPropsRef.current
+
+    if (previousDataProps.data !== currentDataJson || previousDataProps.dataMetadata !== currentDataMetadataJson) {
+      loadConfig()
+    }
+
+    previousDataPropsRef.current = {
+      data: currentDataJson,
+      dataMetadata: currentDataMetadataJson
+    }
+  }, [currentDataJson, currentDataMetadataJson])
 
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
