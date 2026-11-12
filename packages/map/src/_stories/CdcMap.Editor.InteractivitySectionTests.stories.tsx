@@ -7,7 +7,7 @@ import { createNewMapConfig } from '../helpers/createNewMapConfig'
 type Story = StoryObj<typeof CdcMap>
 
 const mapMeta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Editor Tests',
+  title: 'Regression Tests/Map Scripts',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen'
@@ -51,14 +51,18 @@ interactivityConfig.data = interactivityData
 
 const navigationHandler = fn()
 
-const getVisibleTooltipState = (canvasElement: HTMLElement) => {
-  const tooltip = Array.from(canvasElement.querySelectorAll<HTMLElement>('.tooltip-test')).find(element => {
+const getVisibleTooltip = (canvasElement: HTMLElement) =>
+  Array.from(canvasElement.querySelectorAll<HTMLElement>('.tooltip-test')).find(element => {
     const style = getComputedStyle(element)
     return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0'
   })
 
+const getVisibleTooltipState = (canvasElement: HTMLElement) => {
+  const tooltip = getVisibleTooltip(canvasElement)
+
   return {
-    text: tooltip?.textContent || '',
+    heading: tooltip?.querySelector('.tooltip-heading')?.textContent?.trim() || '',
+    body: tooltip?.querySelector('.tooltip-body')?.textContent?.trim() || '',
     isVisible: Boolean(tooltip)
   }
 }
@@ -85,8 +89,10 @@ export const InteractivitySectionTests: Story = {
 
     await waitForEditor(canvas)
     await waitForPresence('.map-container', canvasElement)
-    const usa = (await waitForPresence('path[data-country-code="USA"]', canvasElement)) as SVGPathElement
-    const france = (await waitForPresence('path[data-country-code="FRA"]', canvasElement)) as SVGPathElement
+    await waitForPresence('path[data-country-code="USA"]', canvasElement)
+    await waitForPresence('path[data-country-code="FRA"]', canvasElement)
+    const getGeoPath = (countryCode: string) =>
+      canvasElement.querySelector(`path[data-country-code="${countryCode}"]`) as SVGPathElement
     await openAccordion(canvas, 'Interactivity')
 
     const interactivityButton = canvas
@@ -99,7 +105,7 @@ export const InteractivitySectionTests: Story = {
 
     const section = within(interactivitySection)
     const noDataInput = section.getByRole('textbox', { name: /No Data Tooltip Text/i })
-    const getUsaTooltipMarkup = () => usa.closest('.geo-group')?.getAttribute('data-tooltip-html') || ''
+    const getUsaTooltipMarkup = () => getGeoPath('USA').closest('.geo-group')?.getAttribute('data-tooltip-html') || ''
 
     expect(interactivityData.some(row => row.Country === 'United States')).toBe(false)
     expect(getUsaTooltipMarkup()).toContain('No Data')
@@ -118,10 +124,31 @@ export const InteractivitySectionTests: Story = {
       'Hover detail display → Show custom no-data tooltip',
       () => getVisibleTooltipState(canvasElement),
       async () => {
-        await userEvent.hover(usa)
+        await userEvent.hover(getGeoPath('USA'))
       },
-      (_before, after) => after.isVisible && after.text.includes('Data unavailable')
+      (_before, after) => after.isVisible
     )
+
+    let visibleTooltip = getVisibleTooltip(canvasElement)
+    expect(visibleTooltip).toBeVisible()
+    expect(visibleTooltip?.querySelector('.tooltip-heading')?.textContent?.trim()).toBe('United States of America')
+    expect(visibleTooltip?.querySelector('.tooltip-body')?.textContent?.trim()).toBe('Sample Data: Data unavailable')
+
+    await performAndAssert(
+      'Hover detail display → Show location and value text for a geography with data',
+      () => getVisibleTooltipState(canvasElement),
+      async () => {
+        await userEvent.unhover(getGeoPath('USA'))
+        await userEvent.hover(getGeoPath('FRA'))
+      },
+      (before, after) =>
+        before.isVisible && after.isVisible && before.heading !== after.heading && before.body !== after.body
+    )
+
+    visibleTooltip = getVisibleTooltip(canvasElement)
+    expect(visibleTooltip).toBeVisible()
+    expect(visibleTooltip?.querySelector('.tooltip-heading')?.textContent?.trim()).toBe('France')
+    expect(visibleTooltip?.querySelector('.tooltip-body')?.textContent?.trim()).toBe('Sample Data: 75.2')
 
     const appearanceSelect = getDetailDisplaySelect(interactivitySection)
 
@@ -132,7 +159,7 @@ export const InteractivitySectionTests: Story = {
         hasLinkLabelInput: Boolean(section.queryByRole('textbox', { name: /Tooltips Link Label/i }))
       }),
       async () => {
-        await userEvent.unhover(usa)
+        await userEvent.unhover(getGeoPath('FRA'))
         await userEvent.selectOptions(appearanceSelect, 'click')
       },
       (before, after) => before.hasHoverTooltip && !after.hasHoverTooltip && after.hasLinkLabelInput
@@ -143,13 +170,27 @@ export const InteractivitySectionTests: Story = {
     await userEvent.type(linkLabelInput, 'View details')
 
     await performAndAssert(
-      'Click detail display → Render modal with configured navigation label',
-      () => Boolean(canvas.queryByRole('button', { name: 'View details', hidden: true })),
-      async () => {
-        await userEvent.click(france)
+      'Click detail display → Render location, value, and configured navigation label',
+      () => {
+        const modal = canvasElement.querySelector<HTMLElement>('.modal-content.tooltip')
+        return {
+          isVisible: modal?.checkVisibility({ checkOpacity: true }) ?? false,
+          heading: modal?.querySelector('.tooltip-heading')?.textContent?.trim() || '',
+          body: modal?.querySelector('.tooltip-body')?.textContent?.trim() || '',
+          navigationLabel: modal?.querySelector('.navigation-link__label')?.textContent?.trim() || ''
+        }
       },
-      (before, after) => !before && after
+      async () => {
+        await userEvent.click(getGeoPath('FRA'))
+      },
+      (before, after) => !before.isVisible && after.isVisible && after.navigationLabel === 'View details'
     )
+
+    const clickTooltip = canvasElement.querySelector<HTMLElement>('.modal-content.tooltip')
+    expect(clickTooltip).toBeVisible()
+    expect(clickTooltip?.querySelector('.tooltip-heading')?.textContent?.trim()).toBe('France')
+    expect(clickTooltip?.querySelector('.tooltip-body')?.textContent?.trim()).toBe('Sample Data: 75.2')
+    expect(clickTooltip?.querySelector('.navigation-link__label')?.textContent?.trim()).toBe('View details')
     expect(navigationHandler).not.toHaveBeenCalled()
 
     const closeModal = canvasElement.querySelector('.modal-close') as HTMLElement
