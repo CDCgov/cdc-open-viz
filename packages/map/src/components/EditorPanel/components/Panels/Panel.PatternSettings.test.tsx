@@ -11,6 +11,7 @@ vi.mock('@cdc/core/components/ui/Icon', () => ({ default: () => null }))
 vi.mock('topojson-client', () => ({
   feature: () => ({ features: [{ properties: { iso: 'AL' } }, { properties: { iso: 'PA' } }] })
 }))
+vi.mock('../../../UsaMap/data/us-topo.json', () => ({ default: { objects: { states: {} } } }))
 
 vi.mock('../../../../helpers/applyLegendToRow', () => ({ applyLegendToRow: row => [row.fill] }))
 vi.mock('../../../../context/LegendMemoContext', () => ({
@@ -44,13 +45,41 @@ function Harness({ initial, rows }: { initial: any; rows: Record<string, any> })
           errors: config.runtime.editorErrorMessage
         })}
       </output>
+      <output data-testid='patterns'>{JSON.stringify(config.map.patterns)}</output>
     </ConfigContext.Provider>
   )
 }
 
 const validation = () => JSON.parse(screen.getByTestId('validation').textContent!)
+const patterns = () => JSON.parse(screen.getByTestId('patterns').textContent!)
 
 describe('automatic pattern validation', () => {
+  it('creates a complete pattern item with the documented defaults', async () => {
+    const initial = initialConfig()
+    initial.map.patterns = []
+    const { container } = render(<Harness initial={initial} rows={{}} />)
+    let addPatternButton: HTMLButtonElement | undefined
+    await waitFor(() => {
+      addPatternButton = Array.from(container.querySelectorAll('button')).find(
+        button => button.textContent === 'Add Geo Pattern'
+      )
+      expect(addPatternButton).toBeTruthy()
+    })
+    fireEvent.click(addPatternButton!)
+
+    expect(patterns()).toEqual([
+      {
+        dataKey: '',
+        dataValue: '',
+        pattern: 'circles',
+        label: '',
+        size: 'medium',
+        color: '',
+        contrastCheck: true
+      }
+    ])
+  })
+
   it.each(['', undefined, '   '])('shows automatic color %s as passing without rewriting saved config', async color => {
     const initial = initialConfig()
     initial.map.patterns[0].color = color

@@ -125,6 +125,14 @@ export const PatternSettingsSectionTests: Story = {
       }
     )
 
+    expect(canvasElement.querySelector('select[name="pattern-dataKey--0"]')).toHaveValue('')
+    expect(canvasElement.querySelector('input[id="pattern-dataValue--0"]')).toHaveValue('')
+    expect(canvasElement.querySelector('select[name="pattern-type--0"]')).toHaveValue('circles')
+    expect(canvasElement.querySelector('select[name="pattern-size--0"]')).toHaveValue('medium')
+    expect(canvasElement.querySelector('input[id="pattern-label--0"]')).toHaveValue('')
+    expect(canvasElement.querySelector('input[name="patternColor"]')).toHaveValue('')
+    expect(canvas.getByText('This pattern passes contrast checks')).toBeVisible()
+
     // ==========================================================================
     // TEST: Set dataKey to STATE and dataValue to Colorado
     // ==========================================================================
