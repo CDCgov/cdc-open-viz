@@ -9,6 +9,8 @@ import {
   waitForOptionsToPopulate,
   waitForPresence
 } from '@cdc/core/helpers/testing'
+import { getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { PATTERN_COLOR_DARK, PATTERN_COLOR_LIGHT } from '@cdc/core/helpers/patternColors'
 import oregonTopology from '@cdc/map/src/_stories/_mock/oregon-topojson.json'
 import CdcEditor from '../CdcEditor'
 
@@ -28,6 +30,20 @@ const CATEGORIES = ['Vehicle', 'Work', 'Home', 'School', 'NA']
 const OREGON_FILL = '#00ffff'
 const oregonTopologyUrl = `data:application/json,${encodeURIComponent(JSON.stringify(oregonTopology))}`
 const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() || ''
+const expectedAutomaticPatternColor = (fill: string) =>
+  Number(getColorContrast(PATTERN_COLOR_LIGHT, fill)) > Number(getColorContrast(PATTERN_COLOR_DARK, fill))
+    ? PATTERN_COLOR_LIGHT
+    : PATTERN_COLOR_DARK
+
+const isVisibleThroughAncestors = (element: Element | null, root: HTMLElement) => {
+  let current = element
+  while (current && current !== root) {
+    const styles = getComputedStyle(current)
+    if (styles.display === 'none' || styles.visibility === 'hidden' || styles.opacity === '0') return false
+    current = current.parentElement
+  }
+  return Boolean(element)
+}
 
 const accordionButton = (root: HTMLElement, name: string) =>
   Array.from(root.querySelectorAll<HTMLElement>('[data-accordion-component="AccordionItemButton"]')).find(
@@ -265,6 +281,145 @@ export const MAP008: Story = {
           new Set(after.labels).size === CATEGORIES.length &&
           CATEGORIES.every(category => after.labels.includes(category)) &&
           JSON.stringify(after.stateFills) === JSON.stringify(stateFillsBeforeOverlay)
+      )
+
+      const patternsSection = await openSection(canvas, canvasElement, 'Pattern Settings')
+      await user.click(within(patternsSection).getByRole('button', { name: 'Add Geo Pattern' }))
+      const patternButton = within(patternsSection).getByRole('button', { name: 'Select Column' })
+      await user.click(patternButton)
+      const patternItem = patternButton.closest<HTMLElement>('.series-item')
+      expect(patternItem, 'Expected pattern editor item').toBeTruthy()
+      const dataKeySelect = patternItem!.querySelector<HTMLSelectElement>('select[name^="pattern-dataKey--"]')
+      const dataValueInput = patternItem!.querySelector<HTMLInputElement>('input[id^="pattern-dataValue--"]')
+      const patternTypeSelect = patternItem!.querySelector<HTMLSelectElement>('select[name^="pattern-type--"]')
+      const patternColorInput = patternItem!.querySelector<HTMLInputElement>('input[name="patternColor"]')
+      expect(dataKeySelect, 'Expected pattern data-key control').toBeTruthy()
+      expect(dataValueInput, 'Expected pattern data-value control').toBeTruthy()
+      expect(patternTypeSelect, 'Expected pattern type control').toBeTruthy()
+      expect(patternColorInput, 'Expected pattern color control').toBeTruthy()
+      expect(patternColorInput).toHaveValue('')
+
+      await performAndAssert(
+        'Colorado renders a circle pattern over its categorical fill',
+        () => {
+          const patternPaths = Array.from(canvasElement.querySelectorAll<SVGPathElement>('path.pattern-geoKey--STATE'))
+          const patternPath = colorado.querySelector<SVGPathElement>('path.pattern-geoKey--STATE')
+          const patternId = patternPath?.getAttribute('fill')?.match(/^url\(#(.+)\)$/)?.[1]
+          const patternDefinition = patternId
+            ? canvasElement.querySelector<SVGPatternElement>(`pattern[id="${patternId}"]`)
+            : null
+          const patternCircle = patternDefinition?.querySelector<SVGCircleElement>('circle')
+          const patternBounds = patternPath?.getBBox()
+          const patternClientBounds = patternPath?.getBoundingClientRect()
+          const patternSvgBounds = patternPath?.ownerSVGElement?.getBoundingClientRect()
+          const oregonOverlay = canvasElement.querySelector<SVGPathElement>('.custom-map-layer--Oregon path')
+          const oregonBounds = oregonOverlay?.getBBox()
+          const oregonClientBounds = oregonOverlay?.getBoundingClientRect()
+          const oregonSvgBounds = oregonOverlay?.ownerSVGElement?.getBoundingClientRect()
+          const oregonStatePath = oregon.querySelector<SVGPathElement>('path')
+          const patternLegendButton = canvasElement.querySelector<HTMLElement>(
+            'button.legend-container__li-btn--pattern'
+          )
+          const legendPatternCircle = patternLegendButton?.querySelector<SVGCircleElement>('pattern circle')
+          return {
+            patternCount: patternPaths.length,
+            fill: patternPath?.getAttribute('fill') || '',
+            hasCircles: Boolean(patternCircle),
+            circleColor: patternCircle?.getAttribute('fill') || '',
+            patternWidth: patternBounds?.width || 0,
+            patternHeight: patternBounds?.height || 0,
+            patternVisible: isVisibleThroughAncestors(patternPath, canvasElement),
+            patternIntersectsMap: Boolean(
+              patternClientBounds &&
+                patternSvgBounds &&
+                patternClientBounds.right > patternSvgBounds.left &&
+                patternClientBounds.left < patternSvgBounds.right &&
+                patternClientBounds.bottom > patternSvgBounds.top &&
+                patternClientBounds.top < patternSvgBounds.bottom
+            ),
+            oregonOverlay: {
+              fill: oregonOverlay?.getAttribute('fill') || '',
+              width: oregonBounds?.width || 0,
+              height: oregonBounds?.height || 0,
+              visible: isVisibleThroughAncestors(oregonOverlay, canvasElement),
+              intersectsMap: Boolean(
+                oregonClientBounds &&
+                  oregonSvgBounds &&
+                  oregonClientBounds.right > oregonSvgBounds.left &&
+                  oregonClientBounds.left < oregonSvgBounds.right &&
+                  oregonClientBounds.bottom > oregonSvgBounds.top &&
+                  oregonClientBounds.top < oregonSvgBounds.bottom
+              ),
+              aboveState: Boolean(
+                oregonOverlay &&
+                  oregonStatePath &&
+                  oregonStatePath.compareDocumentPosition(oregonOverlay) & Node.DOCUMENT_POSITION_FOLLOWING
+              )
+            },
+            patternLegendLabel: normalize(patternLegendButton?.innerText),
+            patternLegendVisible: isVisibleThroughAncestors(patternLegendButton, canvasElement),
+            patternLegendHasCircles: Boolean(legendPatternCircle),
+            patternLegendColor: legendPatternCircle?.getAttribute('fill') || '',
+            labels: legendLabels(canvasElement),
+            stateFills: {
+              alabama: geographyFill(alabama),
+              colorado: geographyFill(colorado),
+              alaska: geographyFill(alaska),
+              oregon: geographyFill(oregon)
+            }
+          }
+        },
+        async () => {
+          await user.selectOptions(dataKeySelect!, 'STATE')
+          await user.clear(dataValueInput!)
+          await user.type(dataValueInput!, 'Colorado')
+          await user.selectOptions(patternTypeSelect!, 'circles')
+          await user.tab()
+        },
+        (before, after) =>
+          before.patternCount === 0 &&
+          after.patternCount === 1 &&
+          after.fill.startsWith('url(#') &&
+          after.hasCircles &&
+          after.circleColor === expectedAutomaticPatternColor(stateFillsBeforeOverlay.colorado) &&
+          after.patternWidth > 0 &&
+          after.patternHeight > 0 &&
+          after.patternVisible &&
+          after.patternIntersectsMap &&
+          after.oregonOverlay.fill === OREGON_FILL &&
+          after.oregonOverlay.width > 0 &&
+          after.oregonOverlay.height > 0 &&
+          after.oregonOverlay.visible &&
+          after.oregonOverlay.intersectsMap &&
+          after.oregonOverlay.aboveState &&
+          after.patternLegendLabel === 'Colorado' &&
+          after.patternLegendVisible &&
+          after.patternLegendHasCircles &&
+          after.patternLegendColor === expectedAutomaticPatternColor('#FFFFFF') &&
+          after.labels.length === CATEGORIES.length &&
+          CATEGORIES.every(category => after.labels.includes(category)) &&
+          JSON.stringify(after.stateFills) === JSON.stringify(stateFillsBeforeOverlay)
+      )
+
+      const coloradoPatternFill =
+        colorado.querySelector<SVGPathElement>('path.pattern-geoKey--STATE')?.getAttribute('fill') || ''
+      await performAndAssert(
+        'Patterned Colorado retains its Vehicle tooltip',
+        () => ({
+          tooltip: tooltipText(canvasElement),
+          patternFill: colorado.querySelector<SVGPathElement>('path.pattern-geoKey--STATE')?.getAttribute('fill') || ''
+        }),
+        async () => user.hover(colorado),
+        (before, after) =>
+          before.patternFill.startsWith('url(#') &&
+          after.patternFill === before.patternFill &&
+          after.tooltip === 'State: Colorado Location: Vehicle'
+      )
+      await user.unhover(colorado)
+      await waitFor(() => expect(tooltipText(canvasElement)).toBe(''))
+      expect(colorado.querySelector<SVGPathElement>('path.pattern-geoKey--STATE')).toHaveAttribute(
+        'fill',
+        coloradoPatternFill
       )
 
       await performAndAssert(
