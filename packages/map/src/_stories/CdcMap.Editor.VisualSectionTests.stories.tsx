@@ -7,7 +7,7 @@ import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewate
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 const mapMeta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Editor Tests',
+  title: 'Regression Tests/Map Scripts',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen'
