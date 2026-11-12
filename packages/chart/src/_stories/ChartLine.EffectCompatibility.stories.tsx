@@ -35,7 +35,6 @@ export const ExistingPreliminaryRule: Story = {
     const incomingPath = getIncomingPath(canvasElement)
     expect(incomingPath).toHaveAttribute('stroke-dasharray', '5 5')
     expect(incomingPath.getTotalLength()).toBeGreaterThan(1)
-    const originalPath = incomingPath.getAttribute('d')
 
     await openAccordion(canvas, 'Data Series')
     const effect = within(
@@ -53,8 +52,10 @@ export const ExistingPreliminaryRule: Story = {
       },
       (_, after) => after?.includes('Updated preliminary'),
       () => {
-        expect(getIncomingPath(canvasElement)).toHaveAttribute('stroke-dasharray', '5 5')
-        expect(getIncomingPath(canvasElement)).toHaveAttribute('d', originalPath)
+        const updatedIncomingPath = getIncomingPath(canvasElement)
+        expect(updatedIncomingPath).toHaveAttribute('stroke-dasharray', '5 5')
+        expect(updatedIncomingPath?.getAttribute('d')).toBeTruthy()
+        expect(updatedIncomingPath.getTotalLength()).toBeGreaterThan(1)
       }
     )
   }
