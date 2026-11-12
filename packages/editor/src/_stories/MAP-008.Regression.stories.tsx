@@ -9,6 +9,7 @@ import {
   waitForOptionsToPopulate,
   waitForPresence
 } from '@cdc/core/helpers/testing'
+import oregonTopology from '@cdc/map/src/_stories/_mock/oregon-topojson.json'
 import CdcEditor from '../CdcEditor'
 
 // Source regression: docs/qa/regression-scripts/build-a-standard-us-categorical-map.md
@@ -24,6 +25,8 @@ type Story = StoryObj<typeof CdcEditor>
 type Canvas = ReturnType<typeof within>
 
 const CATEGORIES = ['Vehicle', 'Work', 'Home', 'School', 'NA']
+const OREGON_FILL = '#00ffff'
+const oregonTopologyUrl = `data:application/json,${encodeURIComponent(JSON.stringify(oregonTopology))}`
 const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() || ''
 
 const accordionButton = (root: HTMLElement, name: string) =>
@@ -83,6 +86,8 @@ export const MAP008: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const user = userEvent.setup()
+    const originalFetch = window.fetch
+    const fetchInputs: string[] = []
     const originalConsoleError = console.error
     const consoleErrors: string[] = []
     const unhandledRejections: unknown[] = []
@@ -97,6 +102,10 @@ export const MAP008: Story = {
 
     try {
       console.error = onConsoleError
+      window.fetch = (input, init) => {
+        fetchInputs.push(String(input))
+        return originalFetch(input, init)
+      }
       window.addEventListener('unhandledrejection', onRejection)
       window.addEventListener('error', onWindowError)
 
@@ -176,14 +185,87 @@ export const MAP008: Story = {
       const alabama = geography(canvasElement, 'Alabama')
       const colorado = geography(canvasElement, 'Colorado')
       const alaska = geography(canvasElement, 'Alaska')
+      const oregon = geography(canvasElement, 'Oregon')
       const vehicleColor = legendColor(canvasElement, 'Vehicle')
       const workColor = legendColor(canvasElement, 'Work')
+      const stateFillsBeforeOverlay = {
+        alabama: geographyFill(alabama),
+        colorado: geographyFill(colorado),
+        alaska: geographyFill(alaska),
+        oregon: geographyFill(oregon)
+      }
 
       expect(geographyFill(alabama)).toBe(vehicleColor)
       expect(geographyFill(colorado)).toBe(vehicleColor)
       expect(geographyFill(alabama)).toBe(geographyFill(colorado))
       expect(geographyFill(alaska)).toBe(workColor)
       expect(geographyFill(alaska)).not.toBe(geographyFill(alabama))
+
+      const layersSection = await openSection(canvas, canvasElement, 'Custom Map Layers')
+      await user.click(within(layersSection).getByRole('button', { name: 'Add Map Layer' }))
+      const layerButton = within(layersSection).getByRole('button', { name: 'Layer 1: New Custom Layer' })
+      await user.click(layerButton)
+      const layerItem = layerButton.closest<HTMLElement>('.map-layers-list')!
+      const fileInput = layerItem.querySelector<HTMLInputElement>('input[name="layerFilename"]')!
+      const namespaceInput = layerItem.querySelector<HTMLInputElement>('input[name="layerNamespace"]')!
+      const fillInput = layerItem.querySelector<HTMLInputElement>('input[name="layerFill"][type="text"]')!
+
+      await user.click(fileInput)
+      await user.paste(oregonTopologyUrl)
+      await user.clear(namespaceInput)
+      await user.type(namespaceInput, 'cove (1)')
+      await performAndAssert(
+        'Oregon polygon layer renders over the categorical map',
+        () => {
+          const polygon = canvasElement.querySelector<SVGPathElement>('.custom-map-layer--Oregon path')
+          const bounds = polygon?.getBBox()
+          const clientBounds = polygon?.getBoundingClientRect()
+          const svgBounds = polygon?.ownerSVGElement?.getBoundingClientRect()
+          const styles = polygon ? getComputedStyle(polygon) : undefined
+          const statePath = oregon.querySelector<SVGPathElement>('path')
+          return {
+            path: polygon?.getAttribute('d') || '',
+            fill: polygon?.getAttribute('fill') || '',
+            width: bounds?.width || 0,
+            height: bounds?.height || 0,
+            visible: styles?.display !== 'none' && styles?.visibility !== 'hidden' && styles?.opacity !== '0',
+            intersectsMap: Boolean(
+              clientBounds &&
+                svgBounds &&
+                clientBounds.right > svgBounds.left &&
+                clientBounds.left < svgBounds.right &&
+                clientBounds.bottom > svgBounds.top &&
+                clientBounds.top < svgBounds.bottom
+            ),
+            aboveStates: Boolean(
+              polygon && statePath && statePath.compareDocumentPosition(polygon) & Node.DOCUMENT_POSITION_FOLLOWING
+            ),
+            labels: legendLabels(canvasElement),
+            stateFills: {
+              alabama: geographyFill(alabama),
+              colorado: geographyFill(colorado),
+              alaska: geographyFill(alaska),
+              oregon: geographyFill(oregon)
+            }
+          }
+        },
+        async () => {
+          await user.clear(fillInput)
+          await user.type(fillInput, OREGON_FILL)
+        },
+        (_before, after) =>
+          Boolean(after.path) &&
+          after.fill === OREGON_FILL &&
+          after.width > 0 &&
+          after.height > 0 &&
+          after.visible &&
+          after.intersectsMap &&
+          after.aboveStates &&
+          after.labels.length === CATEGORIES.length &&
+          new Set(after.labels).size === CATEGORIES.length &&
+          CATEGORIES.every(category => after.labels.includes(category)) &&
+          JSON.stringify(after.stateFills) === JSON.stringify(stateFillsBeforeOverlay)
+      )
 
       await performAndAssert(
         'Alabama hover shows its Vehicle category',
@@ -204,9 +286,11 @@ export const MAP008: Story = {
       await waitFor(() => expect(tooltipText(canvasElement)).toBe(''))
 
       expect(consoleErrors).toEqual([])
+      expect(fetchInputs).not.toContain('')
       expect(unhandledRejections).toEqual([])
       expect(windowErrors).toEqual([])
     } finally {
+      window.fetch = originalFetch
       console.error = originalConsoleError
       window.removeEventListener('unhandledrejection', onRejection)
       window.removeEventListener('error', onWindowError)
