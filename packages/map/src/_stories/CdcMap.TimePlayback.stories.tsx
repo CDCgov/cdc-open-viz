@@ -684,21 +684,24 @@ export const TimePlaybackEditorControls: Story = {
     )
 
     const playbackNote = canvas.getByLabelText('Playback Note')
+    expect(playbackNote.tagName).toBe('TEXTAREA')
     await performAndAssert(
-      'Editing the playback note updates its own map guidance',
+      'Editing the playback note renders HTML in its own map guidance',
       () => ({
         note: canvasElement.querySelector('.map-time-playback__note')?.textContent?.trim(),
+        hasStrongMarkup: Boolean(canvasElement.querySelector('.map-time-playback__note strong')),
         subtext: canvasElement.querySelector('.subtext')?.textContent?.trim(),
         savedNote: capturedEditorTimePlayback?.note
       }),
       async () => {
         await userEvent.clear(playbackNote)
-        await userEvent.type(playbackNote, 'Choose a frame to compare state rates.')
+        await userEvent.type(playbackNote, 'Choose a <strong>frame</strong> to compare state rates.')
       },
       (before, after) =>
         before.note === 'Use play, pause, replay, or the slider to interact with the map.' &&
         after.note === 'Choose a frame to compare state rates.' &&
-        after.savedNote === 'Choose a frame to compare state rates.' &&
+        after.hasStrongMarkup &&
+        after.savedNote === 'Choose a <strong>frame</strong> to compare state rates.' &&
         after.subtext === before.subtext
     )
 

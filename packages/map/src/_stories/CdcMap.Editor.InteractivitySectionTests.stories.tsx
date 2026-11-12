@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { openAccordion, performAndAssert, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import CdcMap from '../CdcMap'
 import { createNewMapConfig } from '../helpers/createNewMapConfig'
 
@@ -50,6 +51,15 @@ const interactivityData = [
 interactivityConfig.data = interactivityData
 
 const navigationHandler = fn()
+
+const locationHighlighterConfig = cloneConfig(interactivityConfig)
+locationHighlighterConfig.locationHighlighter = {
+  ...locationHighlighterConfig.locationHighlighter,
+  enabled: true,
+  dropdownLabel: 'Choose a country',
+  note: '',
+  details: ''
+}
 
 const getVisibleTooltipState = (canvasElement: HTMLElement) => {
   const tooltip = Array.from(canvasElement.querySelectorAll<HTMLElement>('.tooltip-test')).find(element => {
@@ -173,6 +183,63 @@ export const InteractivitySectionTests: Story = {
         await userEvent.selectOptions(appearanceSelect, 'hover')
       },
       (before, after) => before.hasLinkLabelInput && !after.hasLinkLabelInput && !after.hasModal && after.hasHoverMarkup
+    )
+  }
+}
+
+export const LocationHighlighterTextareaHtml: Story = {
+  args: {
+    isEditor: true,
+    config: locationHighlighterConfig
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-location-highlighter', canvasElement)
+    await openAccordion(canvas, 'Interactivity')
+
+    const interactivityButton = canvas
+      .getAllByRole('button', { name: /^Interactivity$/i })
+      .find(button => button.closest('[data-accordion-component="AccordionItem"], .accordion__item'))
+    const interactivitySection = interactivityButton?.closest(
+      '[data-accordion-component="AccordionItem"], .accordion__item'
+    ) as HTMLElement
+    expect(interactivitySection).toBeTruthy()
+
+    const section = within(interactivitySection)
+    const noteTextarea = section.getByRole('textbox', { name: 'Note' })
+    const detailsTextarea = section.getByRole('textbox', { name: 'Location details' })
+    expect(noteTextarea.tagName).toBe('TEXTAREA')
+    expect(detailsTextarea.tagName).toBe('TEXTAREA')
+
+    await performAndAssert(
+      'Location highlighter note → Render HTML',
+      () => ({
+        text: canvasElement.querySelector('.map-location-highlighter .filters-section__note-text')?.textContent || '',
+        hasStrongMarkup: Boolean(
+          canvasElement.querySelector('.map-location-highlighter .filters-section__note-text strong')
+        )
+      }),
+      async () => {
+        await userEvent.type(noteTextarea, 'Choose a <strong>country</strong>.')
+      },
+      (before, after) => !before.hasStrongMarkup && after.text === 'Choose a country.' && after.hasStrongMarkup
+    )
+
+    const locationSelect = canvas.getByRole('combobox', { name: 'Choose a country' })
+
+    await performAndAssert(
+      'Location details → Render HTML after selection',
+      () => ({
+        text: canvasElement.querySelector('.map-location-highlighter__details')?.textContent || '',
+        hasStrongMarkup: Boolean(canvasElement.querySelector('.map-location-highlighter__details strong'))
+      }),
+      async () => {
+        await userEvent.type(detailsTextarea, '<strong>Selected country</strong> details')
+        await userEvent.selectOptions(locationSelect, 'FRA')
+      },
+      (before, after) => !before.hasStrongMarkup && after.text === 'Selected country details' && after.hasStrongMarkup
     )
   }
 }
