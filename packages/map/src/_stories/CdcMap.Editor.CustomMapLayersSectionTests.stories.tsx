@@ -224,13 +224,25 @@ export const ExistingLayerAuthoringAndEmptyState: Story = {
     )
 
     await performAndAssert(
-      'Layer tooltip → Update rendered tooltip content',
+      'Layer tooltip → Preserve HTML in rendered tooltip content',
       () => getLayerPath()?.getAttribute('data-tooltip-html'),
       async () => {
         await userEvent.clear(tooltipInput)
-        await userEvent.type(tooltipInput, 'Updated local tooltip')
+        await userEvent.type(tooltipInput, 'Updated <strong>local tooltip</strong>')
       },
-      (before, after) => before !== after && after === 'Updated local tooltip'
+      (before, after) => before !== after && after === 'Updated <strong>local tooltip</strong>'
+    )
+
+    await performAndAssert(
+      'Layer tooltip → Render authored HTML on hover',
+      () => ({
+        text: canvasElement.querySelector('.tooltip-test')?.textContent?.trim() || '',
+        hasStrongMarkup: Boolean(canvasElement.querySelector('.tooltip-test strong'))
+      }),
+      async () => {
+        await userEvent.hover(getLayerPath()!)
+      },
+      (before, after) => !before.hasStrongMarkup && after.text === 'Updated local tooltip' && after.hasStrongMarkup
     )
 
     await performAndAssert(

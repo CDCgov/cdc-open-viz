@@ -89,7 +89,7 @@ export const TextAnnotationsSectionTests: Story = {
     expect(annotationTextarea).toBeTruthy()
 
     await performAndAssert(
-      'Annotation Text → Change to "Important Note"',
+      'Annotation Text → Render HTML',
       () => {
         // Check the actual visualization - the annotation div should contain the text
         const annotationDivs = canvasElement.querySelectorAll('div[aria-label*="Annotation text"]')
@@ -102,12 +102,12 @@ export const TextAnnotationsSectionTests: Story = {
         // Select all text and replace it
         await userEvent.click(annotationTextarea)
         await userEvent.keyboard('{Control>}a{/Control}')
-        await userEvent.type(annotationTextarea, 'Important Note')
+        await userEvent.type(annotationTextarea, '<strong>Important Note</strong>')
         await userEvent.tab() // Trigger blur to commit the change
       },
       (before, after) => {
         // After changing the text, the annotation should display the new text
-        return after.annotationTexts.includes('Important Note')
+        return after.annotationTexts.includes('<strong>Important Note</strong>')
       }
     )
 

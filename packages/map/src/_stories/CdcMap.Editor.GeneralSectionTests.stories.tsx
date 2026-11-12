@@ -216,6 +216,7 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const messageInput = canvas.getByLabelText(/Message/i) as HTMLTextAreaElement
     expect(messageInput).toBeTruthy()
+    expect(messageInput.tagName).toBe('TEXTAREA')
 
     await expectTooltipContent(
       messageInput,
@@ -226,7 +227,8 @@ export const GeneralSectionTests: Story = {
       const introSection = canvasElement.querySelector('.introText')
       return {
         introText: introSection?.textContent || '',
-        hasIntroSection: Boolean(introSection)
+        hasIntroSection: Boolean(introSection),
+        hasStrongMarkup: Boolean(introSection?.querySelector('strong'))
       }
     }
 
@@ -235,12 +237,13 @@ export const GeneralSectionTests: Story = {
       getIntroTextVisual,
       async () => {
         await userEvent.clear(messageInput)
-        await userEvent.type(messageInput, 'This is test intro text')
+        await userEvent.type(messageInput, 'This is <strong>test intro text</strong>')
       },
       (before, after) =>
         !before.introText.includes('This is test intro text') &&
         after.introText.includes('This is test intro text') &&
-        after.hasIntroSection
+        after.hasIntroSection &&
+        after.hasStrongMarkup
     )
 
     // ==========================================================================
@@ -249,12 +252,14 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const subtextInput = canvas.getByLabelText(/Subtext/i) as HTMLTextAreaElement
     expect(subtextInput).toBeTruthy()
+    expect(subtextInput.tagName).toBe('TEXTAREA')
 
     const getSubtextVisual = () => {
-      const subtextElement = canvasElement.querySelector('.subtext')
+      const subtextElement = canvasElement.querySelector('p.subtext.cove-prose')
       return {
         subtextContent: subtextElement?.textContent || '',
-        hasSubtext: Boolean(subtextElement)
+        hasSubtext: Boolean(subtextElement),
+        hasEmMarkup: Boolean(subtextElement?.querySelector('em'))
       }
     }
 
@@ -263,12 +268,13 @@ export const GeneralSectionTests: Story = {
       getSubtextVisual,
       async () => {
         await userEvent.clear(subtextInput)
-        await userEvent.type(subtextInput, 'This is test subtext')
+        await userEvent.type(subtextInput, 'This is <em>test subtext</em>')
       },
       (before, after) =>
         !before.subtextContent.includes('This is test subtext') &&
         after.subtextContent.includes('This is test subtext') &&
-        after.hasSubtext
+        after.hasSubtext &&
+        after.hasEmMarkup
     )
 
     // ==========================================================================
@@ -277,6 +283,7 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
     expect(footnotesInput).toBeTruthy()
+    expect(footnotesInput.tagName).toBe('TEXTAREA')
 
     await expectTooltipContent(
       footnotesInput,
@@ -287,7 +294,8 @@ export const GeneralSectionTests: Story = {
       const footnotesSection = canvasElement.querySelector('.footnotes')
       return {
         footnotesContent: footnotesSection?.textContent || '',
-        hasFootnotes: Boolean(footnotesSection)
+        hasFootnotes: Boolean(footnotesSection),
+        hasSupMarkup: Boolean(footnotesSection?.querySelector('sup'))
       }
     }
 
@@ -296,12 +304,13 @@ export const GeneralSectionTests: Story = {
       getFootnotesVisual,
       async () => {
         await userEvent.clear(footnotesInput)
-        await userEvent.type(footnotesInput, 'Test footnote text')
+        await userEvent.type(footnotesInput, 'Test footnote<sup>1</sup> text')
       },
       (before, after) =>
-        !before.footnotesContent.includes('Test footnote text') &&
-        after.footnotesContent.includes('Test footnote text') &&
-        after.hasFootnotes
+        !before.footnotesContent.includes('Test footnote1 text') &&
+        after.footnotesContent.includes('Test footnote1 text') &&
+        after.hasFootnotes &&
+        after.hasSupMarkup
     )
   }
 }
@@ -330,14 +339,15 @@ export const AltTextAuthoring: Story = {
     )
 
     const staticDescription = canvas.getByLabelText(/Description Text/i) as HTMLTextAreaElement
-    const authoredDescription = 'Static description authored in the General section.'
+    expect(staticDescription.tagName).toBe('TEXTAREA')
+    const authoredDescription = 'Static <strong>description</strong> authored in the General section.'
     const getAccessibleDescription = () => ({
       preview: canvasElement.querySelector('[data-testid="alt-text-desc-preview"]')?.textContent || '',
       ariaLabel: canvasElement.querySelector('.map-container svg[role="img"]')?.getAttribute('aria-label') || ''
     })
 
     await performAndAssert(
-      'Static description → Update accessible output and preview',
+      'Static description → Preserve markup as literal accessible text',
       getAccessibleDescription,
       async () => {
         await userEvent.clear(staticDescription)
