@@ -278,27 +278,25 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const patternId = `${mapId}--${sanitizedDataKey}--${patternDataIndex}`
 
         legendItems.push(
-          <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`}>
-              <button
-                type='button'
-                className='legend-container__li-btn legend-container__li-btn--pattern'
-                aria-label='Pattern legend item. Toggling patterns is not currently supported.'
-              >
-                <LegendShape
-                  shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                  fill='white'
-                  patternInfo={{
-                    pattern: pattern || 'circles',
-                    patternId,
-                    size: patternSizes[size] ?? 10,
-                    color: patternColor
-                  }}
-                />
-                <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
-              </button>
-            </li>
-          </>
+          <li key={patternId} className='legend-container__li legend-container__li--geo-pattern'>
+            <button
+              type='button'
+              className='legend-container__li-btn legend-container__li-btn--pattern'
+              aria-label='Pattern legend item. Toggling patterns is not currently supported.'
+            >
+              <LegendShape
+                shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                fill='white'
+                patternInfo={{
+                  pattern: pattern || 'circles',
+                  patternId,
+                  size: patternSizes[size] ?? 10,
+                  color: patternColor
+                }}
+              />
+              <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
+            </button>
+          </li>
         )
       })
     }
