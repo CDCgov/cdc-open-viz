@@ -156,7 +156,7 @@ const Widget = ({
 
   let isConfigurationReady = false
   const dataConfiguredForRow = !!config.rows[widgetConfig?.rowIdx]?.dataKey
-  if (dataConfiguredForRow || ['dashboardFilters', 'markup-include', 'data-bite'].includes(type)) {
+  if (dataConfiguredForRow || ['dashboardFilters', 'markup-include'].includes(type)) {
     isConfigurationReady = true
   } else {
     if (widgetConfig?.formattedData) {

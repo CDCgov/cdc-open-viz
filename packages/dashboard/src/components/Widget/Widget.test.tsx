@@ -25,6 +25,7 @@ const renderWidget = (
     copyWidget?: any
     clearCopiedWidget?: any
     dispatch?: any
+    rowData?: any
     type?: string
     title?: string
     widgetConfig?: any
@@ -70,6 +71,7 @@ const renderWidget = (
             datasets: {},
             rows: [
               {
+                ...options.rowData,
                 columns: [
                   {
                     width: 12,
@@ -177,8 +179,8 @@ describe('Widget', () => {
     })
   })
 
-  it('lets an unconfigured Data Bite open its visualization editor', () => {
-    const { dispatch } = renderWidget({
+  it('requires an unconfigured Data Bite to configure data before visualization settings', () => {
+    renderWidget({
       type: 'data-bite',
       widgetConfig: {
         uid: 'data-bite-1',
@@ -189,8 +191,48 @@ describe('Widget', () => {
     })
 
     expect(screen.getByTitle('Configure Data')).toBeInTheDocument()
+    expect(screen.queryByTitle('Configure Visualization')).not.toBeInTheDocument()
+  })
+
+  it('lets a Data Bite with visualization-level data open its visualization editor', () => {
+    const { dispatch } = renderWidget({
+      type: 'data-bite',
+      widgetConfig: {
+        uid: 'data-bite-1',
+        rowIdx: 0,
+        colIdx: 0,
+        type: 'data-bite',
+        dataKey: 'data-bite-data',
+        dataDescription: { horizontal: false }
+      }
+    })
+
+    expect(screen.getByTitle('Configure Data')).toBeInTheDocument()
     fireEvent.click(screen.getByTitle('Configure Visualization'))
 
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_VISUALIZATION',
+      payload: {
+        vizKey: 'data-bite-1',
+        configureData: { editing: true, showEditorPanel: true }
+      }
+    })
+  })
+
+  it('lets a Data Bite with row-level data open its visualization editor', () => {
+    const { dispatch } = renderWidget({
+      type: 'data-bite',
+      rowData: { dataKey: 'row-data' },
+      widgetConfig: {
+        uid: 'data-bite-1',
+        rowIdx: 0,
+        colIdx: 0,
+        type: 'data-bite'
+      }
+    })
+
+    fireEvent.click(screen.getByTitle('Configure Visualization'))
+    expect(screen.queryByTitle('Configure Data')).not.toBeInTheDocument()
     expect(dispatch).toHaveBeenCalledWith({
       type: 'UPDATE_VISUALIZATION',
       payload: {
