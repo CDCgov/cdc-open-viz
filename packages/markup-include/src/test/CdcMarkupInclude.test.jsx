@@ -4,7 +4,7 @@ import vm from 'node:vm'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 
 vi.mock('@cdc/core/components/EditorPanel/components/MarkupVariablesEditor', () => ({
@@ -15,6 +15,26 @@ vi.mock('@cdc/core/components/EditorPanel/components/MarkupVariablesEditor', () 
     </div>
   )
 }))
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+const dataSourceConfig = {
+  type: 'markup-include',
+  theme: 'theme-blue',
+  enableMarkupVariables: true,
+  markupVariables: [
+    { name: 'Value', tag: '{{value}}', columnName: 'value', selectionMode: 'first', conditions: [] },
+    { sourceType: 'metadata', name: 'Source', tag: '{{source}}', metadataKey: 'source', conditions: [] }
+  ],
+  contentEditor: {
+    title: 'Updated {{source}}',
+    inlineHTML: '<p>Value {{value}}; source {{source}}</p>',
+    useInlineHTML: true,
+    srcUrl: ''
+  }
+}
 
 const extractMarkedExampleConfig = (content, label) => {
   const match = content.match(
@@ -27,6 +47,116 @@ const extractMarkedExampleConfig = (content, label) => {
 }
 
 describe('Markup Include', () => {
+  it.each([{ data: [{ value: 1 }], dataMetadata: { source: 'Cached file' } }, { data: [], dataMetadata: {} }, {}])(
+    'renders fetched rows and metadata instead of the inline snapshot %j',
+    async snapshot => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [{ value: 42 }], source: 'Fresh file' })
+      })
+      const config = { ...dataSourceConfig, ...snapshot, dataUrl: '/markup-data.json' }
+      const originalConfig = JSON.parse(JSON.stringify(config))
+
+      const { rerender } = render(<CdcMarkupInclude config={config} datasets={{}} />)
+
+      expect(await screen.findByText('Value 42; source Fresh file')).toBeInTheDocument()
+      expect(screen.getByText('Updated Fresh file')).toBeInTheDocument()
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+      expect(config).toEqual(originalConfig)
+
+      rerender(<CdcMarkupInclude config={JSON.parse(JSON.stringify(config))} datasets={{}} />)
+
+      expect(screen.getByText('Value 42; source Fresh file')).toBeInTheDocument()
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+    }
+  )
+
+  it('does not retain snapshot metadata when the URL response has none', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true, json: async () => [{ value: 42 }] })
+
+    render(
+      <CdcMarkupInclude
+        config={{ ...dataSourceConfig, dataUrl: '/markup-data.json', dataMetadata: { source: 'Cached file' } }}
+        datasets={{}}
+      />
+    )
+
+    expect(await screen.findByText('Value 42; source')).toBeInTheDocument()
+    expect(screen.queryByText(/Cached file/)).not.toBeInTheDocument()
+  })
+
+  it('uses the load-once snapshot without fetching its original source URL', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+
+    render(
+      <CdcMarkupInclude
+        config={{
+          ...dataSourceConfig,
+          data: [{ value: 1 }],
+          dataMetadata: { source: 'Imported file' },
+          dataFileName: '/markup-data.json',
+          dataFileSourceType: 'url'
+        }}
+        datasets={{}}
+      />
+    )
+
+    expect(await screen.findByText('Value 1; source Imported file')).toBeInTheDocument()
+    expect(screen.getByText('Updated Imported file')).toBeInTheDocument()
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('follows dashboard row and metadata updates without fetching', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const config = { ...dataSourceConfig, data: [{ value: 1 }], dataMetadata: { source: 'First file' } }
+    const { rerender } = render(<CdcMarkupInclude config={config} datasets={{}} isDashboard={true} />)
+
+    expect(await screen.findByText('Value 1; source First file')).toBeInTheDocument()
+
+    rerender(
+      <CdcMarkupInclude
+        config={{ ...config, data: [{ value: 42 }], dataMetadata: { source: 'Next file' } }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    expect(screen.getByText('Value 42; source Next file')).toBeInTheDocument()
+    expect(screen.getByText('Updated Next file')).toBeInTheDocument()
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('keeps dashboard rows and metadata authoritative when dataUrl is present', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [{ value: 99 }], source: 'Remote file' })
+    })
+    const config = {
+      ...dataSourceConfig,
+      dataUrl: '/markup-data.json',
+      data: [{ value: 1 }],
+      dataMetadata: { source: 'Dashboard file' }
+    }
+    const { rerender } = render(<CdcMarkupInclude config={config} datasets={{}} isDashboard={true} />)
+
+    expect(await screen.findByText('Value 1; source Dashboard file')).toBeInTheDocument()
+    expect(screen.getByText('Updated Dashboard file')).toBeInTheDocument()
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+    rerender(
+      <CdcMarkupInclude
+        config={{ ...config, data: [{ value: 42 }], dataMetadata: { source: 'Filtered dashboard file' } }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    expect(screen.getByText('Value 42; source Filtered dashboard file')).toBeInTheDocument()
+    expect(screen.getByText('Updated Filtered dashboard file')).toBeInTheDocument()
+    expect(screen.queryByText(/Remote file/)).not.toBeInTheDocument()
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')
     const result = await testStandaloneBuild(pkgDir)
