@@ -78,8 +78,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     noDataMessageText,
     markupVariables: contentEditorMarkupVariables
   } = contentEditor || {}
-  const data = configObj?.data || config?.data
-  const dataMetadata = configObj?.dataMetadata || config?.dataMetadata
+  // Standalone URL loads own their fetched result; dashboard and inline data follow parent updates.
+  const dataConfig = !isDashboard && config?.dataUrl ? config : configObj || config
+  const data = dataConfig?.data
+  const dataMetadata = dataConfig?.dataMetadata
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables?.length ? config.markupVariables : contentEditorMarkupVariables || []
