@@ -2,14 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
-import multiCountryConfig from './_mock/multi-country.json'
-import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
 
 const mapMeta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Editor Tests',
+  title: 'Regression Tests/Map Scripts',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen'
@@ -23,7 +21,19 @@ const DEFAULT_ARGS = {
   config: usaStateGradientConfig
 }
 
+const FILTER_STYLES = [
+  'combobox',
+  'dropdown',
+  'multi-select',
+  'nested-dropdown',
+  'pill',
+  'tab',
+  'tab-simple',
+  'tab bar'
+]
+
 export const FiltersSectionTests: Story = {
+  name: 'Filters Section Tests',
   args: {
     ...DEFAULT_ARGS
   },
@@ -230,5 +240,96 @@ export const FiltersSectionTests: Story = {
         return after.labelText.includes('Select State')
       }
     )
+
+    // ==========================================================================
+    // TEST: Every filter style is available and renders its distinct control
+    // ==========================================================================
+    const getFilterStyleSelect = () => within(getFilterBlock()).getByLabelText('Filter Style') as HTMLSelectElement
+    expect(Array.from(getFilterStyleSelect().options, option => option.value)).toEqual(FILTER_STYLES)
+
+    const getRuntimeFilterStyle = () => {
+      const runtimeFilter = canvasElement.querySelector<HTMLElement>(
+        '.cove-visualization__filters-section .single-filters'
+      )
+
+      return {
+        authoredStyle: getFilterStyleSelect().value,
+        className: runtimeFilter?.className || '',
+        hasCombobox: Boolean(runtimeFilter?.querySelector('.cove-combobox')),
+        hasDropdown: Boolean(runtimeFilter?.querySelector('select')),
+        hasMultiSelect: Boolean(runtimeFilter?.querySelector('.cove-multiselect')),
+        hasPills: Boolean(runtimeFilter?.querySelector('button.pill')),
+        hasTabs: Boolean(runtimeFilter?.querySelector('button.tab:not(.tab--simple)')),
+        hasSimpleTabs: Boolean(runtimeFilter?.querySelector('.tab-simple-container button.tab--simple')),
+        hasTabBar: Boolean(runtimeFilter?.querySelector('.single-filters__tab-bar button.button__tab-bar'))
+      }
+    }
+
+    const renderedOrResponsiveDropdown = (state: ReturnType<typeof getRuntimeFilterStyle>, style: string) =>
+      state.authoredStyle === style && state.className.includes('single-filters--dropdown') && state.hasDropdown
+
+    const styleCases = [
+      { style: 'combobox', rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) => state.hasCombobox },
+      { style: 'dropdown', rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) => state.hasDropdown },
+      { style: 'multi-select', rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) => state.hasMultiSelect },
+      {
+        style: 'pill',
+        rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) =>
+          state.hasPills || renderedOrResponsiveDropdown(state, 'pill')
+      },
+      {
+        style: 'tab',
+        rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) =>
+          state.hasTabs || renderedOrResponsiveDropdown(state, 'tab')
+      },
+      {
+        style: 'tab-simple',
+        rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) =>
+          state.className.includes('single-filters--tab-simple') && (state.hasSimpleTabs || state.hasDropdown)
+      },
+      {
+        style: 'tab bar',
+        rendered: (state: ReturnType<typeof getRuntimeFilterStyle>) =>
+          state.hasTabBar || renderedOrResponsiveDropdown(state, 'tab bar')
+      }
+    ] as const
+
+    for (const { style, rendered } of styleCases) {
+      await performAndAssert(
+        `Filter Style → ${style}`,
+        getRuntimeFilterStyle,
+        async () => userEvent.selectOptions(getFilterStyleSelect(), style),
+        (_before, after) => rendered(after)
+      )
+
+      if (style === 'combobox') {
+        expect(within(getFilterBlock()).getByLabelText(/^Description Field/)).toBeVisible()
+      }
+      if (style === 'multi-select') {
+        expect(within(getFilterBlock()).getByLabelText(/^Select Limit/)).toBeVisible()
+      }
+    }
+
+    const getNestedSelect = (labelText: string) =>
+      Array.from(getFilterBlock().querySelectorAll('label'))
+        .find(label => label.querySelector('.edit-label')?.textContent?.includes(labelText))
+        ?.querySelector('select') as HTMLSelectElement
+    await performAndAssert(
+      'Filter Style → nested-dropdown editor',
+      () => Boolean(getNestedSelect('Filter Grouping')),
+      async () => userEvent.selectOptions(getFilterStyleSelect(), 'nested-dropdown'),
+      (_before, after) => after
+    )
+    expect(getNestedSelect('Filter Grouping')).toHaveValue('STATE')
+    const subgrouping = getNestedSelect('Filter SubGrouping')
+    await performAndAssert(
+      'Filter Style → nested-dropdown',
+      () => Boolean(canvasElement.querySelector('.cove-visualization__filters-section .nested-dropdown')),
+      async () => userEvent.selectOptions(subgrouping, 'Location'),
+      (_before, after) => after
+    )
+    expect(getNestedSelect('Subgroup Description Field')).toBeEnabled()
+    expect(within(getFilterBlock()).getByLabelText('Create query parameters')).toBeEnabled()
+    expect(within(getFilterBlock()).getByLabelText('Display subgrouping only')).toBeEnabled()
   }
 }
