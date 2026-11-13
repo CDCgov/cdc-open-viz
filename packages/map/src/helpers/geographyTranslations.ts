@@ -1,4 +1,7 @@
-import { supportedStates, supportedTerritories } from '../data/supported-geos'
+import { supportedCountries, supportedStates, supportedTerritories } from '../data/supported-geos'
+import spanishCountryTranslations from '../data/spanish-country-names.json'
+
+const SPANISH_COUNTRY_TRANSLATIONS: Record<string, string> = spanishCountryTranslations
 
 const SPANISH_TRANSLATIONS: Record<string, string> = {
   'US-AL': 'Alabama',
@@ -79,7 +82,25 @@ Object.entries({ ...supportedStates, ...supportedTerritories }).forEach(([uid, n
 const spanishNameToUid = new Map<string, string>()
 Object.entries(SPANISH_TRANSLATIONS).forEach(([uid, name]) => spanishNameToUid.set(normalizeGeographyName(name), uid))
 
-export const getSpanishGeographyName = (uid: string): string | undefined => SPANISH_TRANSLATIONS[uid]
+const countryNameToUid = new Map<string, string>()
+const spanishCountryNames = new Map<string, string>()
+Object.entries<string[]>(supportedCountries).forEach(([uid, names]) => {
+  countryNameToUid.set(normalizeGeographyName(uid), uid.toUpperCase())
+  names.forEach(name => countryNameToUid.set(normalizeGeographyName(name), uid.toUpperCase()))
+})
+Object.entries(SPANISH_COUNTRY_TRANSLATIONS).forEach(([uid, name]) => {
+  spanishCountryNames.set(uid.toUpperCase(), name)
+  // English names take precedence where a translated name is ambiguous.
+  if (!countryNameToUid.has(normalizeGeographyName(name))) {
+    countryNameToUid.set(normalizeGeographyName(name), uid.toUpperCase())
+  }
+})
+
+export const getCountryGeographyUidAlias = (value: unknown): string | undefined =>
+  countryNameToUid.get(normalizeGeographyName(value))
+
+export const getSpanishGeographyName = (uid: string): string | undefined =>
+  SPANISH_TRANSLATIONS[uid] ?? spanishCountryNames.get(uid.toUpperCase())
 
 export const getLocalizedGeographyName = (uid: string, locale?: string): string | undefined =>
   locale?.toLowerCase().startsWith('es') ? getSpanishGeographyName(uid) : undefined

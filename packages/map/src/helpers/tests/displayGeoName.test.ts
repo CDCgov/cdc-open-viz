@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { displayGeoName } from '../displayGeoName'
 
 describe('displayGeoName', () => {
@@ -48,5 +49,45 @@ describe('displayGeoName', () => {
 
   it('resolves Spanish geography input to the English name', () => {
     expect(displayGeoName('Nuevo México', undefined, 'en-US')).toBe('New Mexico')
+  })
+
+  it.each([
+    ['AFG', 'Afghanistan', 'Afganistán'],
+    ['BRA', 'Brazil', 'Brasil'],
+    ['CZE', 'Czechia', 'Chequia'],
+    ['DEU', 'Germany', 'Alemania'],
+    ['EGY', 'Egypt', 'Egipto'],
+    ['JPN', 'Japan', 'Japón'],
+    ['NZL', 'New Zealand', 'Nueva Zelandia'],
+    ['CIV', "Côte D'ivoire", 'Costa de Marfil'],
+    ['SGS', 'South Georgia and the South Sandwich Islands', 'Islas Georgia del Sur y Sándwich del Sur'],
+    ['Easter Island', 'Easter Island', 'Isla de Pascua'],
+    ['Madeira Islands', 'Madeira Islands', 'Islas Madeira']
+  ])('switches %s between English and the approved Spanish name', (uid, english, spanish) => {
+    expect(displayGeoName(uid, undefined, 'en-US')).toBe(english)
+    expect(displayGeoName(uid, undefined, 'es-MX')).toBe(spanish)
+    expect(displayGeoName(uid.toLowerCase(), undefined, 'es-MX')).toBe(spanish)
+    expect(displayGeoName(english, undefined, 'es-MX')).toBe(spanish)
+    expect(displayGeoName(spanish, undefined, 'en-US')).toBe(english)
+    expect(displayGeoName(uid, undefined, 'en-US')).toBe(english)
+    expect(displayGeoName(uid, 'Author label', 'es-MX')).toBe('Author label')
+  })
+
+  it('preserves canonical codes and existing state translations where country names overlap', () => {
+    expect(displayGeoName('GEO', undefined, 'es-MX')).toBe('Georgia')
+    expect(displayGeoName('US-GA', undefined, 'es-MX')).toBe('Georgia')
+    expect(displayGeoName('US-HI', undefined, 'es-MX')).toBe('Hawái')
+    expect(displayGeoName('US-VI', undefined, 'es-MX')).toBe('Islas Vírgenes de los EE. UU.')
+    expect(displayGeoName('VIR', undefined, 'es-MX')).toBe('Islas Vírgenes (de los EE. UU.)')
+  })
+
+  it.each([
+    ['XAC', 'Ashmore and Cartier Islands'],
+    ['XBK', 'Baker Island'],
+    ['SAH', 'Western Sahara'],
+    ['VUT', 'Vanuatu'],
+    ['XWK', 'Wake Island']
+  ])('falls back to English for untranslated country %s', (uid, english) => {
+    expect(displayGeoName(uid, undefined, 'es-MX')).toBe(english)
   })
 })
