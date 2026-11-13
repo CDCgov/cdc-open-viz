@@ -177,6 +177,29 @@ describe('Widget', () => {
     })
   })
 
+  it('lets an unconfigured Data Bite open its visualization editor', () => {
+    const { dispatch } = renderWidget({
+      type: 'data-bite',
+      widgetConfig: {
+        uid: 'data-bite-1',
+        rowIdx: 0,
+        colIdx: 0,
+        type: 'data-bite'
+      }
+    })
+
+    expect(screen.getByTitle('Configure Data')).toBeInTheDocument()
+    fireEvent.click(screen.getByTitle('Configure Visualization'))
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_VISUALIZATION',
+      payload: {
+        vizKey: 'data-bite-1',
+        configureData: { editing: true, showEditorPanel: true }
+      }
+    })
+  })
+
   it('shows labels for waffle and gauge visualization type aliases', () => {
     renderWidget({
       type: 'TP5 Waffle',

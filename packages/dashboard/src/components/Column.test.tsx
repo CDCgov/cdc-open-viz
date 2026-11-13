@@ -10,8 +10,8 @@ vi.mock('react-dnd', () => ({
 }))
 
 vi.mock('./Widget/Widget', () => ({
-  default: ({ title, widgetConfig }) => (
-    <div data-testid='mock-widget' data-uid={widgetConfig?.uid}>
+  default: ({ title, type, widgetConfig }) => (
+    <div data-testid='mock-widget' data-type={type} data-uid={widgetConfig?.uid}>
       {title}
     </div>
   )
@@ -137,6 +137,36 @@ describe('Column copy paste slots', () => {
 })
 
 describe('Column widget summaries', () => {
+  it('falls back to the canonical type for a Data Bite without visualizationType', () => {
+    renderColumn({
+      data: { width: 12, widget: 'legacy-data-bite' },
+      visualizations: {
+        'legacy-data-bite': {
+          uid: 'legacy-data-bite',
+          type: 'data-bite',
+          visualizationType: '',
+          general: { geoType: 'world' }
+        }
+      }
+    })
+
+    expect(screen.getByTestId('mock-widget')).toHaveAttribute('data-type', 'data-bite')
+  })
+
+  it('falls back to the canonical type in conditional widget slots', () => {
+    renderColumn({
+      data: { width: 12, conditionalWidgets: [{ widget: 'legacy-data-bite' }] },
+      visualizations: {
+        'legacy-data-bite': {
+          uid: 'legacy-data-bite',
+          type: 'data-bite'
+        }
+      }
+    })
+
+    expect(screen.getByTestId('mock-widget')).toHaveAttribute('data-type', 'data-bite')
+  })
+
   it('uses the row widget key as the widget uid when saved config contains a stale inner uid', () => {
     renderColumn({
       data: { width: 12, widget: 'canonical-widget-key' },

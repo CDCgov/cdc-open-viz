@@ -368,6 +368,33 @@ describe('Data Bite', () => {
     expect(fetchRemoteData).toHaveBeenCalledWith('/remote-data.json')
   })
 
+  it('does not clear dashboard editing state before the editor config finishes loading', async () => {
+    const setConfig = vi.fn()
+
+    render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: '',
+          biteBody: '',
+          dataColumn: '',
+          dataFunction: '',
+          editing: true,
+          showEditorPanel: true
+        }}
+        isDashboard={true}
+        isEditor={true}
+        setConfig={setConfig}
+      />
+    )
+
+    expect(await screen.findByText('Configure Data Bites')).toBeInTheDocument()
+    await waitFor(() => expect(setConfig).toHaveBeenCalled())
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(setConfig.mock.calls.every(([config]) => config.editing && config.showEditorPanel)).toBe(true)
+  })
+
   it('updates the rendered value when parent-provided data changes', async () => {
     const config = {
       type: 'data-bite',
