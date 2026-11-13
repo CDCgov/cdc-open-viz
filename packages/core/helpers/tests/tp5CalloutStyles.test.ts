@@ -1,18 +1,17 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { compile } from 'sass'
 
 const packagesRoot = path.resolve(__dirname, '../../..')
-const loadPaths = [path.join(packagesRoot, '../node_modules')]
+const readPackageStyles = packageName =>
+  readFileSync(path.join(packagesRoot, packageName, 'src/css/main.css'), 'utf8').replace(
+    /^@charset\s+["'][^"']+["'];\s*/,
+    ''
+  )
 
 const mountWithPackageStyles = (packageName: string, markup: string) => {
-  const { css } = compile(path.join(packagesRoot, packageName, 'src/scss/main.scss'), {
-    loadPaths,
-    charset: false, // Inline style elements use the document encoding, not a CSS @charset rule.
-    logger: { warn() {}, debug() {} }
-  })
   const style = document.createElement('style')
-  style.textContent = css
+  style.textContent = readPackageStyles(packageName)
   style.dataset.calloutTest = 'true'
   document.head.appendChild(style)
   document.body.innerHTML = `<div class="cove-visualization type-${packageName}">${markup}</div>`
@@ -24,7 +23,7 @@ afterEach(() => {
 })
 
 describe('isolated TP5 callout styling', () => {
-  // Compile only the consuming package's CSS: Storybook can otherwise mask a missing
+  // Load only the consuming package's CSS: Storybook can otherwise mask a missing
   // import by loading the same shared styles later through an unrelated package.
   it.each(['data-bite', 'chart', 'map', 'waffle-chart'])(
     '%s positions and sizes its own flag without another package or a .cove ancestor',
@@ -58,14 +57,9 @@ describe('isolated TP5 callout styling', () => {
 
   it('dashboard rows still remove flag spacing when they hide the flag', () => {
     mountWithPackageStyles('data-bite', '')
-    const { css } = compile(path.join(packagesRoot, 'dashboard/src/scss/main.scss'), {
-      loadPaths,
-      charset: false,
-      logger: { warn() {}, debug() {} }
-    })
     const style = document.createElement('style')
     style.dataset.calloutTest = 'true'
-    style.textContent = css
+    style.textContent = readPackageStyles('dashboard')
     document.head.appendChild(style)
     document.body.innerHTML = `
       <div class="cove-visualization type-dashboard"><div class="cdc-dashboard-inner-container">

@@ -5,7 +5,7 @@ import nestedDropdownStory from './_mocks/nested-dropdown.json'
 import { useState } from 'react'
 import { getNestedOptions } from '../Filters/helpers/getNestedOptions'
 import type { NestedOptions } from '../NestedDropdown/nestedDropdownHelpers'
-import '../Filters/filters.scss'
+import '../Filters/filters.css'
 
 const nestedDropdownOptions = getNestedOptions(nestedDropdownStory as any)
 const proportionalSizingOptions: NestedOptions = [

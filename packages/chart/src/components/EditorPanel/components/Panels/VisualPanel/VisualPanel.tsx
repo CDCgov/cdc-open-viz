@@ -27,7 +27,7 @@ import { StyleTreatmentSection } from '@cdc/core/components/panels/VisualPanel'
 import { getColorScale } from '../../../../../helpers/getColorScale'
 import SeriesColorAssignments from './SeriesColorAssignments'
 import { ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
-import '@cdc/core/components/EditorPanel/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.css'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {

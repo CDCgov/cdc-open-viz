@@ -15,7 +15,7 @@ import ConfigContext from '../../context.ts'
 import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { MapContext } from '../../types/MapContext.js'
 
-import '@cdc/core/components/EditorPanel/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.css'
 import './EditorPanel.styles.css'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { getAvailableMapColumns } from '../../helpers/getMissingRequiredMapFields'

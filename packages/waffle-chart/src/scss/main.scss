@@ -1,9 +1,0 @@
-@import '@cdc/core/styles/utils/accessibility';
-@import 'waffle-chart';
-
-.cove-visualization.type-waffle-chart {
-  .cove-visualization__body:not(.component--has-background, .component--hide-background-color) {
-    background-color: white;
-  }
-
-}

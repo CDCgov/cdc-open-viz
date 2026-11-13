@@ -5,7 +5,7 @@ import Context from '../../context'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import '@cdc/core/components/EditorPanel/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.css'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Panels from './components/Panels'

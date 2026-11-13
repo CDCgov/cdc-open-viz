@@ -4,7 +4,7 @@ import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import CdcDataTable from './CdcDataTable'
 
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 let isEditor = window.location.href.includes('editor=true')
 

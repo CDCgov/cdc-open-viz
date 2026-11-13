@@ -116,7 +116,7 @@ import { calcInitialHeight } from './helpers/sizeHelpers'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
-import './scss/main.scss'
+import './css/main.css'
 import { getInitialState, reducer } from './store/chart.reducer'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getNewRuntime } from './helpers/getNewRuntime'

@@ -1,0 +1,331 @@
+.column-remap-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  position: fixed;
+  z-index: 9998;
+}
+
+.column-remap-wrapper {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 9999;
+}
+
+.column-remap-dialog {
+  background: var(--white);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  max-width: 42rem;
+  overflow-y: auto;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+}
+
+.column-remap-header {
+  align-items: center;
+  border-bottom: 1px solid var(--lightGray);
+  display: flex;
+  justify-content: space-between;
+  margin: -0.5rem -0.5rem 1rem;
+  padding: 0 0.5rem 0.75rem;
+}
+.column-remap-header h2 {
+  margin: 0;
+}
+.column-remap-header button {
+  background: transparent;
+  border: 0;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.column-remap-modal {
+  min-width: min(34rem, 80vw);
+}
+.column-remap-modal .column-remap-field {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(8rem, 1fr) minmax(12rem, 2fr);
+  margin-top: 0.75rem;
+}
+.column-remap-modal .column-remap-section {
+  margin-top: 1.25rem;
+}
+.column-remap-modal .column-remap-section:last-of-type {
+  margin-bottom: 1.25rem;
+}
+.column-remap-modal .column-remap-section > p {
+  margin: 0.25rem 0 0.5rem;
+}
+.column-remap-modal .column-remap-section + .column-remap-section {
+  border-top: 1px solid var(--lightGray);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+}
+.column-remap-modal .column-remap-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 0.25rem;
+}
+.column-remap-modal .column-remap-count {
+  margin: 0;
+}
+.column-remap-modal .column-remap-guidance {
+  margin: 0;
+}
+.column-remap-modal ul.column-remap-conflicts {
+  color: var(--red);
+  display: block;
+  list-style: disc;
+  margin: 1rem 0 0;
+  padding-inline-start: 1.5rem;
+}
+.column-remap-modal ul.column-remap-conflicts li {
+  background: transparent;
+  border: 0;
+  display: list-item;
+  line-height: 1.4;
+  text-align: left;
+  width: auto;
+}
+.column-remap-modal .column-remap-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.cdc-editor .data-designer {
+  display: flex;
+  height: calc(100vh - 3rem);
+  min-height: 0;
+  overflow: hidden;
+}
+.cdc-editor .data-designer .left-col {
+  background: var(--white);
+  border-right: var(--lightGray) 1px solid;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--gbl-padding);
+  width: 50%;
+  z-index: 1;
+}
+.cdc-editor .data-designer .left-col .dataset-name-input {
+  width: 100%;
+}
+.cdc-editor .data-designer .left-col .heading-3 {
+  border-top: 1px solid gray;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+  padding-top: 0.5em;
+}
+.cdc-editor .data-designer .left-col .tabs {
+  margin-bottom: 2em;
+}
+.cdc-editor .data-designer .left-col .tabs > ul.nav {
+  display: flex;
+}
+.cdc-editor .data-designer .left-col .tabs .nav-item {
+  align-items: center;
+  border-bottom: var(--lightGray) 1px solid;
+  color: var(--mediumGray);
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  list-style: none;
+  padding: 0.6rem 0;
+}
+.cdc-editor .data-designer .left-col .tabs .nav-item svg {
+  margin-right: 0.3em;
+}
+.cdc-editor .data-designer .left-col .tabs .nav-item:hover {
+  border-bottom-color: var(--mediumGray);
+}
+.cdc-editor .data-designer .left-col .tabs .nav-item.active {
+  border-bottom-color: var(--mediumGray);
+  border-bottom-width: 5px;
+  color: var(--darkGray);
+}
+.cdc-editor .data-designer .left-col .tabs .tab-content {
+  border-top: 1px solid var(--baseColor);
+  padding-top: var(--gbl-padding);
+}
+.cdc-editor .data-designer .left-col table {
+  border: 1px solid gray;
+  width: 100%;
+}
+.cdc-editor .data-designer .left-col table thead {
+  background-color: rgb(220, 220, 200);
+  border-bottom: 1px solid gray;
+}
+.cdc-editor .data-designer .left-col table td {
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cdc-editor .data-designer .left-col table td button {
+  font-size: 11pt;
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector {
+  border: var(--lightGray) 2px dashed;
+  border-radius: 0.2rem;
+  color: var(--mediumGray);
+  cursor: pointer;
+  font-size: 1em;
+  padding: 1rem 3rem;
+  text-align: center;
+  transition: 0.1s all;
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector svg {
+  color: var(--baseColor);
+  margin: 0 auto 0.5em;
+  max-width: 35px;
+  transition: 0.1s all;
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector svg path {
+  fill: currentColor;
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector.drag-active {
+  background-color: var(--gray2);
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector.drag-active svg {
+  transform: scale(0.8);
+  transition: 0.1s all;
+}
+.cdc-editor .data-designer .left-col .cdcdataviz-file-selector span {
+  color: var(--blue);
+  text-decoration: underline;
+  white-space: pre;
+}
+.cdc-editor .data-designer .left-col .footnote {
+  color: var(--mediumGray);
+  font-size: 0.8rem;
+  font-style: italic;
+  margin: 1em 0 2em 0;
+}
+.cdc-editor .data-designer .left-col .btn.active {
+  background: rgb(0, 51.7, 93.5);
+}
+.cdc-editor .data-designer .left-col .input-group {
+  align-items: stretch;
+  display: flex;
+}
+.cdc-editor .data-designer .left-col .input-group input[type='text'] {
+  border-right: 0;
+  flex-grow: 1;
+}
+.cdc-editor .data-designer .left-col .keep-url {
+  color: var(--mediumGray);
+  font-size: 0.8rem;
+  gap: 0.25rem;
+}
+.cdc-editor .data-designer .left-col .sample-data-list {
+  font-size: 0.8rem;
+  list-style: none;
+}
+.cdc-editor .data-designer .left-col .sample-data-list li {
+  color: var(--blue);
+  cursor: pointer;
+  margin-top: 0.3rem;
+  text-decoration: underline;
+}
+.cdc-editor .data-designer .left-col .file-loaded-area {
+  margin-bottom: 20px;
+}
+.cdc-editor .data-designer .left-col .edit-block {
+  border-left: rgba(0, 0, 0, 0.2) 4px solid;
+  padding-left: 1em;
+  transition: 0.2s all;
+}
+.cdc-editor .data-designer .left-col .edit-block:not(:first-child) {
+  margin-top: 2em;
+}
+.cdc-editor .data-designer .left-col .edit-block input[type='text'],
+.cdc-editor .data-designer .left-col .edit-block input[type='number'] {
+  font-size: 1em;
+}
+.cdc-editor .data-designer .left-col .edit-block label {
+  margin-top: 0;
+}
+.cdc-editor .data-designer .left-col .edit-block label + label {
+  margin-top: 1em;
+}
+.cdc-editor .data-designer .left-col .edit-block:hover {
+  border-left: rgba(0, 0, 0, 0.7) 4px solid;
+  transition: 0.2s all;
+}
+.cdc-editor .data-designer .left-col .edit-block .column-heading {
+  display: block;
+  text-transform: uppercase;
+}
+.cdc-editor .data-designer .left-col .edit-block select,
+.cdc-editor .data-designer .left-col .edit-block input {
+  width: 100%;
+}
+.cdc-editor .data-designer .left-col .url-filters-block {
+  font-size: 12.8px;
+}
+.cdc-editor .data-designer .left-col .url-filters-block .cove-icon {
+  margin: 0 0.5rem;
+}
+.cdc-editor .data-designer .left-col .url-filters-block .url-value-label {
+  margin: 0 1em;
+}
+.cdc-editor .data-designer .left-col .url-filters-block label {
+  display: inline-block;
+  margin-top: 1em;
+  width: 100%;
+}
+.cdc-editor .data-designer .left-col .url-source-options,
+.cdc-editor .data-designer .left-col .data-source-options {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 100px;
+  margin-bottom: 20px;
+}
+.cdc-editor .data-designer .left-col .url-source-options .btn,
+.cdc-editor .data-designer .left-col .data-source-options .btn {
+  margin: 0;
+}
+.cdc-editor .data-designer .left-col .url-source-options .cdcdataviz-file-selector.loaded-file,
+.cdc-editor .data-designer .left-col .data-source-options .cdcdataviz-file-selector.loaded-file {
+  font-size: 0.9em;
+  padding: 0.4rem 3rem;
+}
+.cdc-editor .data-designer .left-col .url-source-options .cdcdataviz-file-selector.loaded-file svg,
+.cdc-editor .data-designer .left-col .data-source-options .cdcdataviz-file-selector.loaded-file svg {
+  height: 1em;
+  margin: 0;
+  position: relative;
+  top: 4px;
+  width: 1em;
+}
+.cdc-editor .data-designer .left-col .data-source-options {
+  align-items: center;
+}
+.cdc-editor .data-designer .right-col {
+  background-color: var(--gray2);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--gbl-padding);
+  position: relative;
+  width: 50%;
+}
+.cdc-editor .data-designer .right-col table {
+  border-collapse: collapse;
+  table-layout: unset;
+  width: 100%;
+}
+.cdc-editor .data-designer .right-col table th,
+.cdc-editor .data-designer .right-col table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

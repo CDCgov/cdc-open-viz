@@ -1,5 +1,5 @@
 import React from 'react'
-import './waiting.scss'
+import './waiting.css'
 
 const styles = {
   position: 'relative',

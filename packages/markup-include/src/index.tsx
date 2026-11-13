@@ -3,7 +3,7 @@ import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 import CdcMarkupInclude from './CdcMarkupInclude'
 

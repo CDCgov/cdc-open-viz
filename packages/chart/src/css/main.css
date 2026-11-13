@@ -1,0 +1,748 @@
+.cove-visualization .cdc-callout {
+  --cdc-callout-background: var(--colors-cyan-10, #eff9fa);
+  --cdc-callout-border-color: var(--colors-cyan-15, #dff2f6);
+  --cdc-callout-border-radius: 0.25rem;
+  --cdc-callout-padding: 1.25rem;
+  --cdc-callout-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+  background: var(--cdc-callout-background);
+  border: 1px solid var(--cdc-callout-border-color);
+  border-radius: var(--cdc-callout-border-radius);
+  box-shadow: var(--cdc-callout-shadow);
+  margin: 0;
+  padding: var(--cdc-callout-padding);
+  position: relative;
+}
+
+.cove-visualization .cdc-callout .cdc-callout__flag {
+  height: auto;
+  position: absolute;
+  right: 1.08rem;
+  top: -0.36rem;
+  width: 1.84rem;
+}
+
+.form-container {
+  overflow-y: auto;
+}
+
+.cove-visualization.type-dashboard .cove-visualization.type-chart.is-editor .cove-visualization__body {
+  background: white;
+}
+
+.cove-visualization.type-chart .data-table-container {
+  width: 100%;
+}
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--0 {
+  display: none !important;
+}
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--1 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--2 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--3 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--4 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--5 > td:first-child {
+  background-color: #ffe699;
+}
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--6 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--7 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--8 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--9 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--10 > td:first-child,
+.cove-visualization.type-chart .data-table-container .row-Box-Plot--11 > td:first-child {
+  background-color: #d9d9d9;
+}
+.cove-visualization.type-chart .data-table-container .region-table {
+  display: table;
+}
+.cove-visualization.type-chart .data-table-container .region-table thead,
+.cove-visualization.type-chart .data-table-container .region-table tbody {
+  display: table-row-group;
+}
+.cove-visualization.type-chart .data-table-container .region-table thead tr,
+.cove-visualization.type-chart .data-table-container .region-table tbody tr {
+  display: table-row;
+}
+.cove-visualization.type-chart .data-table-container .region-table thead tr td,
+.cove-visualization.type-chart .data-table-container .region-table tbody tr td {
+  display: table-cell !important;
+}
+.cove-visualization.type-chart .cove-visualization__body {
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+.cove-visualization.type-chart .cove-visualization__body.component--has-legacy-border,
+.cove-visualization.type-chart .cove-visualization__body.component--has-border-color-theme,
+.cove-visualization.type-chart .cove-visualization__body.component--has-background,
+.cove-visualization.type-chart .cove-visualization__body.component--has-accent {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.cove-visualization.type-chart .cove-visualization__body.component--tp5-treatment {
+  background: transparent;
+}
+.cove-visualization.type-chart .cove-visualization__body.component--tp5-treatment .cdc-callout {
+  --cdc-callout-background: transparent;
+}
+.cove-visualization.type-chart
+  .cove-visualization__body.component--tp5-treatment
+  .cdc-callout
+  .cove-visualization__title,
+.cove-visualization.type-chart
+  .cove-visualization__body.component--tp5-treatment
+  .cdc-callout
+  .cove-visualization__header {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+.cove-visualization.type-chart
+  .cove-visualization__body.component--tp5-treatment
+  .cdc-callout
+  .cove-visualization__title
+  h2,
+.cove-visualization.type-chart
+  .cove-visualization__body.component--tp5-treatment
+  .cdc-callout
+  .cove-visualization__header
+  h2 {
+  font-family: var(--fonts-nunito, var(--app-font-secondary));
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.cove-visualization.type-chart .cove-visualization__title,
+.cove-visualization.type-chart .cove-visualization__header {
+  margin-bottom: 0 !important;
+}
+.cove-visualization.type-chart .chart-required-fields-alerts {
+  display: grid;
+  gap: 0.75rem;
+}
+.cove-visualization.type-chart .chart-required-fields-alerts > .alert {
+  justify-content: flex-start;
+  margin: 0;
+  width: 100%;
+}
+.cove-visualization.type-chart .chart-required-fields-alerts > .alert .alert-message,
+.cove-visualization.type-chart .chart-required-fields-alerts > .alert > .d-flex {
+  align-items: center;
+  display: flex;
+}
+.cove-visualization.type-chart .chart-required-fields-alerts__link {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  text-decoration: underline;
+}
+.cove-visualization.type-chart .chart-required-fields-alerts__link:hover,
+.cove-visualization.type-chart .chart-required-fields-alerts__link:focus-visible {
+  text-decoration-thickness: 2px;
+}
+.cove-visualization.type-chart .y-axis-top-title-row {
+  display: flex;
+  gap: 1rem;
+  margin: 0 0 0.5rem;
+  width: 100%;
+}
+.cove-visualization.type-chart .y-axis-top-title {
+  font-family: var(--fonts-nunito, var(--app-font-secondary));
+  font-weight: 700;
+  line-height: 1.4;
+  min-width: 0;
+  width: 100%;
+}
+.cove-visualization.type-chart .y-axis-top-title-row--split .y-axis-top-title {
+  flex: 1 1 0;
+}
+.cove-visualization.type-chart .y-axis-top-title--right {
+  margin-left: auto;
+  text-align: right;
+}
+.cove-visualization.type-chart .legend-top .legend-wrapper .tooltip-boundary {
+  display: flex;
+  flex-wrap: wrap;
+  order: 2;
+}
+.cove-visualization.type-chart .legend-top .legend-wrapper .tooltip-boundary aside {
+  order: 1;
+  width: 100%;
+}
+.cove-visualization.type-chart .legend-bottom .legend-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--cove-visualization-section-gap, 1.5rem);
+}
+.cove-visualization.type-chart .legend-bottom .legend-wrapper aside {
+  margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
+  width: 100%;
+}
+.cove-visualization.type-chart.is-editor .cove-visualization__body {
+  background: white;
+}
+.cove-visualization.type-chart {
+  border-radius: 3px;
+}
+.cove-visualization.type-chart .chart-description {
+  margin-bottom: 20px;
+}
+.cove-visualization.type-chart .type-pie svg.animated-pie {
+  width: auto !important;
+}
+.cove-visualization.type-chart .legend-container #supression-tooltip {
+  border-radius: 4px;
+  box-shadow: 0px 2px 2px rgba(28, 29, 31, 0.45);
+  font-size: 0.8337rem;
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 16.7rem;
+  padding: 0.5rem 1rem;
+  white-space: normal;
+}
+.cove-visualization.type-chart .legend-container {
+  background: #fff;
+  border: 1px solid var(--cool-gray-10);
+  border-radius: 6px;
+  position: relative;
+  text-align: left;
+  vertical-align: top;
+  width: 100%;
+}
+.cove-visualization.type-chart .legend-container h3 {
+  font-size: var(--legend-title-font-size);
+}
+.cove-visualization.type-chart .legend-container p {
+  font-size: var(--legend-description-font-size);
+}
+.cove-visualization.type-chart .legend-container tspan,
+.cove-visualization.type-chart .legend-container div {
+  font-size: var(--legend-item-font-size);
+}
+.cove-visualization.type-chart .legend-container.border-0 {
+  border: 1px solid transparent;
+  padding: 0;
+}
+.cove-visualization.type-chart .legend-container__inner {
+  column-gap: var(--space-between-legend-item-columns);
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--space-between-legend-item-rows);
+}
+.cove-visualization.type-chart .legend-container__inner.double-column,
+.cove-visualization.type-chart .legend-container__inner.single-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.cove-visualization.type-chart .legend-container__inner.single-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.cove-visualization.type-chart .legend-container__inner.single-row .legend-item {
+  flex-basis: auto;
+}
+.cove-visualization.type-chart .legend-container__inner.double-column.reverse-items div.legend-item:last-child {
+  margin-bottom: 0.2rem !important;
+}
+.cove-visualization.type-chart .legend-container .legend-item {
+  line-height: var(--legend-item-font-size);
+  text-align: left;
+  user-select: none;
+}
+.cove-visualization.type-chart .legend-container .legend-item .visx-legend-label {
+  white-space: pre-wrap;
+  word-break: break-word;
+  word-wrap: break-word;
+}
+.cove-visualization.type-chart .legend-container .vertical-sorted:not(.single-row) .legend-item {
+  white-space: nowrap;
+}
+.cove-visualization.type-chart .legend-container .legend-item > .legend-item {
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.cove-visualization.type-chart .legend-container .legend-item {
+  cursor: pointer;
+  transition: 0.2s all;
+}
+.cove-visualization.type-chart .legend-container .legend-item.not-clickable,
+.cove-visualization.type-chart .legend-container .legend-item.not-clickable .legend-item {
+  cursor: default;
+}
+.cove-visualization.type-chart .legend-container .legend-item.inactive {
+  opacity: 0.5;
+  transition: 0.2s all;
+}
+.cove-visualization.type-chart .legend-container .legend-item.highlighted {
+  border-radius: 1px;
+  outline: 1px solid #005ea2;
+  outline-offset: 5px;
+}
+.cove-visualization.type-chart .legend-container .legend-item--interactive {
+  border-radius: 1px;
+  isolation: isolate;
+  position: relative;
+}
+.cove-visualization.type-chart .legend-container .legend-item--interactive:hover::before,
+.cove-visualization.type-chart .legend-container .legend-item--interactive:focus-visible::before {
+  background-color: var(--colors-cyan-10, #eff9fa);
+  border-radius: 6px;
+  content: '';
+  inset: -6px;
+  position: absolute;
+  z-index: -1;
+}
+.cove-visualization.type-chart .legend-container__outer.link-container {
+  display: flex;
+  flex-direction: row;
+  left: 0%;
+  position: absolute;
+  top: 108%;
+}
+.cove-visualization.type-chart .legend-container__outer.link-container > * {
+  margin: 0;
+}
+.cove-visualization.type-chart .legend-container__outer.link-container > p,
+.cove-visualization.type-chart .legend-container__outer.link-container a {
+  margin-left: 5px;
+}
+.cove-visualization.type-chart .dynamic-legend-list .legend-item {
+  align-items: flex-end !important;
+  justify-content: space-between;
+}
+.cove-visualization.type-chart .dynamic-legend-list .legend-item .btn-wrapper {
+  background: transparent;
+}
+.cove-visualization.type-chart .dynamic-legend-list .visx-legend-label {
+  display: inline-block !important;
+  width: auto !important;
+}
+.cove-visualization.type-chart .dynamic-legend-list button {
+  display: inline-block;
+  width: auto;
+}
+.cove-visualization.type-chart .div[class*='Asterisk'] {
+  transform: 0;
+}
+.cove-visualization.type-chart .legend-preliminary {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  font-size: var(--legend-item-font-size);
+  vertical-align: middle;
+}
+.cove-visualization.type-chart .legend-preliminary > span {
+  align-items: center;
+  display: flex;
+  font-size: 1em;
+  justify-items: center;
+  margin-right: 9px;
+  max-height: 1px;
+  white-space: nowrap;
+}
+.cove-visualization.type-chart .legend-preliminary > p {
+  font-size: var(--legend-item-font-size);
+}
+.cove-visualization.type-chart .legend-preliminary > span[class*='Asterisk'] {
+  margin-top: 15px;
+  transform: scale(1.8);
+}
+.cove-visualization.type-chart .legend-preliminary > span[class*='Dagger'] {
+  margin-top: 2px;
+}
+.cove-visualization.type-chart .legend-preliminary > span[class*='Sign'] {
+  margin-top: 1px;
+}
+.cove-visualization.type-chart .legend-preliminary > svg {
+  height: 23px;
+  width: 50px;
+}
+.cove-visualization.type-chart .legend-preliminary > p {
+  margin: 0;
+}
+.cove-visualization.type-chart .visx-tooltip {
+  z-index: 100000;
+}
+.cove-visualization.type-chart .region-table {
+  margin-top: 15px;
+}
+.cove-visualization.type-chart .p-relative {
+  position: relative;
+}
+.cove-visualization.type-chart .visualization-container {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 100%;
+  min-width: 0;
+}
+.cove-visualization.type-chart .visualization-container .legend-wrapper {
+  max-width: 100%;
+  min-width: 0;
+}
+.cove-visualization.type-chart .visualization-container .legend-wrapper > div,
+.cove-visualization.type-chart .visualization-container .legend-wrapper > aside {
+  max-width: 100%;
+  min-width: 0;
+}
+.cove-visualization.type-chart .visualization-container .tooltip-boundary {
+  max-width: 100%;
+  min-width: 0;
+}
+.cove-visualization.type-chart .visualization-container.legend-top:not(.legend-hidden) .legend-wrapper > div {
+  order: 2;
+  width: 100%;
+}
+.cove-visualization.type-chart .visualization-container.legend-top:not(.legend-hidden) .legend-wrapper aside {
+  height: fit-content;
+  order: 1;
+  width: 100%;
+}
+.cove-visualization.type-chart .visualization-container.legend-left:not(.legend-hidden) .legend-wrapper > div {
+  order: 2;
+  width: 75%;
+}
+.cove-visualization.type-chart .visualization-container.legend-left:not(.legend-hidden) .legend-wrapper aside {
+  height: fit-content;
+  order: 1;
+  width: 25%;
+}
+.cove-visualization.type-chart .visualization-container.legend-right:not(.legend-hidden) .legend-wrapper > div {
+  order: 1;
+  width: 75%;
+}
+.cove-visualization.type-chart .visualization-container.legend-right:not(.legend-hidden) .legend-wrapper aside {
+  height: fit-content;
+  order: 2;
+  width: 25%;
+}
+.cove-visualization.type-chart .visualization-container.left {
+  display: flex;
+  flex-direction: row-reverse;
+}
+.cove-visualization.type-chart .visualization-container.top {
+  flex-direction: column-reverse;
+  flex-wrap: nowrap;
+}
+.cove-visualization.type-chart .visualization-container.top > div.tooltip-boundary {
+  margin-top: 1.5em;
+}
+.cove-visualization.type-chart .visualization-container.bottom {
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.cove-visualization.type-chart .visualization-container.legend-hidden > svg {
+  width: 100% !important;
+}
+.cove-visualization.type-chart .visualization-container .brush-overlay {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cove-visualization.type-chart .visualization-container .brush-overlay .visx-brush,
+.cove-visualization.type-chart .visualization-container .brush-overlay .visx-brush-overlay,
+.cove-visualization.type-chart .visualization-container .brush-overlay .visx-brush-selection,
+.cove-visualization.type-chart .visualization-container .brush-overlay .visx-brush-handle-left,
+.cove-visualization.type-chart .visualization-container .brush-overlay .visx-brush-handle-right {
+  cursor: pointer;
+  touch-action: none;
+}
+.cove-visualization.type-chart .visualization-container svg.dragging-annotation * {
+  user-select: none;
+}
+.cove-visualization.type-chart .visualization-container svg.dragging-annotation path {
+  pointer-events: none;
+}
+.cove-visualization.type-chart .visualization-container > svg {
+  font-size: 14px;
+  margin: 1rem 0 2rem;
+  overflow: visible;
+}
+.cove-visualization.type-chart .visualization-container > svg .visx-linepath {
+  pointer-events: none;
+}
+.cove-visualization.type-chart .visualization-container > svg circle {
+  opacity: 0;
+}
+.cove-visualization.type-chart .visualization-container.chart-line--hover > svg circle {
+  opacity: 0;
+}
+.cove-visualization.type-chart .visualization-container.chart-line--hover > svg circle:hover {
+  opacity: 1;
+}
+.cove-visualization.type-chart .visualization-container.chart-line--always > svg circle {
+  opacity: 1;
+}
+.cove-visualization.type-chart .visualization-container.chart-line--always > svg.animated circle {
+  animation: revealLolly 0.25s linear forwards;
+  animation-delay: 0.75s;
+  animation-play-state: paused;
+  opacity: 0;
+}
+.cove-visualization.type-chart .visualization-container.chart-line--always > svg.animated.animate circle {
+  animation-play-state: running;
+}
+@keyframes revealLolly {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.cove-visualization.type-chart .visualization-container.chart-bar--no-border .visx-group:not(.visx-axis) rect {
+  stroke: none;
+}
+.cove-visualization.type-chart.sm .visualization-container .no-wrap,
+.cove-visualization.type-chart.md .visualization-container .no-wrap,
+.cove-visualization.type-chart.lg .visualization-container .no-wrap,
+.cove-visualization.type-chart.xl .visualization-container .no-wrap {
+  flex-wrap: nowrap;
+}
+.cove-visualization.type-chart.sm .visualization-container .legend-container,
+.cove-visualization.type-chart.md .visualization-container .legend-container,
+.cove-visualization.type-chart.lg .visualization-container .legend-container,
+.cove-visualization.type-chart.xl .visualization-container .legend-container {
+  height: fit-content;
+  margin-left: 1em;
+  width: 25%;
+}
+.cove-visualization.type-chart.sm .visualization-container .legend-container.left,
+.cove-visualization.type-chart.md .visualization-container .legend-container.left,
+.cove-visualization.type-chart.lg .visualization-container .legend-container.left,
+.cove-visualization.type-chart.xl .visualization-container .legend-container.left {
+  margin-left: 0;
+  margin-right: 1em;
+  order: 0;
+}
+.cove-visualization.type-chart.sm .visualization-container .legend-container.bottom,
+.cove-visualization.type-chart.sm .visualization-container .legend-container.top,
+.cove-visualization.type-chart.md .visualization-container .legend-container.bottom,
+.cove-visualization.type-chart.md .visualization-container .legend-container.top,
+.cove-visualization.type-chart.lg .visualization-container .legend-container.bottom,
+.cove-visualization.type-chart.lg .visualization-container .legend-container.top,
+.cove-visualization.type-chart.xl .visualization-container .legend-container.bottom,
+.cove-visualization.type-chart.xl .visualization-container .legend-container.top {
+  margin-left: 0;
+  width: 100%;
+}
+.cove-visualization.type-chart.md .visualization-container > svg,
+.cove-visualization.type-chart.lg .visualization-container > svg,
+.cove-visualization.type-chart.xl .visualization-container > svg {
+  font-size: 16px;
+  order: 1;
+  width: 75%;
+}
+.cove-visualization.type-chart.md .visualization-container > svg circle,
+.cove-visualization.type-chart.lg .visualization-container > svg circle,
+.cove-visualization.type-chart.xl .visualization-container > svg circle {
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+  transform-origin: 50% 50%;
+}
+.cove-visualization.type-chart .animated-pie {
+  opacity: 0;
+  transform: scale(0, 0);
+  transform-origin: center;
+  transition: all 0.4s ease-in-out;
+}
+.cove-visualization.type-chart .animated-pie.animated {
+  opacity: 1;
+  transform: scale(1, 1);
+  transform-origin: center;
+}
+.cove-visualization.type-chart .animated-pie path,
+.cove-visualization.type-chart .animated-pie text {
+  border: rgba(0, 0, 0, 0.3) 1px solid !important;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
+  font-size: 1em;
+  line-height: 1.4em;
+  opacity: 1;
+  padding: 8px 12px;
+}
+.cove-visualization.type-chart .animated-pie .animated-pie-text {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  transition-delay: 0.4s;
+}
+.cove-visualization.type-chart .animated-pie .animated-pie-text.animated {
+  opacity: 1;
+}
+.cove-visualization.type-chart .linear.animated path.animation,
+.cove-visualization.type-chart .Line.animated path.animation,
+.cove-visualization.type-chart .Combo.animated path.animation {
+  opacity: 0;
+}
+.cove-visualization.type-chart .linear.animate path.animation,
+.cove-visualization.type-chart .Line.animate path.animation,
+.cove-visualization.type-chart .Combo.animate path.animation {
+  animation: dash 2s ease-in-out forwards;
+  opacity: 1;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 4000;
+}
+@keyframes dash {
+  to {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+.cove-visualization.type-chart .linear .visx-group,
+.cove-visualization.type-chart .Bar .visx-group,
+.cove-visualization.type-chart .Combo .visx-group {
+  position: relative;
+}
+.cove-visualization.type-chart .linear.animated .vertical path,
+.cove-visualization.type-chart .linear.animated .vertical rect,
+.cove-visualization.type-chart .linear.animated .vertical foreignObject div,
+.cove-visualization.type-chart .Bar.animated .vertical path,
+.cove-visualization.type-chart .Bar.animated .vertical rect,
+.cove-visualization.type-chart .Bar.animated .vertical foreignObject div,
+.cove-visualization.type-chart .Combo.animated .vertical path,
+.cove-visualization.type-chart .Combo.animated .vertical rect,
+.cove-visualization.type-chart .Combo.animated .vertical foreignObject div {
+  animation: growBar 0.5s linear both;
+  animation-play-state: paused;
+  opacity: 0;
+}
+.cove-visualization.type-chart .linear.animated .horizontal path,
+.cove-visualization.type-chart .linear.animated .horizontal rect,
+.cove-visualization.type-chart .linear.animated .horizontal foreignObject div,
+.cove-visualization.type-chart .Bar.animated .horizontal path,
+.cove-visualization.type-chart .Bar.animated .horizontal rect,
+.cove-visualization.type-chart .Bar.animated .horizontal foreignObject div,
+.cove-visualization.type-chart .Combo.animated .horizontal path,
+.cove-visualization.type-chart .Combo.animated .horizontal rect,
+.cove-visualization.type-chart .Combo.animated .horizontal foreignObject div {
+  animation: growBarH 0.5s linear both;
+  animation-play-state: paused;
+  opacity: 0;
+}
+.cove-visualization.type-chart .linear.animated.animate path,
+.cove-visualization.type-chart .linear.animated.animate rect,
+.cove-visualization.type-chart .linear.animated.animate foreignObject div,
+.cove-visualization.type-chart .Bar.animated.animate path,
+.cove-visualization.type-chart .Bar.animated.animate rect,
+.cove-visualization.type-chart .Bar.animated.animate foreignObject div,
+.cove-visualization.type-chart .Combo.animated.animate path,
+.cove-visualization.type-chart .Combo.animated.animate rect,
+.cove-visualization.type-chart .Combo.animated.animate foreignObject div {
+  animation-play-state: running;
+}
+.cove-visualization.type-chart .linear.animated .group-1,
+.cove-visualization.type-chart .linear.animated .group-2,
+.cove-visualization.type-chart .Bar.animated .group-1,
+.cove-visualization.type-chart .Bar.animated .group-2,
+.cove-visualization.type-chart .Combo.animated .group-1,
+.cove-visualization.type-chart .Combo.animated .group-2 {
+  transform-origin: center;
+}
+.cove-visualization.type-chart .linear.animated .visx-linepath .animation,
+.cove-visualization.type-chart .Bar.animated .visx-linepath .animation,
+.cove-visualization.type-chart .Combo.animated .visx-linepath .animation {
+  opacity: 0;
+}
+@keyframes growBar {
+  from {
+    opacity: 1;
+    transform: scale(1, 0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes growBarH {
+  from {
+    opacity: 1;
+    transform: scale(0, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.cove-visualization.type-chart .fieldset--boxplot {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px;
+  padding: 10px;
+}
+.cove-visualization.type-chart .fieldset--boxplot label {
+  margin: 5px 0;
+}
+
+.cdc-visualization__paired-bar-chart {
+  text-align: center;
+  transform: scale(1);
+}
+.cdc-visualization__paired-bar-chart > .visx-group[style] {
+  transform: scale(1);
+}
+
+#paired-bar-legend {
+  text-align: center;
+}
+#paired-bar-legend div {
+  display: flex;
+  margin: 0 0.5em;
+}
+#paired-bar-legend .indicator {
+  height: 1em;
+  margin: 0.25em;
+  vertical-align: middle;
+  width: 1em;
+}
+
+.cove-visualization.type-chart.type-sparkline.lg .visualization-container > svg {
+  width: 100%;
+}
+.cove-visualization.type-chart.type-sparkline .visualization-container.sparkline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+.cove-visualization.type-chart.type-sparkline
+  .cove-visualization__body:not(.component--has-background):not(.component--hide-background-color) {
+  background: #f2f2f2;
+}
+.cove-visualization.type-chart.type-sparkline .cove-visualization__body.component--hide-background-color {
+  background: transparent;
+}
+.cove-visualization.type-chart.type-sparkline .cove-visualization__body.sparkline {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  padding: 1em;
+}
+.cove-visualization.type-chart.type-sparkline .cove-visualization__body.sparkline .visx-axis-tick:first-of-type {
+  transform: translate(20px, 0);
+}
+.cove-visualization.type-chart.type-sparkline .cove-visualization__body.sparkline .visx-axis-tick:last-of-type {
+  transform: translate(-20px, 0);
+}
+.cove-visualization.type-chart.type-sparkline .subtext,
+.cove-visualization.type-chart.type-sparkline .subtext--responsive-ticks {
+  margin-top: 0px;
+}
+.cove-visualization.type-chart.type-sparkline .is-editor {
+  position: relative;
+}
+
+.cove-visualization .debug {
+  border: 2px solid red;
+}
+
+.legend-patterns {
+  gap: var(--space-between-legend-item-rows);
+  margin-top: var(--space-between-legend-item-rows);
+}
+.legend-patterns.flex-row {
+  column-gap: var(--space-between-legend-item-columns);
+  row-gap: var(--space-between-legend-item-rows);
+}
