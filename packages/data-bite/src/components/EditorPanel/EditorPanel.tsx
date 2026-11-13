@@ -18,7 +18,7 @@ const EditorPanel = () => {
       config={config}
       updateConfig={updateConfig as (config: any) => void}
       loading={loading}
-      setParentConfig={setParentConfig as ((config: any) => void) | undefined}
+      setParentConfig={loading ? undefined : (setParentConfig as ((config: any) => void) | undefined)}
       isDashboard={isDashboard}
       title='Configure Data Bites'
     >
