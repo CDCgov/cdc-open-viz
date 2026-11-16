@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { hashObj } from '@cdc/core/helpers/hashObj'
+import initialState from '../../data/initial-state'
 import generateRuntimeData, { generateBubbleLayerRuntimeData } from '../generateRuntimeData'
+import { generateRuntimeLegend } from '../generateRuntimeLegend'
 import { createBubbleSizeScale, getBubbleSizeLegendItems } from '../bubbleLayers'
 import {
   createCategoricalBubbleSizeScale,
@@ -8,6 +11,49 @@ import {
 } from '../bubbleSize'
 
 describe('generateRuntimeData', () => {
+  it.each([false, true])('preserves county identifiers across data column changes with unified legend %s', unified => {
+    const config: any = {
+      ...initialState,
+      columns: {
+        geo: { name: 'FIPS' },
+        primary: { name: 'vaccinated' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' }
+      },
+      general: { ...initialState.general, geoType: 'us-county', type: 'data' },
+      legend: { ...initialState.legend, type: 'equalnumber', unified },
+      data: [
+        { FIPS: '01001', vaccinated: '34.13' },
+        { FIPS: '12001', vaccinated: '43.21' }
+      ]
+    }
+    const countyKeys = ['01001', '12001']
+
+    const initial = generateRuntimeData(config, [], 1, false)
+    config.columns.primary.name = 'FIPS'
+    const fipsData = generateRuntimeData(config, [], 2, false)
+    const legendMemo = { current: new Map<string, number>() }
+    const specialMemo = { current: new Map<string, number>() }
+    const legend = generateRuntimeLegend(config, fipsData as any, 'fips', () => {}, [] as any, legendMemo, specialMemo)
+
+    expect(Array.isArray(legend) ? legend : legend.items).not.toHaveLength(0)
+    countyKeys.forEach(key => expect(legendMemo.current.has(hashObj(fipsData[key]))).toBe(true))
+
+    config.columns.primary.name = 'vaccinated'
+    const restored = generateRuntimeData(config, [], 3, false)
+
+    expect(Object.keys(initial).sort()).toEqual(countyKeys)
+    expect(Object.keys(fipsData).sort()).toEqual(countyKeys)
+    expect(Object.keys(restored).sort()).toEqual(countyKeys)
+    expect(config.data.map(row => row.FIPS)).toEqual(countyKeys)
+    expect(fipsData['01001'].FIPS).toBe('01001')
+    expect(fipsData['12001'].FIPS).toBe('12001')
+    expect(restored['01001'].vaccinated).toBe(34.13)
+    expect(restored['01001'].uid).toBe('01001')
+    expect(Object.keys(restored['01001'])).not.toContain('uid')
+  })
+
   const createCategoricalBubbleSizeConfig = (overrides: any = {}) => ({
     columns: {
       geo: { name: '' },
