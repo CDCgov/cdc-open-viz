@@ -49,6 +49,8 @@ const DataPointFilters = ({ columns, columnSourceData }) => {
                 Remove
               </button>
               <Select
+                id={`waffle-filter-${index}-column`}
+                fieldName='columnName'
                 label='Column'
                 value={filter.columnName || ''}
                 options={columns}
@@ -58,6 +60,8 @@ const DataPointFilters = ({ columns, columnSourceData }) => {
                 }}
               />
               <Select
+                id={`waffle-filter-${index}-value`}
+                fieldName='columnValue'
                 label='Column Value'
                 value={filter.columnValue || ''}
                 options={getFilterColumnValues(index)}

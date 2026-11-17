@@ -6,6 +6,7 @@ import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 import { DATA_FUNCTIONS, DATA_OPERATORS } from '../../../../../CdcWaffleChart'
 import ConfigContext from '../../../../../ConfigContext'
+import defaults from '../../../../../data/initial-state'
 import DataPointFilters from './DataPointFilters'
 import TrendIndicator from './TrendIndicator'
 
@@ -15,12 +16,13 @@ const DataPanel = () => {
   const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
   const columns = useDataColumns(columnSourceData)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
+  const dataConditionalComparate = config.dataConditionalComparate ?? ''
 
   useEffect(() => {
     //Verify comparate data type
     let operators = ['<', '>', '<=', '>=']
-    if (config.dataConditionalComparate !== '') {
-      if (operators.indexOf(config.dataConditionalOperator) > -1 && isNaN(config.dataConditionalComparate)) {
+    if (dataConditionalComparate !== '') {
+      if (operators.indexOf(config.dataConditionalOperator) > -1 && isNaN(dataConditionalComparate)) {
         updateConfig({ ...config, invalidComparate: true })
       } else {
         if (config.invalidComparate) {
@@ -85,7 +87,7 @@ const DataPanel = () => {
             </div>
             <div className='cove-accordion__panel-col'>
               <TextField
-                value={config.dataConditionalComparate}
+                value={dataConditionalComparate}
                 fieldName={'dataConditionalComparate'}
                 updateField={updateField}
                 className={config.invalidComparate ? 'cove-accordion__input-error' : ''}
@@ -116,7 +118,11 @@ const DataPanel = () => {
         {!config.customDenom && (
           <div className='cove-accordion__panel-row align-center'>
             <div className='cove-accordion__panel-col'>
-              <TextField value={config.dataDenom} fieldName='dataDenom' updateField={updateField} />
+              <TextField
+                value={config.dataDenom ?? defaults.dataDenom}
+                fieldName='dataDenom'
+                updateField={updateField}
+              />
             </div>
             <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
               <label className='cove-accordion__panel-label--muted'>default (100)</label>
@@ -147,15 +153,15 @@ const DataPanel = () => {
       <ul className='column-edit'>
         <li className='three-col'>
           <div style={{ marginRight: '1rem' }}>
-            <TextField value={config.prefix} fieldName='prefix' label='Prefix' updateField={updateField} />
+            <TextField value={config.prefix ?? ''} fieldName='prefix' label='Prefix' updateField={updateField} />
           </div>
           <div style={{ marginRight: '1rem' }}>
-            <TextField value={config.suffix} fieldName='suffix' label='Suffix' updateField={updateField} />
+            <TextField value={config.suffix ?? ''} fieldName='suffix' label='Suffix' updateField={updateField} />
           </div>
           <div>
             <TextField
               type='number'
-              value={config.roundToPlace}
+              value={config.roundToPlace ?? defaults.roundToPlace}
               fieldName='roundToPlace'
               label='Round'
               updateField={updateField}
@@ -174,7 +180,7 @@ const DataPanel = () => {
         <hr className='cove-accordion__divider' />
         <div className='cove-accordion__panel-section reverse-labels'>
           <TextField
-            value={config.valueDescription}
+            value={config.valueDescription ?? ''}
             label='Value Descriptor'
             fieldName='valueDescription'
             updateField={updateField}

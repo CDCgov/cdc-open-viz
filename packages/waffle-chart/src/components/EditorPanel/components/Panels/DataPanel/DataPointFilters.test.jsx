@@ -26,11 +26,14 @@ describe('DataPointFilters', () => {
       </ConfigContext.Provider>
     )
 
-    const selects = screen.getAllByRole('combobox')
-    expect(selects[1]).toHaveTextContent('North')
-    expect(selects[1]).toHaveTextContent('South')
+    const column = screen.getByRole('combobox', { name: 'Column' })
+    const columnValue = screen.getByRole('combobox', { name: 'Column Value' })
+    expect(column).toHaveAttribute('id', 'waffle-filter-0-column')
+    expect(columnValue).toHaveAttribute('id', 'waffle-filter-0-value')
+    expect(columnValue).toHaveTextContent('North')
+    expect(columnValue).toHaveTextContent('South')
 
-    fireEvent.change(selects[0], { target: { value: 'Category' } })
+    fireEvent.change(column, { target: { value: 'Category' } })
     expect(updateConfig).toHaveBeenCalledWith(
       expect.objectContaining({ filters: [expect.objectContaining({ columnName: 'Category' })] })
     )
