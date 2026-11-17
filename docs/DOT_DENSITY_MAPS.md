@@ -86,6 +86,8 @@ type CountyDotDensityOptions = {
 
 A density-only map may leave `columns.primary.name` empty for a neutral base. A configured primary column keeps the choropleth beneath the dots. The editor accepts a configured density series in place of the primary-column requirement, while still requiring geography. The county renderer permits either an authored or injected layer to render without choropleth legend items.
 
+Neutral fills distinguish row presence: counties without a matching runtime row retain the standard gray (`#DFE1E2`) and have no county hover tooltip. Counties with a matching row use the lighter density background (`#F5F6F7`), including reported zero and counts below one dot. Authored choropleth fills retain precedence. This checks row presence, not completeness of individual series values.
+
 ## Data and Render Flow
 
 ```mermaid

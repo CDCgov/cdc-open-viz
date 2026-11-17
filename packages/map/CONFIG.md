@@ -202,6 +202,8 @@ The standard **Legend** controls apply to density: `general.showSidebar`, `legen
 
 `dotDensity.series[].color` is retained and rendered when present on imported series. New series omit this field and use `general.palette`.
 
+Counties without a matching row in the current runtime data use the standard gray background (`#DFE1E2`) and have no county hover tooltip. With dot density active, counties with a matching row use a lighter neutral background (`#F5F6F7`) unless an authored base Data Column supplies their fill. Reported zero and positive counts below one dot remain data-bearing counties; they are not treated as missing rows.
+
 `dotDensity.unit` is retained for compatibility with earlier configs but has no rendered effect; author unit information in Legend Description.
 
 Earlier prototype configs with `dotDensity.legend.show` and `dotDensity.legend.title` are normalized into the shared fields when imported or activated as county density maps, and the old object is removed. Dormant legacy density settings do not alter the base map legend. An existing nonempty shared title takes precedence. New exports use the standard legend fields.

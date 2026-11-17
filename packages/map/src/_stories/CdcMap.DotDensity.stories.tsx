@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { zoomTransform } from 'd3-zoom'
+import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { expect, fireEvent, userEvent, within } from 'storybook/test'
 import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 import CountyDotDensityPrototype from './dotDensity/CountyDotDensityPrototype'
@@ -162,18 +163,12 @@ export const DiseaseOutbreaks: Story = {
     // Verify each disease color actually reaches the Canvas, not just the legend.
     const pixels = map.getContext('2d')!.getImageData(0, 0, map.width, map.height).data
     let backgroundPixels = 0
-    let oldBackgroundPixels = 0
     for (let i = 0; i < pixels.length; i += 4) {
       if (pixels[i] === 245 && pixels[i + 1] === 246 && pixels[i + 2] === 247 && pixels[i + 3] === 255) {
         backgroundPixels++
       }
-      if (pixels[i] === 223 && pixels[i + 1] === 225 && pixels[i + 2] === 226 && pixels[i + 3] === 255) {
-        oldBackgroundPixels++
-      }
     }
     expect(backgroundPixels).toBeGreaterThan(100)
-    // Antialiased boundaries can coincidentally match the old shade at isolated pixels.
-    expect(oldBackgroundPixels).toBeLessThan(10)
     for (const disease of diseaseSeries) {
       const rgb = [1, 3, 5].map(offset => parseInt(disease.color.slice(offset, offset + 2), 16))
       let matches = 0
@@ -339,5 +334,55 @@ export const ExcludedCountyDoesNotConsumeDensityBudget: Story = {
     expect(map.dataset.densityError).toBe('')
     expect(map.dataset.positionSignature).toContain('04013:cases:')
     expect(map.dataset.positionSignature).not.toContain('51620:')
+  }
+}
+
+export const MissingCountyData: Story = {
+  render: () => (
+    <CountyDotDensityRuntimeHarness
+      rows={[
+        { FIPS: '04013', Cases: 0 },
+        { FIPS: '04021', Cases: 1 },
+        { FIPS: '04019', Cases: 50 }
+      ]}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const map = (await waitForPresence('canvas[data-drawn-dots="10"]', canvasElement)) as HTMLCanvasElement
+    const projection = geoAlbersUsaTerritories()
+      .scale(map.width * 1.25)
+      .translate([map.width / 2, map.height / 2])
+    const zero = projection([-112.1, 33.5])!
+    const belowOneDot = projection([-111.4, 32.9])!
+    const missing = projection([-112.5, 34.6])!
+    const readFill = ([x, y]: number[]) =>
+      Array.from(map.getContext('2d')!.getImageData(Math.floor(x), Math.floor(y), 1, 1).data)
+
+    expect(readFill(zero)).toEqual([245, 246, 247, 255])
+    expect(readFill(belowOneDot)).toEqual([245, 246, 247, 255])
+    expect(readFill(missing)).toEqual([223, 225, 226, 255])
+
+    const tooltip = canvasElement.querySelector('#runtime-density-tooltip') as HTMLElement
+    const hover = ([x, y]: number[]) => {
+      const bounds = map.getBoundingClientRect()
+      fireEvent.mouseMove(map, {
+        clientX: bounds.left + (x * bounds.width) / map.width,
+        clientY: bounds.top + (y * bounds.height) / map.height
+      })
+    }
+    await performAndAssert(
+      'A county with reported zero retains its hover tooltip',
+      () => tooltip.style.display,
+      async () => hover(zero),
+      (_, display) => display === 'block'
+    )
+    expect(tooltip).toBeVisible()
+    await performAndAssert(
+      'A county without a data row hides the preceding county tooltip',
+      () => tooltip.style.display,
+      async () => hover(missing),
+      (_, display) => display === 'none'
+    )
+    expect(tooltip).not.toBeVisible()
   }
 }
