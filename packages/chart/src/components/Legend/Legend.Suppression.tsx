@@ -1,13 +1,17 @@
 import React, { useMemo } from 'react'
 import { ChartConfig } from '../../types/ChartConfig'
 import RichTooltip from '@cdc/core/components/RichTooltip/RichTooltip'
+import EffectLegendSwatch from './EffectLegendSwatch'
+import { resolveEffectLegendStyle } from './helpers/resolveEffectLegendStyle'
 interface LegendProps {
   config: ChartConfig
   isLegendBottom: boolean
+  colorScale: (value: string) => string
+  data: Record<string, any>[]
 }
 
-const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) => {
-  const { preliminaryData, visualizationType, visualizationSubType, legend, data } = config
+const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom, colorScale, data }) => {
+  const { preliminaryData, visualizationType, visualizationSubType, legend } = config
   const showPiePercent = config.dataFormat.showPiePercent && config.visualizationType === 'Pie'
   const hasOpenCircleEffects = () =>
     preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style !== 'Filled Circles') &&
@@ -29,7 +33,20 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
         pd.type === 'effect' &&
         pd.style && (
           <div key={index} className='legend-preliminary'>
-            <span className={pd.symbol}>{pd.lineCode}</span>
+            {pd.inheritSeriesStyle ? (
+              <EffectLegendSwatch
+                effect={pd}
+                style={resolveEffectLegendStyle({
+                  effect: pd,
+                  data: data || [],
+                  series: config.runtime?.series || [],
+                  seriesLabels: config.runtime?.seriesLabels,
+                  colorScale
+                })}
+              />
+            ) : (
+              <span className={pd.symbol}>{pd.lineCode}</span>
+            )}
             <p>{pd.label}</p>
           </div>
         )

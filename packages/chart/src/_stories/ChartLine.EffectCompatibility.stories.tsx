@@ -118,3 +118,66 @@ export const NewlyAddedRule: Story = {
     expect(effect.queryByLabelText('Apply style to')).not.toBeInTheDocument()
   }
 }
+
+export const InheritedSeriesStyle: Story = {
+  args: {
+    config: {
+      ...config,
+      title: 'Inherited series style',
+      data: [
+        { date: '2024-10-01', Value: '52', Value2: '42', Status: 'preliminary' },
+        { date: '2025-01-01', Value: '57', Value2: '47', Status: 'preliminary' },
+        { date: '2025-04-01', Value: '54', Value2: '44', Status: 'final' }
+      ],
+      series: [
+        { ...config.series[0], dataKey: 'Value', weight: 1 },
+        { ...config.series[0], dataKey: 'Value2', weight: 3 }
+      ],
+      preliminaryData: [
+        {
+          ...config.preliminaryData[0],
+          seriesKeys: ['Value', 'Value2'],
+          inheritSeriesStyle: true
+        }
+      ]
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const swatch = canvasElement.querySelector<SVGLineElement>('.legend-preliminary svg line')
+    expect(swatch).not.toBeNull()
+    expect(swatch).toHaveAttribute('stroke', '#000')
+    expect(swatch).toHaveAttribute('stroke-width', '2')
+  }
+}
+
+export const InheritedSeriesCircleSize: Story = {
+  args: {
+    config: {
+      ...config,
+      title: 'Inherited circle size',
+      data: [
+        { date: '2024-10-01', Value: '52', Status: 'preliminary' },
+        { date: '2025-01-01', Value: '57', Status: 'final' }
+      ],
+      preliminaryData: [
+        {
+          ...config.preliminaryData[0],
+          style: 'Open Circles',
+          lineCode: '◯',
+          circleSize: 10,
+          inheritSeriesStyle: true
+        }
+      ]
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const legendCircle = canvasElement.querySelector('.legend-preliminary circle')
+    expect(legendCircle).toHaveAttribute('r', '10')
+    expect(legendCircle?.parentElement).toHaveStyle({ width: '20px', height: '20px' })
+    expect(canvasElement.querySelector('.line-chart-group circle')).toHaveAttribute('r', '10')
+  }
+}
