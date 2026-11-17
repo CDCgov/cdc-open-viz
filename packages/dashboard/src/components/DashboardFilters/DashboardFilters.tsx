@@ -17,6 +17,7 @@ import Title from '@cdc/core/components/ui/Title'
 import parse from 'html-react-parser'
 import './dashboardfilter.styles.css'
 import { isVisibleDashboardFilter } from '../../helpers/filterVisibility'
+import { isShowAllEnabled, SHOW_ALL_VALUE } from '../../helpers/showAllOption'
 
 type DashboardFilterProps = {
   show: number[]
@@ -201,8 +202,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   options={multiValues}
                   fieldName={filterIndex}
                   updateField={updateField}
-                  selected={filter.active as string[]}
+                  selected={(filter.queuedActive ?? filter.active) as string[]}
                   limit={filter.selectLimit || 5}
+                  exclusiveValue={isShowAllEnabled(filter) ? SHOW_ALL_VALUE : undefined}
                   loading={loading}
                   placeholder={filter.resetLabel || '- Select -'}
                 />

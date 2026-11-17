@@ -456,3 +456,31 @@ describe('DashboardFilters filter notes', () => {
     expect(note).not.toHaveClass('mb-1')
   })
 })
+
+describe('DEV-13957 queued multiselect display', () => {
+  it('displays pending selections while Apply has not changed the applied selection', () => {
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={true}
+        filters={[
+          {
+            key: 'Substance',
+            type: 'datafilter',
+            filterStyle: 'multi-select',
+            showDropdown: true,
+            values: ['All', 'Acetone', 'Benzene'],
+            active: ['Acetone'],
+            queuedActive: ['All'],
+            showAllOption: true
+          } as any
+        ]}
+      />
+    )
+    expect(container.querySelector('.selected')).toHaveTextContent('All')
+    expect(container.querySelector('.selected')).not.toHaveTextContent('Acetone')
+  })
+})

@@ -119,3 +119,65 @@ describe('MultiSelect', () => {
     expect(screen.getByText('Germany')).toBeInTheDocument()
   })
 })
+
+describe('MultiSelect exclusive choice', () => {
+  const exclusiveOptions = [
+    { value: 'All', label: 'All' },
+    { value: 'Acetone', label: 'Acetone' },
+    { value: 'Benzene', label: 'Benzene' }
+  ]
+
+  it.each([1, 2])('can replace a full selection with the exclusive option at limit %s', async limit => {
+    const updateField = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <MultiSelect
+        fieldName='substance'
+        options={exclusiveOptions}
+        selected={['Acetone', 'Benzene'].slice(0, limit)}
+        limit={limit}
+        exclusiveValue='All'
+        updateField={updateField}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
+    await user.click(screen.getByRole('option', { name: 'All' }))
+    expect(updateField).toHaveBeenLastCalledWith(null, null, 'substance', ['All'])
+  })
+
+  it('can replace an exclusive selection when the limit is one', async () => {
+    const updateField = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <MultiSelect
+        fieldName='substance'
+        options={exclusiveOptions}
+        selected={['All']}
+        limit={1}
+        exclusiveValue='All'
+        updateField={updateField}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
+    await user.click(screen.getByRole('option', { name: 'Acetone' }))
+    expect(updateField).toHaveBeenLastCalledWith(null, null, 'substance', ['Acetone'])
+  })
+
+  it('continues enforcing the limit between ordinary options', async () => {
+    const updateField = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <MultiSelect
+        fieldName='substance'
+        options={exclusiveOptions}
+        selected={['Acetone']}
+        limit={1}
+        exclusiveValue='All'
+        updateField={updateField}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
+    await user.click(screen.getByRole('option', { name: 'Benzene' }))
+    expect(updateField).not.toHaveBeenCalled()
+  })
+})
