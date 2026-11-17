@@ -39,8 +39,17 @@ const emptyMapStory = (explicitEmpty: boolean): Story => {
     render: args => <ReloadableMap config={args.config} />,
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
+      const openBubbleLayers = () =>
+        performAndAssert(
+          'Open the Bubble Layers panel and wait for its controls',
+          () => Boolean(canvas.queryByRole('button', { name: 'Add Bubble Layer', exact: true })),
+          () => openAccordion(canvas, 'Bubble Layers'),
+          (_before, visible) => visible,
+          () => expect(canvas.getByText('There are currently no bubble layers.')).toBeVisible()
+        )
+
       await waitForEditor(canvas)
-      await openAccordion(canvas, 'Bubble Layers')
+      await openBubbleLayers()
       expect(canvas.getByText('There are currently no bubble layers.')).toBeVisible()
       expect(canvas.queryByRole('button', { name: /^Layer 1/ })).not.toBeInTheDocument()
       await performAndAssert(
@@ -63,7 +72,7 @@ const emptyMapStory = (explicitEmpty: boolean): Story => {
       expect(canvas.getByText('There are currently no bubble layers.')).toBeVisible()
       await userEvent.click(canvas.getByRole('button', { name: 'Reload saved map' }))
       await waitForEditor(canvas)
-      await openAccordion(canvas, 'Bubble Layers')
+      await openBubbleLayers()
       expect(canvas.getByText('There are currently no bubble layers.')).toBeVisible()
       expect(canvas.queryByRole('button', { name: /^Layer 1/ })).not.toBeInTheDocument()
     }

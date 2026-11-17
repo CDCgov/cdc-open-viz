@@ -886,44 +886,37 @@ describe('CdcDashboard legacy URL filter behavior', () => {
 
     await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://data.test/files/state-CA.json']))
 
-    await waitFor(() =>
+    // A completed request does not guarantee the lazy child renderers have committed.
+    await waitFor(() => {
       expect(readDatasetProbe('dataset-dynamicStateData')).toEqual({
         data: routeData['/files/state-CA.json'],
         runtimeDataUrl: 'https://data.test/files/state-CA.json'
       })
-    )
-    await waitFor(() =>
       expect(readDataBiteProbe('data-bite-dynamicStateBite').data).toEqual([
         { dataset: 'dynamic-ca', state_code: 'CA', dynamicValue: 1 }
       ])
-    )
-    await waitFor(() =>
       expect(readDataBiteProbe('data-bite-staticStateBite').data).toEqual([
         { state_code: 'CA', label: 'California static bite', value: 100 }
       ])
-    )
+    })
 
     requestedUrls.length = 0
     fireEvent.change(screen.getByLabelText('State File'), { target: { value: 'NY' } })
 
     await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://data.test/files/state-NY.json']))
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(readDatasetProbe('dataset-dynamicStateData')).toEqual({
         data: routeData['/files/state-NY.json'],
         runtimeDataUrl: 'https://data.test/files/state-NY.json'
       })
-    )
-    await waitFor(() =>
       expect(readDataBiteProbe('data-bite-dynamicStateBite').data).toEqual([
         { dataset: 'dynamic-ny', state_code: 'NY', dynamicValue: 2 }
       ])
-    )
-    await waitFor(() =>
       expect(readDataBiteProbe('data-bite-staticStateBite').data).toEqual([
         { state_code: 'NY', label: 'New York static bite', value: 200 }
       ])
-    )
+    })
   })
 
   it('keeps an opted-in File Name combobox empty until selection and shows filtersIncomplete content', async () => {
