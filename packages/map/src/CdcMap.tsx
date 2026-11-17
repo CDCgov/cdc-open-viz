@@ -10,6 +10,7 @@ import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { MapConfig } from './types/MapConfig'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { normalizeDotDensityLegend } from './helpers/dotDensityConfig'
 import { getPrimaryBubbleLayer } from './helpers/bubbleLayers'
 import type { Datasets } from '@cdc/core/types/DataSet'
 
@@ -58,7 +59,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
     const configToLoad = editorsConfig ?? configObj
 
     const migratedConfig = isDashboard ? configToLoad : coveUpdateWorker(configToLoad)
-    let newState = applyConfigDefaults(migratedConfig, initialState)
+    let newState = applyConfigDefaults(normalizeDotDensityLegend(migratedConfig), initialState)
     if (newState.dataUrl) {
       let { data: newData, dataMetadata } = await fetchRemoteData(newState.dataUrl)
       newState.dataMetadata = dataMetadata

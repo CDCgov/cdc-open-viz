@@ -40,6 +40,8 @@ export type Config = {
     SharedTp5VisualOptions & {
       showTitle: boolean
       useWrap?: boolean
+      circleStyle?: 'off' | 'light' | 'dark'
+      circleFontSize?: number | string
     }
   general: {
     isCompactStyle: boolean

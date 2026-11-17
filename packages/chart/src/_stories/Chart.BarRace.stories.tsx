@@ -58,15 +58,6 @@ export const AnnualChangesOverTime: Story = {
 export const GeneralSectionTests: Story = {
   name: 'Editor: General Section',
   parameters: { test: { timeout: 30000 } },
-  beforeEach: () => {
-    const originalUrl = window.location.href
-    const originalState = window.history.state
-    const developerUrl = new URL(originalUrl)
-    developerUrl.searchParams.set('isCoveDeveloper', 'true')
-    window.history.replaceState(originalState, '', developerUrl)
-
-    return () => window.history.replaceState(originalState, '', originalUrl)
-  },
   args: {
     config: {
       ...annualChangeConfig,
@@ -362,15 +353,6 @@ export const VisualSectionTests: Story = {
 export const IneligibleGeneralSectionTests: Story = {
   name: 'Editor: Ineligible General Section',
   parameters: { test: { timeout: 30000 } },
-  beforeEach: () => {
-    const originalUrl = window.location.href
-    const originalState = window.history.state
-    const developerUrl = new URL(originalUrl)
-    developerUrl.searchParams.set('isCoveDeveloper', 'true')
-    window.history.replaceState(originalState, '', developerUrl)
-
-    return () => window.history.replaceState(originalState, '', originalUrl)
-  },
   args: {
     config: {
       ...annualChangeConfig,
@@ -388,56 +370,134 @@ export const IneligibleGeneralSectionTests: Story = {
     await openAccordion(canvas, 'General')
 
     const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
+    expect(Array.from(subtype.options).map(option => option.value)).toEqual(['regular', 'stacked'])
+    expect(canvasElement.querySelector('svg .horizontal')).toBeInTheDocument()
+    expect(canvasElement.querySelector('.bar-chart-race')).not.toBeInTheDocument()
+  }
+}
+
+export const InitialBarAuthoringTests: Story = {
+  name: 'Editor: Initial Bar Authoring',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: {
+      ...annualChangeConfig,
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      barStyle: 'rounded',
+      series: annualChangeConfig.series.slice(0, 1),
+      xAxis: { ...annualChangeConfig.xAxis, dataKey: '' },
+      newViz: true
+    } as any,
+    isEditor: true,
+    interactionLabel: 'Initial Bar race authoring story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('.chart-required-fields-alerts .alert-info', canvasElement)
+    await openAccordion(canvas, 'Date/Category Axis')
+
+    const dataKey = canvasElement.querySelector(
+      '[data-required-field-control="date-category-axis"]'
+    ) as HTMLSelectElement
     await performAndAssert(
-      'Keep ineligible racing mode selected with the regular Bar fallback',
-      () => {
-        const fallbackBars = Array.from(canvasElement.querySelectorAll('svg .horizontal path[id^="barGroup"]'))
-        return {
-          fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
-          flatBarsRendered:
-            fallbackBars.length > 0 && fallbackBars.every(path => !path.getAttribute('d')?.includes('Q')),
-          guidanceInPreviewAlerts: Boolean(
-            Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
-              /requires at least two ordinary data series/i.test(alert.textContent || '')
-            )
-          ),
-          guidanceInEditorPanel: /requires at least two ordinary data series/i.test(
-            canvasElement.querySelector('.editor-panel')?.textContent || ''
-          ),
-          lollipopRendered: Boolean(canvasElement.querySelector('svg .horizontal circle[data-tooltip-html]')),
-          raceRendered: Boolean(canvasElement.querySelector('.bar-chart-race')),
-          subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
-        }
-      },
+      'Complete the ordinary Bar requirements',
+      () => ({
+        chartRendered: Boolean(canvasElement.querySelector('.tooltip-boundary svg[role="img"], svg.linear')),
+        requiredAlert: Boolean(canvasElement.querySelector('.chart-required-fields-alerts .alert-info'))
+      }),
+      async () => userEvent.selectOptions(dataKey, 'Year'),
+      (before, after) => before.requiredAlert && !before.chartRendered && !after.requiredAlert && after.chartRendered
+    )
+
+    await openAccordion(canvas, 'General')
+    const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
+    expect(Array.from(subtype.options).map(option => option.value)).toEqual(['regular', 'stacked', 'racing'])
+
+    const getFallbackState = () => {
+      const fallbackBars = Array.from(canvasElement.querySelectorAll('svg .horizontal path[id^="barGroup"]'))
+      return {
+        fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
+        flatBarsRendered:
+          fallbackBars.length > 0 &&
+          fallbackBars.every(path => Boolean(path.getAttribute('d')) && !path.getAttribute('d')?.includes('Q')),
+        guidanceVisible: Boolean(
+          Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
+            /requires at least two ordinary data series/i.test(alert.textContent || '')
+          )
+        ),
+        lollipopRendered: Boolean(canvasElement.querySelector('svg .horizontal circle[data-tooltip-html]')),
+        raceRendered: Boolean(canvasElement.querySelector('.bar-chart-race')),
+        subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
+      }
+    }
+
+    await performAndAssert(
+      'Select Racing and show its ineligible Bar fallback',
+      getFallbackState,
       async () => userEvent.selectOptions(subtype, 'racing'),
-      (_before, after) =>
+      (before, after) =>
+        before.subtype === 'regular' &&
+        !before.guidanceVisible &&
+        !before.raceRendered &&
         after.subtype === 'racing' &&
-        after.guidanceInPreviewAlerts &&
-        !after.guidanceInEditorPanel &&
+        after.guidanceVisible &&
         after.fallbackRendered &&
         after.flatBarsRendered &&
         !after.lollipopRendered &&
         !after.raceRendered
     )
+  }
+}
 
-    await performAndAssert(
-      'Exit an ineligible race through the same subtype control',
-      () => ({
+export const IneligibleSavedRaceTests: Story = {
+  name: 'Editor: Ineligible Saved Race',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: {
+      ...annualChangeConfig,
+      series: annualChangeConfig.series.slice(0, 1)
+    } as any,
+    isEditor: true,
+    interactionLabel: 'Ineligible saved bar race editor story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
+
+    const getFallbackState = () => {
+      const fallbackBars = Array.from(canvasElement.querySelectorAll('svg .horizontal path[id^="barGroup"]'))
+      return {
         fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
+        flatBarsRendered: fallbackBars.length > 0 && fallbackBars.every(path => !path.getAttribute('d')?.includes('Q')),
         guidanceInPreviewAlerts: Boolean(
           Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
             /requires at least two ordinary data series/i.test(alert.textContent || '')
           )
         ),
+        lollipopRendered: Boolean(canvasElement.querySelector('svg .horizontal circle[data-tooltip-html]')),
+        raceRendered: Boolean(canvasElement.querySelector('.bar-chart-race')),
         subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
-      }),
+      }
+    }
+
+    await performAndAssert(
+      'Exit an ineligible saved race through the subtype control',
+      getFallbackState,
       async () => userEvent.selectOptions(canvas.getByLabelText(/chart subtype/i), 'regular'),
       (before, after) =>
         before.subtype === 'racing' &&
         before.guidanceInPreviewAlerts &&
+        before.fallbackRendered &&
+        before.flatBarsRendered &&
+        !before.lollipopRendered &&
+        !before.raceRendered &&
         after.subtype === 'regular' &&
         !after.guidanceInPreviewAlerts &&
-        after.fallbackRendered
+        after.fallbackRendered &&
+        !after.raceRendered
     )
   }
 }

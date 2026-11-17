@@ -19,7 +19,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import MediaControls from '@cdc/core/components/MediaControls'
 import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
-import './scss/main.scss'
+import './css/main.css'
 
 import dashboardReducer from './store/dashboard.reducer'
 import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'

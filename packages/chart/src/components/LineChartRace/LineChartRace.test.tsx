@@ -88,11 +88,11 @@ const installAnimationFrameController = () => {
   }
 }
 
-const renderRace = (context = getContext()) => {
+const renderRace = (context = getContext(), topYAxisTitles?: React.ReactNode) => {
   const race = getLineRaceEligibility(context.config, data)
   return render(
     <ConfigContext.Provider value={context}>
-      <LineChartRace parentWidth={700} parentHeight={400} race={race} />
+      <LineChartRace parentWidth={700} parentHeight={400} race={race} topYAxisTitles={topYAxisTitles} />
     </ConfigContext.Provider>
   )
 }
@@ -110,6 +110,26 @@ describe('LineChartRace', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+  })
+
+  it('renders playback before top y-axis titles and chart content', () => {
+    const { container } = renderRace(getContext(), <div className='y-axis-top-title-row'>Population (millions)</div>)
+    const race = container.querySelector('.line-chart-race')
+    const header = container.querySelector('.line-chart-race__header')
+    const title = container.querySelector('.y-axis-top-title-row')
+    const chart = screen.getByTestId('line-chart')
+
+    expect(race?.firstElementChild).toBe(header)
+    expect(header?.nextElementSibling).toBe(title)
+    expect(title?.nextElementSibling).toContainElement(chart)
+  })
+
+  it('does not add title markup when top y-axis titles are absent', () => {
+    const { container } = renderRace()
+    const header = container.querySelector('.line-chart-race__header')
+
+    expect(container.querySelector('.y-axis-top-title-row')).not.toBeInTheDocument()
+    expect(header?.nextElementSibling).toContainElement(screen.getByTestId('line-chart'))
   })
 
   it('plays, pauses, resumes from paused progress, completes, and replays', () => {

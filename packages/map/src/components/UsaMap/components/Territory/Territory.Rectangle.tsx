@@ -1,13 +1,14 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 import { useContext } from 'react'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
 import { patternSizes } from '../../helpers/patternSizes'
-import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
 import BubbleMarker from '../../../BubbleMarker'
+import useMapHighlight from '../../../../hooks/useMapHighlight'
 
 const EMPTY_BUBBLE_RENDER_ROWS: NonNullable<TerritoryShape['bubbleRenderRows']> = []
 
@@ -32,11 +33,13 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   ...props
 }) => {
   const { config } = useContext<MapContext>(ConfigContext)
-  const { territoryData, ...otherProps } = props
+  const { territoryData, style, ...otherProps } = props
   const rectanglePath =
     'M42,0.5 C42.8284271,0.5 43.5,1.17157288 43.5,2 L43.5,2 L43.5,26 C43.5,26.8284271 42.8284271,27.5 42,27.5 L42,27.5 L3,27.5 C2.17157288,27.5 1.5,26.8284271 1.5,26 L1.5,26 L1.5,2 C1.5,1.17157288 2.17157288,0.5 3,0.5 L3,0.5 Z'
 
   const geoKey = territory || `US-${label}`
+  const { isHighlighted } = useMapHighlight()
+  const bringToFront = isHighlighted(geoKey, territoryData?.[config.columns.geo.name])
   const territoryBubbles = bubbleRenderRows.map(bubbleRow => (
     <BubbleMarker
       key={`${geoKey}-bubble-${bubbleRow.layerIndex}-${bubbleRow.uid}`}
@@ -54,10 +57,16 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   ))
 
   return (
-    <svg viewBox='0 0 45 29' key={geoKey} className={geoKey} style={{ overflow: 'visible', ...svgStyle }}>
+    <svg
+      viewBox='0 0 45 29'
+      key={geoKey}
+      className={geoKey}
+      style={{ overflow: 'visible', ...svgStyle, ...(bringToFront ? { position: 'relative', zIndex: 1 } : {}) }}
+    >
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...otherProps}
+        style={style}
         strokeLinejoin='round'
         tabIndex={-1}
         onClick={handleShapeClick}
@@ -86,7 +95,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           }
 
           const { pattern: patternData, patternIndex, matchedDataKey } = matchedPattern
-          const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
+          const patternColor = resolvePatternColor(patternData.color, backgroundColor)
           const sanitizedTerritory = sanitizeToSvgId(territory || label)
           const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
           const patternId = `${mapId}--territory-${sanitizedTerritory}-${sanitizedDataKey}--${patternIndex}`
@@ -142,6 +151,17 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           )
         })()}
         {territoryBubbles}
+        {bringToFront && (
+          <path
+            className='selected-territory-outline'
+            d={rectanglePath}
+            fill='none'
+            stroke='#000000'
+            strokeWidth={2}
+            pointerEvents='none'
+            aria-hidden='true'
+          />
+        )}
         <text
           textAnchor='middle'
           dominantBaseline='middle'

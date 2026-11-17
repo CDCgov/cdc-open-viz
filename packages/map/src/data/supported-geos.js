@@ -339,7 +339,7 @@ export const supportedCountries = {
   CAN: ['Canada'],
   CYM: ['Cayman Islands', 'Cayman Is.', 'Cayman Islands (U.K.)'],
   CAF: ['Central African Republic', 'Central African Rep.'],
-  TCD: ['Chad'],
+  TCD: ['Chad', 'Republic of Chad'],
   CHL: ['Chile'],
   CHN: ['China'],
   CXR: ['Christmas Island', 'Christmas Island (Australia)'],
@@ -349,6 +349,7 @@ export const supportedCountries = {
   COG: ['Congo', 'Congo, Republic of the', 'Republic of the Congo'],
   COD: [
     'Democratic Republic of the Congo',
+    'Democratic Republic of Congo',
     'Congo, Democratic Republic of the',
     'Congo, the Democratic Republic of the',
     'Dem. Rep. Congo'

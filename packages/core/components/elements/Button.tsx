@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 import LoadSpin from '../ui/LoadSpin'
 
-import './button.scss'
+import './button.css'
 
 export type ButtonVariant =
   | 'primary'

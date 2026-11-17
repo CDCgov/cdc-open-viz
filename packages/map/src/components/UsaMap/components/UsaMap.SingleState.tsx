@@ -33,8 +33,6 @@ const SingleStateMap: React.FC = () => {
   const {
     config,
     isDashboard,
-    setSharedFilterValue,
-    isFilterValueSupported,
     runtimeFilters,
     runtimeData,
     tooltipId,
@@ -135,6 +133,7 @@ const SingleStateMap: React.FC = () => {
     geosJsx.push(
       // prettier-ignore
       <SingleState.CountyOutput
+        key='counties'
         counties={counties}
         scale={scale}
         geoStrokeColor={geoStrokeColor}
@@ -146,6 +145,7 @@ const SingleStateMap: React.FC = () => {
     geosJsx.push(
       // prettier-ignore
       <SingleState.StateOutput
+        key='states'
         topoData={topoData}
         path={path}
         scale={scale}
@@ -160,8 +160,6 @@ const SingleStateMap: React.FC = () => {
         key='cities'
         geoClickHandler={geoClickHandler}
         titleCase={titleCase}
-        setSharedFilterValue={setSharedFilterValue}
-        isFilterValueSupported={isFilterValueSupported}
         tooltipId={tooltipId}
       />
     )

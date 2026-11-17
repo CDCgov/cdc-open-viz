@@ -28,9 +28,8 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
       const { marker, x, y, dx, dy, edit, connectionType } = annotation
 
       return (
-        <>
+        <React.Fragment key={`annotation--${index}`}>
           <Drag
-            key={`annotation--${index}`}
             width={width}
             height={height}
             x={x}
@@ -43,6 +42,8 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
               return (
                 <>
                   <AnnotationComponent
+                    width={width}
+                    height={height}
                     dx={dx} // label position
                     dy={dy} // label position
                     x={x}
@@ -131,7 +132,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
               )
             }}
           </Drag>
-        </>
+        </React.Fragment>
       )
     })
   )

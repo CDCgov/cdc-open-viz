@@ -60,7 +60,7 @@ import {
 import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 
 // styles
-import './scss/main.scss'
+import './css/main.css'
 
 const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
@@ -505,14 +505,27 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     prevFiltersRef.current = currentFiltersJson
   }, [currentFiltersJson])
 
-  if (
-    configObj &&
-    config &&
-    (JSON.stringify(configObj.data) !== JSON.stringify(config.data) ||
-      JSON.stringify(configObj.dataMetadata || {}) !== JSON.stringify(config.dataMetadata || {}))
-  ) {
-    loadConfig()
-  }
+  // Reload only when parent-provided data or metadata changes. Comparing props with the
+  // internally hydrated config would never converge for dataUrl-only configs.
+  const currentDataJson = JSON.stringify(configObj?.data)
+  const currentDataMetadataJson = JSON.stringify(configObj?.dataMetadata)
+  const previousDataPropsRef = useRef({
+    data: currentDataJson,
+    dataMetadata: currentDataMetadataJson
+  })
+
+  useEffect(() => {
+    const previousDataProps = previousDataPropsRef.current
+
+    if (previousDataProps.data !== currentDataJson || previousDataProps.dataMetadata !== currentDataMetadataJson) {
+      loadConfig()
+    }
+
+    previousDataPropsRef.current = {
+      data: currentDataJson,
+      dataMetadata: currentDataMetadataJson
+    }
+  }, [currentDataJson, currentDataMetadataJson])
 
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
@@ -678,12 +691,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const shouldShowTp5CalloutFlag = !config.visual?.whiteBackground && dataColorResolution.state !== 'resolved'
+    const circleStyle = config.visual?.circleStyle
+    const shouldUseCircleStyle = isTp5 && (circleStyle === 'light' || circleStyle === 'dark')
+    const circleFontSizeValue = Number(config.visual?.circleFontSize)
+    const circleFontSize = Number.isFinite(circleFontSizeValue) && circleFontSizeValue > 0 ? circleFontSizeValue : 36
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
+      shouldUseCircleStyle ? 'cdc-callout__body--circle-value' : '',
       shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
       shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
     ]
@@ -724,14 +743,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
                 !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
-              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
+              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''} ${
+                shouldShowTp5CalloutFlag ? 'cdc-callout--has-flag' : ''
+              }`}
               style={
                 dataColorResolution.state === 'resolved'
                   ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
                   : undefined
               }
             >
-              {!config.visual?.whiteBackground && dataColorResolution.state !== 'resolved' && (
+              {shouldShowTp5CalloutFlag && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 
@@ -744,7 +765,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && (
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
-                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      {shouldUseCircleStyle ? (
+                        <span className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}>
+                          <span className='cdc-callout__value' style={{ fontSize: `${circleFontSize}px` }}>
+                            {calculateDataBite(true)}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      )}
                       {!shouldUseTrendBelow && hasTrendArrow && (
                         <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
                           {renderTrendArrow({

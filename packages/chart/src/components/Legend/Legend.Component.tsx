@@ -4,6 +4,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import { getLegendClasses } from './helpers/getLegendClasses'
+import { getHighlightedBarLegendKey } from '../../helpers/barLegendHighlight'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Label } from '../../types/Label'
@@ -301,12 +302,15 @@ const Legend: React.FC<LegendProps> = forwardRef(
                     )
                   })}
 
-                  {highLightedLegendItems.map((bar, i) => {
+                  {highLightedLegendItems.map(bar => {
                     // if duplicates only return first item
                     let className = 'legend-item'
-                    let itemName = bar.legendLabel
+                    const itemName =
+                      config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked'
+                        ? getHighlightedBarLegendKey(bar.legendLabel)
+                        : bar.legendLabel
 
-                    if (!itemName) return false
+                    if (!bar.legendLabel) return false
                     if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                       className += ' inactive'
                     }
@@ -315,16 +319,18 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       <LegendItem
                         className={className}
                         tabIndex={0}
-                        key={`legend-quantile-${i}`}
+                        key={itemName}
+                        role='button'
+                        aria-pressed={seriesHighlight.includes(itemName)}
                         onKeyDown={e => {
-                          if (e.key === 'Enter') {
+                          if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault()
-                            highlight(bar.legendLabel)
+                            highlight(itemName)
                           }
                         }}
                         onClick={e => {
                           e.preventDefault()
-                          highlight(bar.legendLabel)
+                          highlight(itemName)
                         }}
                       >
                         <LegendShape

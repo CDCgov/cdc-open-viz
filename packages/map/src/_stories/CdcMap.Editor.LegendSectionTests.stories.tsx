@@ -33,6 +33,19 @@ const CATEGORY_SORT_ARGS = {
   }
 }
 
+const DYNAMIC_DESCRIPTION_ARGS = {
+  isEditor: true,
+  config: {
+    ...wastewaterMapConfig,
+    legend: {
+      ...wastewaterMapConfig.legend,
+      dynamicDescription: false,
+      description: '',
+      descriptions: {}
+    }
+  }
+}
+
 const EQUAL_INTERVAL_SEPARATE_ZERO_ARGS = {
   isEditor: true,
   config: {
@@ -745,6 +758,7 @@ export const LegendSectionTests: Story = {
         return label?.textContent?.includes('Legend Description')
       }
     ) as HTMLTextAreaElement
+    expect(legendDescriptionTextarea).toBeTruthy()
 
     const getLegendDescription = () => {
       const legendContainer = canvasElement.querySelector('.legend-container')
@@ -752,6 +766,7 @@ export const LegendSectionTests: Story = {
       return {
         descriptionText: descriptionElement?.textContent?.trim() || '',
         descriptionExists: Boolean(descriptionElement),
+        hasStrongMarkup: Boolean(descriptionElement?.querySelector('strong')),
         legendHTML: legendContainer?.innerHTML || ''
       }
     }
@@ -761,14 +776,60 @@ export const LegendSectionTests: Story = {
       getLegendDescription,
       async () => {
         await userEvent.clear(legendDescriptionTextarea)
-        await userEvent.type(legendDescriptionTextarea, 'This is a custom legend description for testing.')
+        await userEvent.type(
+          legendDescriptionTextarea,
+          'This is a <strong>custom legend description</strong> for testing.'
+        )
       },
       (before, after) => {
         return (
           after.descriptionText.includes('This is a custom legend description') &&
+          after.hasStrongMarkup &&
           after.legendHTML !== before.legendHTML
         )
       }
+    )
+  }
+}
+
+export const DynamicLegendDescriptionTextareaHtml: Story = {
+  args: DYNAMIC_DESCRIPTION_ARGS,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'Legend')
+
+    const dynamicDescriptionCheckbox = canvas.getByLabelText('Dynamic Legend Description')
+
+    await performAndAssert(
+      'Dynamic legend description → Show per-filter textarea',
+      () => Boolean(canvas.queryByRole('combobox', { name: 'Filter Value' })),
+      async () => {
+        await userEvent.click(dynamicDescriptionCheckbox)
+      },
+      (before, after) => !before && after
+    )
+
+    const legendButton = canvas.getByRole('button', { name: /^Legend$/i })
+    const legendSection = legendButton.closest('.accordion__item') as HTMLElement
+    const dynamicDescription = within(legendSection).getByRole('textbox', { name: /Legend Description/i })
+    expect(dynamicDescription.tagName).toBe('TEXTAREA')
+
+    await performAndAssert(
+      'Dynamic legend description → Render HTML for active filter',
+      () => {
+        const description = canvasElement.querySelector('p[class*="dynamic-legend-description-"]')
+        return {
+          text: description?.textContent || '',
+          hasStrongMarkup: Boolean(description?.querySelector('strong'))
+        }
+      },
+      async () => {
+        await userEvent.type(dynamicDescription, 'Europe <strong>dynamic description</strong>')
+      },
+      (before, after) => !before.hasStrongMarkup && after.text === 'Europe dynamic description' && after.hasStrongMarkup
     )
   }
 }

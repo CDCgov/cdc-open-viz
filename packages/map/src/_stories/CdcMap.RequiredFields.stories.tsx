@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
+  openAccordion,
   performAndAssert,
   waitForAbsence,
   waitForEditor,
@@ -115,3 +116,176 @@ export const RuntimeModeDoesNotShowAuthoringAlerts: Story = {
 }
 
 export default meta
+
+const incompleteNavigationMap = cloneConfig(incompleteDataMap)
+incompleteNavigationMap.general.type = 'navigation'
+incompleteNavigationMap.columns.navigate.name = ''
+incompleteNavigationMap.data = incompleteNavigationMap.data.map(row => ({ ...row, URL: '/location' }))
+
+export const CompletesRequiredNavigationColumns: Story = {
+  args: { config: incompleteNavigationMap, isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('.map-required-fields-alerts', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Geography', 'Navigation'])
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+    expect(canvasElement.querySelector('.cove-visualization__body')).toBeNull()
+    expect(canvasElement.querySelector('.navigation-menu')).toBeNull()
+    await userEvent.click(canvas.getByTitle('Collapse Editor'))
+    await performAndAssert(
+      'Navigation Geography alert reveals the editor and focuses its field',
+      () => ({
+        focused: document.activeElement?.getAttribute('data-required-field-control'),
+        collapsed: !!canvasElement.querySelector('.editor-panel__toggle.collapsed')
+      }),
+      () => userEvent.click(canvas.getByRole('button', { name: 'Open Columns and focus Geography' })),
+      (_, after) => after.focused === 'map-geography' && !after.collapsed
+    )
+    await userEvent.selectOptions(
+      canvasElement.querySelector('[data-required-field-control="map-geography"]')!,
+      'STATE'
+    )
+    await waitForAbsence('.map-required-fields-alerts .alert-info:first-child + .alert-info', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Navigation'])
+    await userEvent.click(canvas.getByRole('button', { name: 'Columns', exact: true }))
+    await userEvent.click(canvas.getByTitle('Collapse Editor'))
+    await performAndAssert(
+      'URL alert reveals Columns and focuses the URL field',
+      () => ({
+        focused: document.activeElement?.getAttribute('data-required-field-control'),
+        collapsed: !!canvasElement.querySelector('.editor-panel__toggle.collapsed')
+      }),
+      () => userEvent.click(canvas.getByRole('button', { name: 'Open Columns and focus Navigation' })),
+      (_, after) => after.focused === 'map-url-column' && !after.collapsed
+    )
+    await userEvent.selectOptions(canvas.getByLabelText('Navigation'), 'URL')
+    await waitForAbsence('.map-required-fields-alerts', canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.navigation-menu', canvasElement)
+    await userEvent.selectOptions(canvas.getByLabelText('Navigation'), '')
+    await waitForPresence('.map-required-fields-alerts', canvasElement)
+    expectRequiredAlerts(canvasElement, ['Navigation'])
+    expect(canvasElement.querySelector('.navigation-menu')).toBeNull()
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+  }
+}
+
+export const SwitchesRequiredFieldsWithMapType: Story = {
+  args: {
+    config: {
+      ...cloneConfig(incompleteDataMap),
+      columns: {
+        ...cloneConfig(incompleteDataMap.columns),
+        navigate: { name: '' }
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    expectRequiredAlerts(canvasElement, ['Geography', 'Data Column'])
+    await userEvent.click(canvas.getByRole('button', { name: 'Type', exact: true }))
+    const mapType = canvasElement.querySelector('select[name="type"]') as HTMLSelectElement
+    await performAndAssert(
+      'Switch Data to Navigation requirements',
+      () =>
+        getAlerts(canvasElement)
+          .map(alert => alert.textContent)
+          .join(' '),
+      () => userEvent.selectOptions(mapType, 'navigation'),
+      (_, after) => after.includes('Navigation') && !after.includes('Data Column')
+    )
+    expectRequiredAlerts(canvasElement, ['Geography', 'Navigation'])
+    expect(canvasElement.querySelector('.waiting')).toBeNull()
+    await performAndAssert(
+      'Switch Navigation to Data requirements',
+      () =>
+        getAlerts(canvasElement)
+          .map(alert => alert.textContent)
+          .join(' '),
+      () => userEvent.selectOptions(mapType, 'data'),
+      (_, after) => after.includes('Data Column') && !after.includes('Navigation')
+    )
+    expectRequiredAlerts(canvasElement, ['Geography', 'Data Column'])
+  }
+}
+
+export const NavigationRuntimeDoesNotShowAuthoringAlerts: Story = {
+  args: { config: incompleteNavigationMap, isEditor: false },
+  play: async ({ canvasElement }) => {
+    expect(canvasElement.querySelector('.map-required-fields-alerts')).toBeNull()
+  }
+}
+
+const countyColumnSwitchRows = [
+  { 'FIPS Codes': '01001', 'Percent Vaccinated': '20' },
+  { 'FIPS Codes': '06001', 'Percent Vaccinated': '40' },
+  { 'FIPS Codes': '12001', 'Percent Vaccinated': '60' }
+]
+
+const countyColumnSwitchConfig = {
+  ...cloneConfig(usaStateGradientConfig),
+  general: {
+    ...usaStateGradientConfig.general,
+    geoType: 'us-county',
+    equalNumberOptIn: true,
+    hideUnselectedStates: false,
+    statesPicked: [],
+    palette: { name: 'sequential_blue', version: '2.1', isReversed: false }
+  },
+  columns: {
+    ...usaStateGradientConfig.columns,
+    geo: { ...usaStateGradientConfig.columns.geo, name: 'FIPS Codes' },
+    primary: { ...usaStateGradientConfig.columns.primary, name: 'Percent Vaccinated', label: 'Percent Vaccinated' }
+  },
+  table: { ...usaStateGradientConfig.table, expanded: true },
+  data: countyColumnSwitchRows,
+  formattedData: countyColumnSwitchRows
+}
+
+export const RestoresCountyDataAfterSelectingFips: Story = {
+  args: { config: countyColumnSwitchConfig, isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('.county-map-canvas', canvasElement)
+    await waitForPresence('[aria-label="Map Legend"] svg rect', canvasElement)
+    await openAccordion(canvas, 'Columns')
+
+    const dataColumn = canvasElement.querySelector<HTMLSelectElement>(
+      '[data-required-field-control="map-data-column"]'
+    )!
+    expect(dataColumn).toBeTruthy()
+
+    const readCountyOutput = () => ({
+      tableValues: Array.from(canvasElement.querySelectorAll('tbody td')).map(cell => cell.textContent?.trim()),
+      legendColors: Array.from(canvasElement.querySelectorAll('[aria-label="Map Legend"] svg g rect')).map(rect =>
+        rect.getAttribute('fill')
+      )
+    })
+    const originalOutput = readCountyOutput()
+    expect(originalOutput.tableValues).toEqual(expect.arrayContaining(['20', '40', '60']))
+    expect(originalOutput.legendColors).toHaveLength(3)
+
+    await performAndAssert(
+      'Selecting FIPS retains the counties and produces a numeric legend',
+      readCountyOutput,
+      () => userEvent.selectOptions(dataColumn, 'FIPS Codes'),
+      (_, after) =>
+        after.tableValues.length === originalOutput.tableValues.length &&
+        !after.tableValues.includes('20') &&
+        after.legendColors.length === 3
+    )
+    await performAndAssert(
+      'Restoring Percent Vaccinated restores the county table and colors',
+      readCountyOutput,
+      () => userEvent.selectOptions(dataColumn, 'Percent Vaccinated'),
+      (_, after) =>
+        JSON.stringify(after.tableValues) === JSON.stringify(originalOutput.tableValues) &&
+        JSON.stringify(after.legendColors) === JSON.stringify(originalOutput.legendColors)
+    )
+    expect(canvasElement.querySelector('tbody')).not.toHaveTextContent('No Data')
+  }
+}

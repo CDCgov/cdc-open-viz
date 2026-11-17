@@ -17,7 +17,7 @@ const RacingChartRenderer = ({ barRace, family, lineRace, parentRef, renderTopYA
 
   return (
     <>
-      {(family === 'Line' || !eligibility.eligible) && renderTopYAxisTitles()}
+      {!eligibility.eligible && renderTopYAxisTitles()}
       <div ref={parentRef} style={{ width: '100%' }}>
         <ParentSize>
           {parent => {
@@ -30,7 +30,13 @@ const RacingChartRenderer = ({ barRace, family, lineRace, parentRef, renderTopYA
             }
 
             return lineRace.eligible ? (
-              <LineChartRace ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} race={lineRace} />
+              <LineChartRace
+                ref={svgRef}
+                parentWidth={parent.width}
+                parentHeight={parent.height}
+                race={lineRace}
+                topYAxisTitles={renderTopYAxisTitles()}
+              />
             ) : (
               <LineChartRaceFallback ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
             )

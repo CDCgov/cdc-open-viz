@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getCountyTerritoryVisibility } from '../countyTerritories'
+import { getCountyTerritoryVisibility, isCountyTerritoryGeographyIncluded } from '../countyTerritories'
 
 describe('countyTerritories', () => {
   it('collects visible territory prefixes and county ids from runtime data', () => {
@@ -105,5 +105,40 @@ describe('countyTerritories', () => {
     expect(Array.from(visibility.statePrefixes)).toEqual([])
     expect(Array.from(visibility.countyIds)).toEqual([])
     expect(visibility.key).toBe('true:all')
+  })
+})
+
+describe('county territory topology selection', () => {
+  it('keeps mainland features and missing ids when territories are hidden', () => {
+    const visibility = getCountyTerritoryVisibility(false)
+    expect(isCountyTerritoryGeographyIncluded('01', visibility)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('01001', visibility)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded(undefined, visibility)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('72', visibility)).toBe(false)
+    expect(isCountyTerritoryGeographyIncluded('72001', visibility)).toBe(false)
+  })
+
+  it('preserves the legacy Puerto Rico exception for state and county features', () => {
+    const visibility = getCountyTerritoryVisibility(false)
+    expect(isCountyTerritoryGeographyIncluded('72', visibility, true)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('72001', visibility, true)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('78', visibility, true)).toBe(false)
+    expect(isCountyTerritoryGeographyIncluded('78010', visibility, true)).toBe(false)
+  })
+
+  it('includes only territory states and counties represented in data when visibility is automatic', () => {
+    const visibility = getCountyTerritoryVisibility(undefined, { '72001': {} })
+    expect(isCountyTerritoryGeographyIncluded('72', visibility)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('72001', visibility)).toBe(true)
+    expect(isCountyTerritoryGeographyIncluded('72003', visibility)).toBe(false)
+    expect(isCountyTerritoryGeographyIncluded('78', visibility)).toBe(false)
+    expect(isCountyTerritoryGeographyIncluded('78010', visibility)).toBe(false)
+  })
+
+  it('includes every territory feature when always shown', () => {
+    const visibility = getCountyTerritoryVisibility(true)
+    for (const uid of ['72', '72001', '78', '78010', '60', '60010']) {
+      expect(isCountyTerritoryGeographyIncluded(uid, visibility)).toBe(true)
+    }
   })
 })

@@ -6,6 +6,7 @@ import { MapRefInterface } from '../hooks/useProgrammaticMapTooltip'
 import { MutableRefObject } from 'react'
 
 export type MapContext = {
+  selectedLocationId?: string
   currentViewport: ViewPort
   customNavigationHandler?: Function
   vizViewport?: ViewPort
@@ -39,6 +40,9 @@ export type MapContext = {
   runtimeFilters: Function
   runtimeLegend
   runtimeBubbleLegend
+  hiddenDensitySeries?: string[]
+  /** Runtime-only source schema; dashboard config.data may already contain filtered rows. */
+  densitySourceColumns?: readonly string[]
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void

@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useId } from 'react'
+import { resolvePatternColor } from '../helpers/patternColors'
 
 interface PatternInfo {
   pattern: string
@@ -17,13 +18,15 @@ interface LegendShapeProps {
 
 const LegendShape: React.FC<LegendShapeProps> = props => {
   const { fill, borderColor, display = 'inline-block', shape = 'circle', patternInfo } = props
+  const instanceId = useId().replace(/:/g, '')
   const dimensions = { width: '1em', height: '1em' }
   const isCircleOrSquare = ['circle', 'square'].includes(shape)
 
   // If pattern is provided, use SVG with pattern fill
   if (patternInfo) {
     const patternSize = String(Number.isFinite(Number(patternInfo.size)) ? patternInfo.size : 10)
-    const patternColor = patternInfo.color || '#212529'
+    const patternColor = resolvePatternColor(patternInfo.color, fill)
+    const patternId = `${instanceId}--${patternInfo.patternId}`
 
     return (
       <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={{ display, verticalAlign: 'middle', width: dimensions.width, height: dimensions.height }}>
@@ -32,7 +35,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
           <defs>
             {patternInfo.pattern === 'waves' && (
               <pattern
-                id={patternInfo.patternId}
+                id={patternId}
                 patternUnits="userSpaceOnUse"
                 width={patternSize}
                 height={patternSize}
@@ -47,7 +50,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
             )}
             {patternInfo.pattern === 'circles' && (
               <pattern
-                id={patternInfo.patternId}
+                id={patternId}
                 patternUnits="userSpaceOnUse"
                 width={patternSize}
                 height={patternSize}
@@ -62,7 +65,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
             )}
             {patternInfo.pattern === 'lines' && (
               <pattern
-                id={patternInfo.patternId}
+                id={patternId}
                 patternUnits="userSpaceOnUse"
                 width={patternSize}
                 height={patternSize}
@@ -79,7 +82,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
             )}
             {patternInfo.pattern === 'diagonalLines' && (
               <pattern
-                id={patternInfo.patternId}
+                id={patternId}
                 patternUnits="userSpaceOnUse"
                 width={patternSize}
                 height={patternSize}
@@ -113,7 +116,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
           )}
           {shape === 'circle' ? (
             <circle
-              fill={`url(#${patternInfo.patternId})`}
+              fill={`url(#${patternId})`}
               r={7.5}
               cx={8}
               cy={8}
@@ -121,7 +124,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
             />
           ) : (
             <rect
-              fill={`url(#${patternInfo.patternId})`}
+              fill={`url(#${patternId})`}
               width={15}
               height={15}
               x={0.5}

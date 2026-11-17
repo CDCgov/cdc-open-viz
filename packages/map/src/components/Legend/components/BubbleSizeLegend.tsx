@@ -41,8 +41,11 @@ const BubbleSizeLegend = ({
   const bubbleSizeLegendColor = hasColorColumn ? NEUTRAL_BUBBLE_LEGEND_COLOR : getBubbleLayerStaticColor(config, layer)
   const bubbleOpacity = getBubbleLayerOpacity(layer)
   const hasSizeLegendHeader = Boolean(title || description)
+  const singleItemLabel = layer.legend?.size?.singleItemLabel?.trim() ?? ''
+  const usesSingleItemLabel = items.length === 1 && singleItemLabel !== ''
   const sizeLegendClasses = ['bubble-size-legend']
-  if (config.legend.style === 'gradient') sizeLegendClasses.push('bubble-size-legend--gradient')
+  if (usesSingleItemLabel) sizeLegendClasses.push('bubble-size-legend--single-item-label')
+  if (!usesSingleItemLabel && config.legend.style === 'gradient') sizeLegendClasses.push('bubble-size-legend--gradient')
 
   return (
     <div className={addTopSpacing ? 'mt-3' : undefined}>
@@ -83,7 +86,7 @@ const BubbleSizeLegend = ({
                   extraBubbleBorder={layer.extraBubbleBorder}
                 />
               </svg>
-              <span className='cove-prose'>{item.label}</span>
+              <span className='cove-prose'>{usesSingleItemLabel ? singleItemLabel : item.label}</span>
             </li>
           )
         })}

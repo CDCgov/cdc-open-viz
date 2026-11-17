@@ -1,0 +1,157 @@
+.post-type-cdc_visualization .cove input[type='radio'] {
+  appearance: auto !important;
+  background-color: initial !important;
+  border: initial !important;
+  box-sizing: border-box !important;
+  cursor: default !important;
+  margin: 3px 3px 0 5px !important;
+  padding: initial !important;
+}
+
+.cove-visualization .editor-panel .cove-input-group,
+.cove-visualization .editor-panel .cove-accordion__small-inputs {
+  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  width: 100%;
+}
+.cove-visualization .editor-panel .cove-input-group > .cove-input,
+.cove-visualization .editor-panel .cove-accordion__small-inputs > .cove-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  position: relative;
+  width: 1%;
+}
+.cove-visualization .editor-panel .cove-input-group > .cove-input__label,
+.cove-visualization .editor-panel .cove-accordion__small-inputs > .cove-input__label {
+  display: none;
+}
+.cove-visualization .editor-panel .cove-input-group:not(.clear) > :not(:first-child),
+.cove-visualization .editor-panel .cove-accordion__small-inputs:not(.clear) > :not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  margin-left: -1px;
+}
+.cove-visualization .editor-panel .cove-input-group:not(.clear) > :not(:last-child),
+.cove-visualization .editor-panel .cove-accordion__small-inputs:not(.clear) > :not(:last-child) {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+.cove-visualization .editor-panel .cove-input-group.clear[flow='left'] > :first-child,
+.cove-visualization .editor-panel .cove-accordion__small-inputs.clear[flow='left'] > :first-child {
+  border: 0;
+  left: 0;
+}
+.cove-visualization .editor-panel .cove-input-group.clear[flow='right'] > :last-child,
+.cove-visualization .editor-panel .cove-accordion__small-inputs.clear[flow='right'] > :last-child {
+  border: 0;
+  right: 0;
+}
+.cove-visualization .editor-panel .cove-input-group.clear .cove-input-group__label,
+.cove-visualization .editor-panel .cove-accordion__small-inputs.clear .cove-input-group__label {
+  background-color: transparent;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  user-select: none;
+}
+.cove-visualization .editor-panel .map-location-links-editor {
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+.cove-visualization .editor-panel .map-location-links-editor > h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.cove-visualization .editor-panel .remove-column {
+  font-size: 13px;
+}
+.cove-visualization .editor-panel .helper {
+  align-self: center;
+  cursor: pointer;
+  height: 17px;
+  margin-left: 0.3rem;
+  opacity: 0.7;
+  position: relative;
+  width: 17px;
+}
+.cove-visualization .editor-panel textarea {
+  min-height: 140px;
+}
+.cove-visualization .editor-panel .data-toggle {
+  list-style: none;
+}
+.cove-visualization .editor-panel .data-toggle li {
+  padding-left: 2em;
+  position: relative;
+}
+.cove-visualization .editor-panel .data-toggle li:before {
+  border-left: rgba(0, 0, 0, 0.2) 4px solid;
+  bottom: 0;
+  content: ' ';
+  left: 20px;
+  position: absolute;
+  top: 0;
+  transition: 0.2s all;
+}
+.cove-visualization .editor-panel .data-toggle li:after {
+  background: url('../images/inactive-checkmark.svg') no-repeat;
+  background-size: 14px;
+  content: ' ';
+  height: 14px;
+  left: 0;
+  opacity: 0.5;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 0.2s opacity;
+  width: 14px;
+  z-index: 40;
+}
+.cove-visualization .editor-panel .data-toggle li {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.2s opacity;
+}
+.cove-visualization .editor-panel .data-toggle li:not(:first-child) {
+  margin-top: 1em;
+}
+.cove-visualization .editor-panel .data-toggle li input[type='text'],
+.cove-visualization .editor-panel .data-toggle li input[type='number'] {
+  font-size: 1em;
+}
+.cove-visualization .editor-panel .data-toggle li label {
+  margin-top: 0;
+}
+.cove-visualization .editor-panel .data-toggle li label + label {
+  margin-top: 1em;
+}
+.cove-visualization .editor-panel .data-toggle li:hover:before {
+  border-left: rgba(0, 0, 0, 0.7) 4px solid;
+  transition: 0.2s all;
+}
+.cove-visualization .editor-panel .data-toggle li:hover:after {
+  opacity: 1;
+  transition: 0.2s all;
+}
+.cove-visualization .editor-panel .data-toggle li.active {
+  opacity: 1;
+  position: relative;
+}
+.cove-visualization .editor-panel .data-toggle li.active:before {
+  border-left: rgba(0, 0, 0, 0.7) 4px solid;
+}
+.cove-visualization .editor-panel .data-toggle li.active:after {
+  background-image: url(../images/active-checkmark.svg);
+  content: ' ';
+  opacity: 1;
+  transition: 0.2s opacity;
+}
+.cove-visualization.md .waiting,
+.cove-visualization.lg .waiting,
+.cove-visualization.xl .waiting {
+  background-color: #fff;
+}

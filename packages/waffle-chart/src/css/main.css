@@ -1,0 +1,415 @@
+.modal.cdc-cove-editor *:focus-visible,
+.cove-visualization *:focus-visible {
+  border-radius: 6px !important;
+  outline: dashed 2px rgb(0, 122, 153) !important;
+  outline-offset: 3px !important;
+}
+
+.cove-visualization .cdc-callout {
+  --cdc-callout-background: var(--colors-cyan-10, #eff9fa);
+  --cdc-callout-border-color: var(--colors-cyan-15, #dff2f6);
+  --cdc-callout-border-radius: 0.25rem;
+  --cdc-callout-padding: 1.25rem;
+  --cdc-callout-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+  background: var(--cdc-callout-background);
+  border: 1px solid var(--cdc-callout-border-color);
+  border-radius: var(--cdc-callout-border-radius);
+  box-shadow: var(--cdc-callout-shadow);
+  margin: 0;
+  padding: var(--cdc-callout-padding);
+  position: relative;
+}
+
+.cove-visualization .cdc-callout .cdc-callout__flag {
+  height: auto;
+  position: absolute;
+  right: 1.08rem;
+  top: -0.36rem;
+  width: 1.84rem;
+}
+
+.cove-visualization.type-waffle-chart .cove-waffle-chart__subtext.subtext {
+  line-height: var(--visualization-body-line-height);
+}
+.cove-visualization.type-waffle-chart .cove-visualization__body {
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+.cove-visualization.type-waffle-chart .cove-visualization__body.component--has-legacy-border,
+.cove-visualization.type-waffle-chart .cove-visualization__body.component--has-border-color-theme,
+.cove-visualization.type-waffle-chart .cove-visualization__body.component--has-background,
+.cove-visualization.type-waffle-chart .cove-visualization__body.component--has-accent {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.cove-visualization.type-waffle-chart .cove-value-with-trend {
+  align-items: baseline;
+  display: inline-flex;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__value-block {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__value-row {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.2em;
+  line-height: 1;
+  min-width: 0;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__trend-slot {
+  align-items: center;
+  display: inline-flex;
+  min-width: 0;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__trend-row {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.2rem;
+  min-width: 0;
+  row-gap: 0.2rem;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__value-block .cove-trend-arrow__label {
+  line-height: 1;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__trend-footer-label {
+  font-family: var(--app-font-main);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+.cove-visualization.type-waffle-chart .cove-gauge-chart__chart {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  justify-items: center;
+  margin: 0 auto;
+  margin-left: auto;
+}
+.cove-visualization.type-waffle-chart .cove-gauge-chart__chart > svg {
+  margin: 0.7em 0;
+}
+.cove-visualization.type-waffle-chart .cove-gauge-chart__subtext {
+  line-height: var(--visualization-body-line-height);
+}
+.cove-visualization.type-waffle-chart .cove-gauge-chart__text {
+  font-weight: 400;
+  line-height: 1.25em;
+}
+.cove-visualization.type-waffle-chart:not(.gauge__style--tp5) .cove-gauge-chart__subtext {
+  font-style: italic;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart.cove-waffle-chart--verical {
+  align-items: center;
+  flex-flow: column;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart.cove-waffle-chart--verical .cove-waffle-chart__chart {
+  padding-right: 0;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__chart {
+  box-sizing: content-box;
+  padding-right: 1rem;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__data {
+  flex: 1 1 0;
+  min-width: 175px;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__data {
+  align-content: space-between;
+  display: flex;
+  flex-wrap: wrap;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__data .cove-waffle-chart__data--primary {
+  font-size: 70px;
+  font-weight: 400;
+  line-height: 1em;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__data .cove-waffle-chart__data--text {
+  line-height: 1.25em;
+  width: 100%;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__data > .cove-waffle-chart__subtext {
+  margin-top: 1em;
+}
+.cove-visualization.type-waffle-chart .cove-waffle-chart__node {
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cove-visualization.type-waffle-chart .reverse-labels div {
+  float: left;
+  margin-right: 5px;
+}
+.cove-visualization.type-waffle-chart .reverse-labels {
+  overflow: auto;
+}
+
+.cove-waffle-chart.font-small .cove-waffle-chart__data--primary,
+.cove-gauge-chart.font-small .cove-waffle-chart__data--primary {
+  font-size: 35px;
+}
+.cove-waffle-chart.font-small .cove-waffle-chart__data--text,
+.cove-gauge-chart.font-small .cove-waffle-chart__data--text {
+  font-size: 14px;
+}
+
+.cove-waffle-chart.font-medium .cove-waffle-chart__data--primary,
+.cove-gauge-chart.font-medium .cove-waffle-chart__data--primary {
+  font-size: 50px;
+}
+.cove-waffle-chart.font-medium .cove-waffle-chart__data--text,
+.cove-gauge-chart.font-medium .cove-waffle-chart__data--text {
+  font-size: 18px;
+}
+
+.cove-waffle-chart.font-large .cove-waffle-chart__data--primary,
+.cove-gauge-chart.font-large .cove-waffle-chart__data--primary {
+  font-size: 80px;
+}
+.cove-waffle-chart.font-large .cove-waffle-chart__data--text,
+.cove-gauge-chart.font-large .cove-waffle-chart__data--text {
+  font-size: 20px;
+}
+
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body,
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body.component--has-legacy-border,
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body.component--has-border-color-theme,
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body.component--has-background,
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body.component--has-accent {
+  background: none !important;
+  container-type: inline-size;
+  padding: 0 !important;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5
+  .cove-visualization__body.component--has-legacy-border
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5
+  .cove-visualization__body.component--has-border-color-theme
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5
+  .cove-visualization__body.component--has-background
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5 .cove-visualization__body.component--has-accent > .cove-visualization__body-wrap {
+  padding: 0 !important;
+}
+.type-waffle-chart.waffle__style--tp5 .cdc-callout {
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.type-waffle-chart.waffle__style--tp5 .cdc-callout__icon {
+  color: var(--colors-cyan-60v);
+  font-family: var(--icons-cdc);
+  font-size: 2rem;
+  position: absolute;
+  right: 1rem;
+  top: -0.65rem;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 0;
+  row-gap: 1rem;
+}
+@container (max-width: 480px) {
+  .type-waffle-chart.waffle__style--tp5 .cove-waffle-chart {
+    flex-wrap: wrap;
+  }
+  .type-waffle-chart.waffle__style--tp5 .cove-waffle-chart .cove-waffle-chart__chart {
+    width: 100% !important;
+  }
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__chart {
+  margin-bottom: 0;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__data {
+  align-content: flex-start;
+  margin-bottom: 0;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__data .cove-waffle-chart__data--primary {
+  color: var(--colors-cyan-60v);
+  font-size: 2rem;
+  font-weight: 400;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__data .cove-waffle-chart__data--text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  margin-top: 0.5rem;
+}
+.type-waffle-chart.waffle__style--tp5 .cdc-callout__heading {
+  font-family: var(--fonts-nunito) !important;
+  font-size: 1.1rem;
+  width: 100%;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__subtext {
+  margin-top: 1rem;
+}
+.type-waffle-chart.waffle__style--tp5 .cove-waffle-chart__subtext--below {
+  flex: 0 0 100%;
+  margin-top: 0;
+  text-align: left;
+  width: 100%;
+}
+.type-waffle-chart.waffle__style--tp5.white-background-style .cove-visualization__body,
+.type-waffle-chart.waffle__style--tp5.white-background-style .cove-visualization__body.component--has-legacy-border,
+.type-waffle-chart.waffle__style--tp5.white-background-style
+  .cove-visualization__body.component--has-border-color-theme,
+.type-waffle-chart.waffle__style--tp5.white-background-style .cove-visualization__body.component--has-background,
+.type-waffle-chart.waffle__style--tp5.white-background-style .cove-visualization__body.component--has-accent {
+  background: white !important;
+  padding: 0 !important;
+}
+.type-waffle-chart.waffle__style--tp5.white-background-style .cove-visualization__body > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5.white-background-style
+  .cove-visualization__body.component--has-legacy-border
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5.white-background-style
+  .cove-visualization__body.component--has-border-color-theme
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5.white-background-style
+  .cove-visualization__body.component--has-background
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.waffle__style--tp5.white-background-style
+  .cove-visualization__body.component--has-accent
+  > .cove-visualization__body-wrap {
+  padding: 0 !important;
+}
+.type-waffle-chart.waffle__style--tp5.white-background-style .cdc-callout {
+  background: transparent !important;
+  border: 1px solid #009ec1 !important;
+  box-shadow: 0 2px 4px rgba(159, 159, 159, 0.1);
+}
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body,
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body.component--has-legacy-border,
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body.component--has-border-color-theme,
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body.component--has-background,
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body.component--has-accent {
+  background: none !important;
+  container-type: inline-size;
+  padding: 0 !important;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5
+  .cove-visualization__body.component--has-legacy-border
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5
+  .cove-visualization__body.component--has-border-color-theme
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5
+  .cove-visualization__body.component--has-background
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5 .cove-visualization__body.component--has-accent > .cove-visualization__body-wrap {
+  padding: 0 !important;
+}
+.type-waffle-chart.gauge__style--tp5 .cdc-callout {
+  gap: 0.7rem;
+}
+.type-waffle-chart.gauge__style--tp5 .cdc-callout__heading {
+  font-family: var(--fonts-nunito) !important;
+  font-size: 1.1rem;
+  width: 100%;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart {
+  padding: 0;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__chart {
+  width: 100%;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__chart > svg {
+  display: block;
+  width: 100%;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__body {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  row-gap: 0.5rem;
+}
+@container (max-width: 480px) {
+  .type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__body {
+    flex-wrap: wrap;
+  }
+  .type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__body .cove-gauge-chart__value-section {
+    width: 100%;
+  }
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__value-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 1px;
+  width: auto;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-gauge-chart__content {
+  font-size: 1rem;
+  min-height: 1rem;
+}
+.type-waffle-chart.gauge__style--tp5.use-wrap .cove-gauge-chart__body {
+  flex-wrap: wrap;
+}
+.type-waffle-chart.gauge__style--tp5.use-wrap .cove-gauge-chart__value-section,
+.type-waffle-chart.gauge__style--tp5.use-wrap .cove-gauge-chart__content {
+  flex-basis: 100%;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-waffle-chart__data--primary {
+  color: var(--colors-cyan-60v);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-waffle-chart__data--text {
+  font-size: 1rem;
+  margin-top: 0;
+}
+.type-waffle-chart.gauge__style--tp5 .cove-waffle-chart__subtext {
+  line-height: var(--visualization-body-line-height);
+  margin-top: auto;
+}
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body,
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body.component--has-legacy-border,
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body.component--has-border-color-theme,
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body.component--has-background,
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body.component--has-accent {
+  background: white !important;
+  padding: 0 !important;
+}
+.type-waffle-chart.gauge__style--tp5.white-background-style .cove-visualization__body > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5.white-background-style
+  .cove-visualization__body.component--has-legacy-border
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5.white-background-style
+  .cove-visualization__body.component--has-border-color-theme
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5.white-background-style
+  .cove-visualization__body.component--has-background
+  > .cove-visualization__body-wrap,
+.type-waffle-chart.gauge__style--tp5.white-background-style
+  .cove-visualization__body.component--has-accent
+  > .cove-visualization__body-wrap {
+  padding: 0 !important;
+}
+.type-waffle-chart.gauge__style--tp5.white-background-style .cdc-callout {
+  background: transparent !important;
+  border: 1px solid #009ec1 !important;
+  box-shadow: 0 2px 4px rgba(159, 159, 159, 0.1);
+}
+
+.type-waffle-chart.gauge__style--tp5:not(.row *) .cove-gauge-chart__body.d-flex.justify-content-center {
+  justify-content: center;
+  width: 100%;
+}
+
+.cove-visualization.type-waffle-chart
+  .cove-visualization__body:not(.component--has-background, .component--hide-background-color) {
+  background-color: white;
+}

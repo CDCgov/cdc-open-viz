@@ -69,11 +69,19 @@ export const DataTableSectionTests: Story = {
     // ==========================================================================
     // First expand the data table if it's collapsed
     const dataTableHeadingButton = canvasElement.querySelector('.data-table-heading') as HTMLElement
-    const dataTableContainer = canvasElement.querySelector('.data-table-container')
     const isCollapsed = dataTableHeadingButton?.classList.contains('collapsed')
     if (isCollapsed) {
-      await userEvent.click(dataTableHeadingButton)
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await performAndAssert(
+        'Data Table → Expand for formatting checks',
+        () => ({
+          isCollapsed: dataTableHeadingButton.classList.contains('collapsed'),
+          hasTable: Boolean(canvasElement.querySelector('.data-table-container .data-table'))
+        }),
+        async () => {
+          await userEvent.click(dataTableHeadingButton)
+        },
+        (before, after) => before.isCollapsed && !after.isCollapsed && after.hasTable
+      )
     }
 
     const wrapColumnsCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
@@ -194,9 +202,10 @@ export const DataTableSectionTests: Story = {
       const label = textarea.closest('label')
       return label?.textContent?.includes('Screen Reader Description')
     }) as HTMLTextAreaElement
+    expect(screenReaderDescTextarea).toBeTruthy()
 
     await performAndAssert(
-      'Screen Reader Description → Set custom description',
+      'Screen Reader Description → Preserve markup as literal caption text',
       () => {
         const dataTable = canvasElement.querySelector('.data-table')
         const caption = dataTable?.querySelector('caption')
@@ -206,10 +215,10 @@ export const DataTableSectionTests: Story = {
       },
       async () => {
         await userEvent.clear(screenReaderDescTextarea)
-        await userEvent.type(screenReaderDescTextarea, 'Table showing state population data by region')
+        await userEvent.type(screenReaderDescTextarea, 'Table showing <strong>state population data</strong> by region')
       },
       (before, after) => {
-        return after.captionText.includes('Table showing state population data')
+        return after.captionText.includes('Table showing <strong>state population data</strong> by region')
       }
     )
 

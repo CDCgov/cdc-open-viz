@@ -7,11 +7,14 @@ import {
   supportedCities,
   stateKeys,
   territoryKeys,
-  countryKeys,
   countyKeys,
   cityKeys
 } from '../data/supported-geos'
-import { getGeographyUidAlias, getLocalizedGeographyName } from './geographyTranslations'
+import { getCountryGeographyUidAlias, getGeographyUidAlias, getLocalizedGeographyName } from './geographyTranslations'
+
+const countryNames = new Map(
+  Object.entries<string[]>(supportedCountries).map(([uid, names]) => [uid.toUpperCase(), names[0]])
+)
 
 /**
  * Converts a geographic key to its display name.
@@ -48,8 +51,8 @@ export const displayGeoName = (key: string, displayOverride?: string, locale?: s
     }
   }
 
-  if (countryKeys.includes(normalizedKey)) {
-    value = titleCase(supportedCountries[normalizedKey][0])
+  if (countryNames.has(normalizedKey)) {
+    value = titleCase(countryNames.get(normalizedKey))
     wasLookedUp = true
   }
 
@@ -82,7 +85,9 @@ export const displayGeoName = (key: string, displayOverride?: string, locale?: s
   // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is.
   // Otherwise the value is a custom/unrecognized entry (e.g. a manually-entered site name) - display it exactly
   // as entered rather than guessing at title-casing, since that can mangle intentional abbreviations (e.g. "ID:2472").
-  const geographyUid = getGeographyUidAlias(rawKey) || normalizedKey
+  const geographyUid = countryNames.has(normalizedKey)
+    ? normalizedKey
+    : getGeographyUidAlias(rawKey) || getCountryGeographyUidAlias(rawKey) || normalizedKey
   const localizedValue = getLocalizedGeographyName(geographyUid, locale)
   if (localizedValue) return localizedValue
 

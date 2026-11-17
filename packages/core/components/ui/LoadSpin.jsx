@@ -1,5 +1,5 @@
 import React from 'react'
-import './loadspin.scss'
+import './loadspin.css'
 
 const LoadSpin = ({ color = '#fff', opacity = 100, size = 100, className }) => {
   const n = 8

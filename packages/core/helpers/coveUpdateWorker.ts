@@ -35,6 +35,7 @@ import update_4_26_8 from './ver/4.26.8'
 import update_4_26_8_1 from './ver/4.26.8-1'
 import update_4_26_8_2 from './ver/4.26.8-2'
 import update_4_26_10 from './ver/4.26.10'
+import update_4_26_11 from './ver/4.26.11'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 import cloneConfig from './cloneConfig'
@@ -79,7 +80,8 @@ const versions: MigrationEntry[] = [
   ['4.26.8', update_4_26_8],
   ['4.26.8-1', update_4_26_8_1],
   ['4.26.8-2', update_4_26_8_2],
-  ['4.26.10', update_4_26_10]
+  ['4.26.10', update_4_26_10],
+  ['4.26.11', update_4_26_11]
 ]
 
 export const CURRENT_COVE_CONFIG_VERSION = versions[versions.length - 1][0]

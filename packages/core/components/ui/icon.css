@@ -1,0 +1,28 @@
+.cdc-open-viz-module .cove-icon,
+.cdc-editor .cove-icon,
+.cove-visualization .cove-icon,
+.cove-overlay .cove-icon {
+  align-items: center;
+  display: inline-flex;
+  height: auto;
+  justify-content: center;
+  width: 1rem;
+}
+@media all and (-ms-high-contrast: none) {
+  .cdc-open-viz-module .cove-icon,
+  .cdc-editor .cove-icon,
+  .cove-visualization .cove-icon,
+  .cove-overlay .cove-icon {
+    height: 30px;
+  }
+}
+.cdc-open-viz-module .cove-icon > svg,
+.cdc-editor .cove-icon > svg,
+.cove-visualization .cove-icon > svg,
+.cove-overlay .cove-icon > svg {
+  height: auto;
+  max-height: 100%;
+  max-width: 100%;
+  pointer-events: none;
+  width: auto;
+}

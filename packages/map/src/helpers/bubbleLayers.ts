@@ -151,6 +151,7 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
     showBubbleZeros: false,
     staticColor: DEFAULT_BUBBLE_STATIC_COLOR,
     ...restOverrides,
+    placeOverLabels: restOverrides.placeOverLabels === true,
     opacity: getBubbleLayerOpacity(restOverrides),
     legend,
     columns: {

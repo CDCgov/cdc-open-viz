@@ -281,7 +281,7 @@ When a modernization works in an isolated unit fixture but fails against a real 
 | `packages/editor/src/scss/modernization.scss` | Entry-action and workspace layout styles |
 | `packages/core/helpers/markConfigTracking.ts` | Immutable helper for recording typed config-tracking flags |
 | `packages/chart/src/components/EditorPanel/EditorPanel.tsx` | Chart entry-action placement |
-| `packages/map/src/components/EditorPanel/components/EditorPanel.tsx` | Map entry-action placement |
+| `packages/map/src/components/EditorPanel/EditorPanel.tsx` | Map entry-action placement |
 | `packages/dashboard/src/components/VisualizationsPanel/VisualizationsPanel.tsx` | Dashboard entry-action placement |
 | `packages/core/generateViteConfig.js` and `packages/core/devTemplate/dev.js` | Aggregated real-example support for standalone editor development |
 | `packages/core/helpers/ver/4.26.8.ts` | Related structural axis repair; not a modernization recipe |

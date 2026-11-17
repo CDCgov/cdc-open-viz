@@ -1,5 +1,5 @@
 import { previewTheme } from './coveSbThemes'
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 export const parameters = {
   options: {
@@ -14,6 +14,15 @@ export const parameters = {
     matchers: {
       color: /(background|color)$/i,
       date: /Date$/
+    }
+  },
+  a11y: {
+    test: 'error',
+    options: {
+      runOnly: {
+        type: 'rule',
+        values: ['aria-command-name']
+      }
     }
   },
   docs: {

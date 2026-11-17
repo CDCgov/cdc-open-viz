@@ -24,7 +24,7 @@
     "@storybook/addon-a11y": "^10.3.3",
     "@storybook/addon-docs": "^10.3.3",
     "@storybook/addon-links": "^10.3.3",
-    "@storybook/addon-mcp": "^0.6.0",
+    "@storybook/addon-mcp": "^0.7.0",
     "@storybook/addon-vitest": "^10.3.3",
     "@storybook/builder-vite": "^10.3.3",
     "@storybook/react-vite": "^10.3.3",
@@ -86,7 +86,6 @@
     "react-visibility-sensor": "^5.1.1",
     "resize-observer-polyfill": "^1.5.1",
     "rollup-plugin-node-externals": "^6.1.2",
-    "sass": "^1.89.2",
     "storybook": "^10.3.3",
     "storybook-addon-fetch-mock": "^2.0.1",
     "stylelint": "^17.3.0",
@@ -108,9 +107,6 @@
     "packages/**/*.css": [
       "stylelint --fix",
       "npx prettier --write"
-    ],
-    "packages/**/*.scss": [
-      "npx prettier --write"
     ]
   },
   "private": true,
@@ -130,7 +126,7 @@
     "tar": "^7.5.11",
     "flatted": "^3.4.2",
     "effect": "^3.20.0",
-    "handlebars": "^4.7.9",
+    "handlebars": "^4.7.10",
     "**/follow-redirects": "^1.16.1",
     "**/source-map-js": "^1.2.2",
     "**/babel-plugin-macros/**/yaml": "^1.10.3"

@@ -1,5 +1,5 @@
 import React from 'react'
-import '../scss/kpi.scss'
+import '../css/kpi.css'
 
 export const KPIComponent = ({ label, value }) => {
   return (

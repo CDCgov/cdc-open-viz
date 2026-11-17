@@ -1,0 +1,314 @@
+import React, { useContext } from 'react'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import ConfigContext from '../../../../../context'
+import clone from 'lodash/clone'
+import map from 'lodash/map'
+import set from 'lodash/set'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { createScopedKey } from '../../../../../helpers/createScopedKey'
+import {
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+} from '@cdc/core/helpers/constants'
+
+const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
+
+/**
+ * Notice: each shape Col has a legend title and description should the title/desc need to be different for different shapes.
+ * @param {} props
+ * @returns
+ */
+const HexSettingShapeColumns = props => {
+  const { columnsOptions } = props
+  const { config, setConfig, mapId } = useContext(ConfigContext)
+
+  const handleItemUpdate = (key, value, shapeGroupIndex, itemIndex) => {
+    setConfig({
+      ...config,
+      hexMap: {
+        ...config.hexMap,
+        shapeGroups: config.hexMap.shapeGroups.map((group, groupIndex) => {
+          if (groupIndex === shapeGroupIndex) {
+            return {
+              ...group,
+              items: group.items.map((item, index) => {
+                if (itemIndex === index) {
+                  return {
+                    ...item,
+                    [key]: value
+                  }
+                } else {
+                  return item
+                }
+              })
+            }
+          } else {
+            return group
+          }
+        })
+      }
+    })
+  }
+
+  const handleRemoveShapeCondition = (shapeGroupIndex, itemIndex) => {
+    setConfig({
+      ...config,
+      hexMap: {
+        ...config.hexMap,
+        shapeGroups: config.hexMap.shapeGroups.map((group, groupIndex) => {
+          if (groupIndex === shapeGroupIndex) {
+            return {
+              ...group,
+              items: group.items.filter((item, index) => index !== itemIndex)
+            }
+          } else {
+            return group
+          }
+        })
+      }
+    })
+  }
+
+  return (
+    config.general.displayAsHex &&
+    config.hexMap.type === 'shapes' && (
+      <>
+        <fieldset className='edit-block'>
+          {config.hexMap.shapeGroups && (
+            <>
+              <Accordion allowZeroExpanded>
+                <ul style={{ listStyle: 'none' }}>
+                  {config.hexMap.shapeGroups?.map((shapeGroup, shapeGroupIndex) => {
+                    return (
+                      <AccordionItem key={createScopedKey(mapId, 'hex-shape-group', shapeGroupIndex)}>
+                        <AccordionItemHeading>
+                          <AccordionItemButton>{`Legend Shape Group ${shapeGroupIndex + 1}`}</AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <label>
+                            <span className='edit-label column-heading'>Legend Title</span>
+                            <input
+                              type='text'
+                              value={shapeGroup.legendTitle || ''}
+                              onChange={e => {
+                                const newConfig = cloneConfig(config)
+                                newConfig.hexMap.shapeGroups[shapeGroupIndex].legendTitle = e.target.value
+                                setConfig(newConfig)
+                              }}
+                            />
+                          </label>
+
+                          <label>
+                            <span className='edit-label column-heading'>Legend Description</span>
+                            <input
+                              type='text'
+                              value={shapeGroup.legendDescription || ''}
+                              onChange={e => {
+                                const newConfig = clone(config)
+                                newConfig.hexMap.shapeGroups[shapeGroupIndex].legendDescription = e.target.value
+                                setConfig(newConfig)
+                              }}
+                            />
+                          </label>
+
+                          {shapeGroup.items.map((item, itemIndex) => {
+                            return (
+                              <Accordion
+                                key={createScopedKey(mapId, 'hex-shape-condition', shapeGroupIndex, itemIndex)}
+                                allowZeroExpanded
+                                style={{ marginTop: itemIndex === 0 ? '15px' : 'initial' }}
+                              >
+                                <AccordionItem>
+                                  <AccordionItemHeading>
+                                    <AccordionItemButton>{`Shape Condition ${itemIndex + 1}`}</AccordionItemButton>
+                                  </AccordionItemHeading>
+                                  <AccordionItemPanel>
+                                    <>
+                                      <Select
+                                        label='Shape Column'
+                                        value={
+                                          config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape ||
+                                          'Arrow Up'
+                                        }
+                                        options={shapeOptions}
+                                        fieldName={`shape-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) => {
+                                          handleItemUpdate('shape', value, shapeGroupIndex, itemIndex)
+                                        }}
+                                      />
+
+                                      <Select
+                                        label='Column'
+                                        value={config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].key || ''}
+                                        options={columnsOptions.map(c => c.key)}
+                                        fieldName={`key-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) =>
+                                          handleItemUpdate('key', value, shapeGroupIndex, itemIndex)
+                                        }
+                                      />
+
+                                      <Select
+                                        label='Operator'
+                                        value={
+                                          config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator || '='
+                                        }
+                                        options={[
+                                          DATA_OPERATOR_EQUAL,
+                                          DATA_OPERATOR_NOTEQUAL,
+                                          DATA_OPERATOR_LESS,
+                                          DATA_OPERATOR_GREATER,
+                                          DATA_OPERATOR_LESSEQUAL,
+                                          DATA_OPERATOR_GREATEREQUAL
+                                        ]}
+                                        fieldName={`operator-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) =>
+                                          handleItemUpdate('operator', value, shapeGroupIndex, itemIndex)
+                                        }
+                                      />
+
+                                      <label>
+                                        <span className='edit-label column-heading'>Value</span>
+                                        <input
+                                          type='text'
+                                          value={
+                                            config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].value || ''
+                                          }
+                                          onChange={e =>
+                                            handleItemUpdate('value', e.target.value, shapeGroupIndex, itemIndex)
+                                          }
+                                        />
+                                      </label>
+                                      <button
+                                        type='button'
+                                        className='cove-button cove-button--warn'
+                                        style={{
+                                          background: 'none',
+                                          border: '1px solid red',
+                                          color: 'red',
+                                          marginTop: '15px'
+                                        }}
+                                        onClick={e => handleRemoveShapeCondition(shapeGroupIndex, itemIndex)}
+                                      >
+                                        Remove Shape Conditional
+                                      </button>
+                                    </>
+                                  </AccordionItemPanel>
+                                </AccordionItem>
+                              </Accordion>
+                            )
+                          })}
+
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                            <button
+                              type='button'
+                              className='cove-button'
+                              style={{ marginTop: '15px' }}
+                              onClick={() => {
+                                const newConfig = cloneConfig(config)
+                                set(
+                                  newConfig,
+                                  'hexMap.shapeGroups',
+                                  map(newConfig.hexMap.shapeGroups, (group, index) => {
+                                    if (index === shapeGroupIndex) {
+                                      return {
+                                        ...group,
+                                        items: [
+                                          ...group.items,
+                                          {
+                                            key: '',
+                                            shape: 'Arrow Up',
+                                            column: '',
+                                            operator: '=',
+                                            value: ''
+                                          }
+                                        ]
+                                      }
+                                    }
+                                    return group
+                                  })
+                                )
+
+                                setConfig(newConfig)
+                              }}
+                            >
+                              Add Shape Condition
+                            </button>
+
+                            <button
+                              type='button'
+                              className='cove-button cove-button--warn'
+                              style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }}
+                              onClick={() => {
+                                let newGroups = [
+                                  ...config.hexMap.shapeGroups.slice(0, shapeGroupIndex),
+                                  ...config.hexMap.shapeGroups.slice(shapeGroupIndex + 1)
+                                ]
+
+                                setConfig({
+                                  ...config,
+                                  hexMap: {
+                                    ...config.hexMap,
+                                    shapeGroups: newGroups
+                                  }
+                                })
+                              }}
+                            >
+                              Remove Shape Group
+                            </button>
+                          </div>
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                    )
+                  })}
+                </ul>
+              </Accordion>
+            </>
+          )}
+        </fieldset>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            type='button'
+            className='cove-button'
+            style={{ marginTop: '15px' }}
+            onClick={index => {
+              let copy = config.hexMap.shapeGroups
+              copy.push({
+                legendTitle: '',
+                legendDescription: '',
+                items: [{ key: '', shape: 'Arrow Up', column: '', operator: '=', value: '' }]
+              })
+              copy.legendTitle = ''
+              copy.legendDescription = ''
+              setConfig({
+                ...config,
+                hexMap: {
+                  ...config.hexMap,
+                  shapeGroups: copy
+                }
+              })
+            }}
+          >
+            Add Shape Group
+          </button>
+        </div>
+      </>
+    )
+  )
+}
+
+const HexSetting = () => props.children
+
+HexSetting.ShapeColumns = HexSettingShapeColumns
+
+export default HexSetting

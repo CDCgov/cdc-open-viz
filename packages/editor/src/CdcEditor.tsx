@@ -19,7 +19,7 @@ import { saveConfigToWindow as updateVizConfig } from './helpers/saveConfigToWin
 import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 import useModernizationSession from './hooks/useModernizationSession'
 
-import './scss/main.scss'
+import './css/main.css'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'

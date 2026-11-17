@@ -1,11 +1,11 @@
-name: Reject PRs with new .scss Files
+name: Reject Sass sources
 
 on:
   pull_request:
     types: [opened, synchronize]
 
 jobs:
-  check-scss-files:
+  check-sass-sources:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -16,13 +16,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for new .scss files in the PR
+      - name: Check for Sass files and direct dependencies
         run: |
-          added_files=$(git diff --diff-filter=A --name-only ${{ github.event.pull_request.base.sha }}...${{ github.sha }})
+          sass_files=$(find packages _stories -type f \( -name '*.scss' -o -name '*.sass' \) -print)
 
-          if echo "$added_files" | grep -q '\.scss$'; then
-            echo "Error: PR contains newly added .scss files."
+          if [ -n "$sass_files" ]; then
+            echo "Error: Sass source files remain:"
+            echo "$sass_files"
             exit 1
-          else
-            echo "No new .scss files found in the PR."
           fi
+
+          if grep -R -n '"sass"[[:space:]]*:' package.json packages --include=package.json; then
+            echo "Error: direct Sass dependencies remain."
+            exit 1
+          fi
+
+          echo "No Sass sources or direct dependencies found."
