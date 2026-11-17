@@ -1,10 +1,44 @@
 import { describe, expect, it } from 'vitest'
+import { createTooltipBuilder } from '../../hooks/useTooltip'
 import { displayGeoName } from '../displayGeoName'
 
 describe('displayGeoName', () => {
   it('resolves lowercase world iso codes to country names', () => {
     expect(displayGeoName('ssd')).toBe('South Sudan')
     expect(displayGeoName('usa')).toBe('United States of America')
+  })
+
+  it.each([
+    ['Republic of Chad', 'Chad'],
+    ['Democratic Republic of Congo', 'Democratic Republic of the Congo']
+  ])('displays world country alias %s as canonical name %s', (countryAlias, canonicalName) => {
+    expect(displayGeoName(countryAlias)).toBe(canonicalName)
+  })
+
+  it.each([
+    ['Republic of Chad', 'Chad'],
+    ['Democratic Republic of Congo', 'Democratic Republic of the Congo']
+  ])('uses the canonical name for world tooltip alias %s', (countryAlias, canonicalName) => {
+    const config = {
+      general: {
+        geoType: 'world',
+        type: 'data',
+        hideGeoColumnInTooltip: false,
+        hidePrimaryColumnInTooltip: false,
+        geoLabelOverride: ''
+      },
+      columns: {
+        geo: { name: 'Location', label: 'Location', tooltip: false, displayColumn: '' },
+        primary: { name: 'Value', label: 'Value', tooltip: true },
+        navigate: { name: '' }
+      },
+      legend: { specialClasses: [] },
+      tooltips: { noDataLabel: 'No Data' }
+    }
+
+    const tooltip = createTooltipBuilder(config as any).buildTooltip({ Location: countryAlias, Value: 1 }, countryAlias)
+
+    expect(tooltip).toContain(`<p class="tooltip-heading" style="text-transform: none;">${canonicalName}</p>`)
   })
 
   it('formats the District of Columbia state key as a display label', () => {
