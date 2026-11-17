@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
+  openAccordion,
   performAndAssert,
   waitForAbsence,
   waitForEditor,
@@ -215,5 +216,76 @@ export const NavigationRuntimeDoesNotShowAuthoringAlerts: Story = {
   args: { config: incompleteNavigationMap, isEditor: false },
   play: async ({ canvasElement }) => {
     expect(canvasElement.querySelector('.map-required-fields-alerts')).toBeNull()
+  }
+}
+
+const countyColumnSwitchRows = [
+  { 'FIPS Codes': '01001', 'Percent Vaccinated': '20' },
+  { 'FIPS Codes': '06001', 'Percent Vaccinated': '40' },
+  { 'FIPS Codes': '12001', 'Percent Vaccinated': '60' }
+]
+
+const countyColumnSwitchConfig = {
+  ...cloneConfig(usaStateGradientConfig),
+  general: {
+    ...usaStateGradientConfig.general,
+    geoType: 'us-county',
+    equalNumberOptIn: true,
+    hideUnselectedStates: false,
+    statesPicked: [],
+    palette: { name: 'sequential_blue', version: '2.1', isReversed: false }
+  },
+  columns: {
+    ...usaStateGradientConfig.columns,
+    geo: { ...usaStateGradientConfig.columns.geo, name: 'FIPS Codes' },
+    primary: { ...usaStateGradientConfig.columns.primary, name: 'Percent Vaccinated', label: 'Percent Vaccinated' }
+  },
+  table: { ...usaStateGradientConfig.table, expanded: true },
+  data: countyColumnSwitchRows,
+  formattedData: countyColumnSwitchRows
+}
+
+export const RestoresCountyDataAfterSelectingFips: Story = {
+  args: { config: countyColumnSwitchConfig, isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await waitForPresence('.county-map-canvas', canvasElement)
+    await waitForPresence('[aria-label="Map Legend"] svg rect', canvasElement)
+    await openAccordion(canvas, 'Columns')
+
+    const dataColumn = canvasElement.querySelector<HTMLSelectElement>(
+      '[data-required-field-control="map-data-column"]'
+    )!
+    expect(dataColumn).toBeTruthy()
+
+    const readCountyOutput = () => ({
+      tableValues: Array.from(canvasElement.querySelectorAll('tbody td')).map(cell => cell.textContent?.trim()),
+      legendColors: Array.from(canvasElement.querySelectorAll('[aria-label="Map Legend"] svg g rect')).map(rect =>
+        rect.getAttribute('fill')
+      )
+    })
+    const originalOutput = readCountyOutput()
+    expect(originalOutput.tableValues).toEqual(expect.arrayContaining(['20', '40', '60']))
+    expect(originalOutput.legendColors).toHaveLength(3)
+
+    await performAndAssert(
+      'Selecting FIPS retains the counties and produces a numeric legend',
+      readCountyOutput,
+      () => userEvent.selectOptions(dataColumn, 'FIPS Codes'),
+      (_, after) =>
+        after.tableValues.length === originalOutput.tableValues.length &&
+        !after.tableValues.includes('20') &&
+        after.legendColors.length === 3
+    )
+    await performAndAssert(
+      'Restoring Percent Vaccinated restores the county table and colors',
+      readCountyOutput,
+      () => userEvent.selectOptions(dataColumn, 'Percent Vaccinated'),
+      (_, after) =>
+        JSON.stringify(after.tableValues) === JSON.stringify(originalOutput.tableValues) &&
+        JSON.stringify(after.legendColors) === JSON.stringify(originalOutput.legendColors)
+    )
+    expect(canvasElement.querySelector('tbody')).not.toHaveTextContent('No Data')
   }
 }

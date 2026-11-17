@@ -115,7 +115,8 @@ const generateRuntimeData = (
       const configPrimaryName = choroplethPrimary || bubblePrimary
       const value = row[configPrimaryName]
       const categoryLegend = typeof value === 'string' && isCategoryLegend
-      if (value && !categoryLegend) {
+      // Geography identifiers must stay strings, even when selected as the numeric measure.
+      if (value && !categoryLegend && configPrimaryName !== geoColName) {
         row[configPrimaryName] = numberFromString(value)
       }
 
