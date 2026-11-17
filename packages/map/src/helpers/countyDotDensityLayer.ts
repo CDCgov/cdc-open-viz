@@ -55,19 +55,8 @@ export const prepareCountyDotDensity = (
       })
     )
   )
-  const requested = rows.reduce(
-    (sum, feature) =>
-      sum +
-      series.reduce(
-        (total, _category, index) => total + getDotCount(values.get(String(feature.id))![index], dotValue),
-        0
-      ),
-    0
-  )
-  if (requested > 100000)
-    return empty(
-      `${requested.toLocaleString()} dots requested. Increase the dot value to stay within the 100,000-dot prototype budget.`
-    )
+  if ([...values.values()].some(counts => counts.some(value => !Number.isSafeInteger(getDotCount(value, dotValue)))))
+    return empty('Choose a dot value that produces a safely representable whole-dot count.')
 
   const dots: Dot[] = []
   const signatures: string[] = []

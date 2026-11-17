@@ -148,13 +148,13 @@ Prepared dots are sorted into a deterministic mixed paint order. Series order co
 | Nonpositive/nonfinite dot value or nonfinite seed                       | Layer preparation returns an error and no dots.                                                                        |
 | Negative, missing, nonfinite, or nonnumeric count                       | Contributes no dots and increments the omitted-value status. The source value is retained for tooltip/table rendering. |
 | Invalid radius                                                          | Drawing submits no dots and reports an error.                                                                          |
-| More than 100,000 requested dots across matched counties and all series | Entire layer is rejected with an instruction to increase dot value. There is no silent thinning.                       |
+| Dot count is not a safe integer | Entire layer is rejected with an instruction to choose a dot value producing a safely representable count. |
 | Sampling shortfall                                                      | Entire layer is rejected; no partial distribution is shown.                                                            |
 | Hidden series or county excluded by native focus                        | Drawing skips its dots without regenerating coordinates.                                                               |
 | All diseases hidden                                                     | Geography remains, with a clear selection status.                                                                      |
 | No outbreak fixture for a county                                        | Storybook omits that row instead of inventing a zero-case observation.                                                 |
 
-The budget includes hidden diseases and counties outside the current state focus if their rows are still in runtime data. Hiding a disease or zooming into a state does not bypass the preparation budget. The sampler defaults to a 100,000-dot limit and 1,000,000 candidate attempts per county/series call; this is not a global sampling-time limit.
+There is no fixed dot-count cap. Preparation includes hidden diseases and counties outside the current state focus if their rows are still in runtime data. The sampler retains a limit of 1,000,000 candidate attempts per county/series call; this is not a global sampling-time limit. Requests that cannot complete within those attempts still reject the entire layer rather than silently thinning dots.
 
 Canvas attributes `data-drawn-dots`, `data-series-counts`, `data-position-signature`, and `data-density-error` support browser checks. Submitted-dot counts are not counts of individually visible, unobscured pixels: Canvas clipping and overlap still apply. The map does not display a dot-count status above the Canvas. Errors, omitted-value warnings, and the all-series-hidden status remain visible.
 
@@ -166,7 +166,7 @@ The production legend shows series labels. Selecting a category isolates it, sel
 
 Import [`examples/dot-density-outbreaks.json`](../packages/map/examples/dot-density-outbreaks.json) into the updated editor for a ready-configured synthetic Arizona map. The companion [`CSV`](../packages/map/examples/dot-density-outbreaks.csv) contains the same 15 county rows for data-import practice. Select Arizona under **Select Location** to focus the map. `ImportableSample` in the editor stories loads that exact JSON file.
 
-Find the stories under **Components → Templates → Map → Dot Density Prototype**. Start with `DiseaseOutbreaks`, `DenseDiseaseOutbreaks`, and `CountySelection`. Population, nationwide, resize, empty, missing-fixture, and budget examples are also available.
+Find the stories under **Components → Templates → Map → Dot Density Prototype**. Start with `DiseaseOutbreaks`, `DenseDiseaseOutbreaks`, and `CountySelection`. Population, nationwide, resize, empty, missing-fixture, and `AboveFormerDotLimit` examples are also available. The latter draws 100,001 dots through the production renderer.
 
 The file's `beforeEach` intercepts the county-topography request and supplies the bundled 2019 topology; cleanup restores `fetch`. This makes the examples deterministic while exercising the production loader and renderer.
 
@@ -186,7 +186,7 @@ The editor stories live under **Components → Templates → Map → Editor Test
 
 The following remain deliberate follow-up work rather than guarantees of this first editor implementation:
 
-- Benchmark generation, memory, projection, and frame time on representative devices. The 100,000-dot cap is an experimental bound, not a demonstrated performance guarantee. Evaluate projected-coordinate caching or worker-based preparation against measured needs.
+- Benchmark generation, memory, projection, and frame time on representative devices. There is currently no fixed dot-count cap or demonstrated performance guarantee. Use measurements to decide whether a future cap, projected-coordinate caching, or worker-based preparation is needed.
 - Exercise full dashboard authoring/filter orchestration and column-replacement UI scenarios. The current implementation consumes the existing filtered runtime rows; the Data Import remapper already walks exact string references such as `series[].column` (see [Column Remap System](COLUMN_REMAP_SYSTEM.md)).
 - Verify image/PDF export and a dedicated accessibility matrix. Native Canvas reuse and labeled series toggles are useful foundations, not proof of every export or assistive-technology scenario.
 - Reassess whole-dot flooring and remainder messaging with product/QA. This implementation retains the prototype policy; authors can explain quantity and remainder handling through Legend Description.

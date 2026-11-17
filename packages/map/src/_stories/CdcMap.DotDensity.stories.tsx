@@ -31,7 +31,7 @@ const meta: Meta<typeof CountyDotDensityPrototype> = {
     docs: {
       description: {
         component:
-          'County-only dot layer rendered by the actual CdcMap county Canvas, including its boundaries, state focus, tooltips, table, and zoom controls. Use Controls to change geography, dot value, radius, or seed. Data is synthetic; dots are reproducible approximate locations. The 100,000-dot budget rejects excessive requests rather than silently thinning dots. This is not a production map config option.'
+          'County-only dot layer rendered by the actual CdcMap county Canvas, including its boundaries, state focus, tooltips, table, and zoom controls. Use Controls to change geography, dot value, radius, or seed. Data is synthetic; dots are reproducible approximate locations. There is no fixed dot-count cap; incomplete placement is rejected rather than silently thinned.'
       }
     }
   },
@@ -130,11 +130,12 @@ export const Empty: Story = {
     expect(within(canvasElement).getByText('No data to display.')).toBeVisible()
   }
 }
-export const BudgetExceeded: Story = {
-  args: { geography: 'all', dotValue: 1 },
+export const AboveFormerDotLimit: Story = {
+  render: () => <CountyDotDensityRuntimeHarness rows={[{ FIPS: '04013', Cases: 500005 }]} />,
   play: async ({ canvasElement }) => {
-    await waitForPresence('canvas[data-drawn-dots="0"]', canvasElement)
-    expect(within(canvasElement).getByText(/Increase the dot value/)).toBeVisible()
+    const map = (await waitForPresence('canvas[data-drawn-dots="100001"]', canvasElement)) as HTMLCanvasElement
+    expect(map.dataset.densityError).toBe('')
+    expect(JSON.parse(map.dataset.seriesCounts!)).toEqual({ cases: 100001 })
   }
 }
 
@@ -273,7 +274,6 @@ export const CountySelection: Story = {
 }
 export const EmptyDiseaseOutbreaks: Story = { ...Empty, args: { ...outbreakArgs, empty: true } }
 export const NoOutbreakFixtureData: Story = { ...Empty, args: { ...outbreakArgs, geography: '06' } }
-export const OutbreakBudgetExceeded: Story = { ...BudgetExceeded, args: { ...outbreakArgs, dotValue: 0.01 } }
 
 export const DisabledDensityStaysDisabledAfterZoom: Story = {
   render: () => <CountyDotDensityRuntimeHarness />,
@@ -320,7 +320,7 @@ export const DisabledDensityStaysDisabledAfterZoom: Story = {
   }
 }
 
-export const ExcludedCountyDoesNotConsumeDensityBudget: Story = {
+export const UnsupportedCountyDoesNotGenerateDots: Story = {
   render: () => (
     <CountyDotDensityRuntimeHarness
       rows={[

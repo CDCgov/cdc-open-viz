@@ -41,12 +41,27 @@ describe('county dot density layer', () => {
     expect(prepareCountyDotDensity([county], {}, settings).dots).toHaveLength(0)
   })
 
-  it('enforces the combined category budget and rejects invalid settings without partial output', () => {
-    expect(prepareCountyDotDensity([county], { '04013': { a: 300000, b: 300000 } }, settings).error).toContain(
-      'Increase the dot value'
+  it('prepares combined series above the former 100,000-dot limit without thinning', () => {
+    const result = prepareCountyDotDensity([county], { '04013': { a: 300000, b: 300000 } }, settings)
+    expect(result.error).toBe('')
+    expect(result.dots).toHaveLength(120000)
+    expect(result.dots.filter(dot => dot.seriesId === 'a')).toHaveLength(60000)
+    expect(result.dots.filter(dot => dot.seriesId === 'b')).toHaveLength(60000)
+  })
+
+  it('rejects invalid settings and unrepresentable dot counts without partial output', () => {
+    expect(prepareCountyDotDensity([county], { '04013': { a: Number.MAX_VALUE, b: 50 } }, settings).error).toContain(
+      'safely representable'
     )
     expect(prepareCountyDotDensity([county], {}, { ...settings, dotValue: 0 }).error).toContain('positive')
     expect(prepareCountyDotDensity([county], { '04013': { a: -5, b: 'invalid' } }, settings).dots).toHaveLength(0)
+  })
+
+  it('rejects sampling shortfalls without returning a partial distribution', () => {
+    const emptyCounty = { ...county, geometry: { type: 'Polygon' as const, coordinates: [] } }
+    const result = prepareCountyDotDensity([emptyCounty], { '04013': { a: 50, b: 50 } }, settings)
+    expect(result.error).toContain('Placement limit reached')
+    expect(result.dots).toHaveLength(0)
   })
 
   it('reports missing, negative, and invalid counts without treating them as observed zeros', () => {

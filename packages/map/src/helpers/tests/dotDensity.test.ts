@@ -128,8 +128,13 @@ describe('dot density placement', () => {
     expect(result.points.every(point => Math.abs(point[0]) >= 179 && geoContains(feature, point))).toBe(true)
   })
 
-  it('does not allocate unbounded arrays and reports bounded sampling shortfalls', () => {
-    expect(() => generate({ maxDots: 99 })).toThrow('Dot budget exceeded')
+  it('generates more than the former 100,000-dot limit', () => {
+    const result = generate({ value: 100001, dotValue: 1 })
+    expect(result.complete).toBe(true)
+    expect(result.points).toHaveLength(100001)
+  })
+
+  it('rejects unrepresentable counts and reports bounded sampling shortfalls', () => {
     expect(() => generate({ value: Number.MAX_VALUE, dotValue: Number.MIN_VALUE })).toThrow(RangeError)
     expect(() => generate({ seed: NaN })).toThrow(RangeError)
     expect(() => generate({ maxAttempts: -1 })).toThrow(RangeError)
