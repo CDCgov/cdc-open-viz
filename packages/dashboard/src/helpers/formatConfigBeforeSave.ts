@@ -76,6 +76,7 @@ export const cleanSharedFilters = (config: DashboardConfig) => {
           break
         } else {
           delete config.dashboard.sharedFilters[index].active
+          delete config.dashboard.sharedFilters[index].queuedActive
           if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
           if (filter.order === 'data') {
             delete config.dashboard.sharedFilters[index].values

@@ -25,6 +25,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import Button from '@cdc/core/components/elements/Button'
 import type { APIFilterDropdowns } from '../DashboardFiltersWrapper'
 import * as filterResetHelpers from '../../../helpers/filterResetHelpers'
+import { isShowAllEnabled, normalizeMultiSelectActive, SHOW_ALL_VALUE } from '../../../helpers/showAllOption'
 
 type DashboardFitlersEditorProps = {
   apiFilterDropdowns?: APIFilterDropdowns
@@ -151,7 +152,25 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       value?.subgroupDescriptionSelector !== sharedFilters[index].subGrouping?.subgroupDescriptionSelector
     const subgroupDescriptionsNeedRefresh =
       prop === 'subGrouping' && newSharedFilters[index].type === 'datafilter' && value?.subgroupDescriptionSelector
-    if (prop === 'order' && value === 'data') {
+    if (prop === 'showAllOption') {
+      const filter = newSharedFilters[index]
+      filter.values = []
+      filter.orderedValues = filter.orderedValues?.filter(option => option !== SHOW_ALL_VALUE)
+      const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
+      const updatedFilter = sharedFiltersWithValues[index]
+      if (!value && updatedFilter.defaultValue === SHOW_ALL_VALUE && !updatedFilter.values.includes(SHOW_ALL_VALUE)) {
+        updatedFilter.defaultValue = ''
+      }
+      updatedFilter.active = normalizeMultiSelectActive(updatedFilter, updatedFilter.active).filter(option =>
+        updatedFilter.values.includes(option)
+      )
+      if (updatedFilter.queuedActive !== undefined) {
+        updatedFilter.queuedActive = normalizeMultiSelectActive(updatedFilter, updatedFilter.queuedActive).filter(
+          option => updatedFilter.values.includes(option)
+        )
+      }
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
+    } else if (prop === 'order' && value === 'data') {
       newSharedFilters[index].values = []
       delete newSharedFilters[index].orderedValues
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
@@ -172,7 +191,24 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       if (!shouldPreserveForFilterStyleChange(sharedFilters[index], value)) {
         newSharedFilters[index] = resetFilterStyleState(newSharedFilters[index], value)
       }
-      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      if (isShowAllEnabled(sharedFilters[index]) && value !== FILTER_STYLE.multiSelect) {
+        const filter = newSharedFilters[index]
+        filter.values = []
+        filter.orderedValues = filter.orderedValues?.filter(option => option !== SHOW_ALL_VALUE)
+        filter.active = undefined
+        filter.queuedActive = undefined
+        const updatedFilters = addValuesToDashboardFilters(newSharedFilters, data)
+        const updatedFilter = updatedFilters[index]
+        if (updatedFilter.defaultValue === SHOW_ALL_VALUE && !updatedFilter.values.includes(SHOW_ALL_VALUE)) {
+          updatedFilter.defaultValue = ''
+          updatedFilter.active = updatedFilter.values[0] || ''
+        }
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: updatedFilters })
+      } else if (isShowAllEnabled(newSharedFilters[index])) {
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: addValuesToDashboardFilters(newSharedFilters, data) })
+      } else {
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      }
     } else if (
       prop === 'filterBy' &&
       isFileNameFilter(newSharedFilters[index]) &&
@@ -198,7 +234,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
     } else if (prop === 'defaultValue') {
-      newSharedFilters[index].active = value
+      newSharedFilters[index].active =
+        newSharedFilters[index].filterStyle === FILTER_STYLE.multiSelect
+          ? normalizeMultiSelectActive(newSharedFilters[index], value)
+          : value
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'allowEmptyInitialState' && isFileNameFilter(newSharedFilters[index])) {
       updateEmptyInitialState(newSharedFilters[index], value)
@@ -252,7 +291,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
   const addNewFilter = () => {
     const _sharedFilters = cloneDeep(sharedFilters) || []
     const columnName = 'New Dashboard Filter ' + (_sharedFilters.length + 1)
-    const newFilter = { key: columnName, showDropdown: true, values: [] } as SharedFilter
+    const newFilter = { key: columnName, showDropdown: true, showAllOption: false, values: [] } as SharedFilter
     dispatch({ type: 'SET_SHARED_FILTERS', payload: [..._sharedFilters, newFilter] })
     updateConfig({ ...vizConfig, sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, _sharedFilters.length] })
   }

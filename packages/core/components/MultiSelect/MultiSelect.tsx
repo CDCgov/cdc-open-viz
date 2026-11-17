@@ -20,6 +20,7 @@ interface MultiSelectProps {
   label?: string
   selected?: (string | number)[]
   limit?: number
+  exclusiveValue?: string | number
   tooltip?: React.ReactNode
   loading?: boolean
   placeholder?: string
@@ -34,6 +35,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   updateField,
   selected = [],
   limit,
+  exclusiveValue,
   tooltip,
   loading,
   placeholder = '- Select -'
@@ -69,9 +71,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const handleItemSelect = (option: Option, e = null) => {
     if (e && e.type === 'keyup' && e.key !== 'Enter') return
-    if (limit && items?.length >= limit) return
-    const newItems = [...items, option]
-    update(newItems)
+    if (exclusiveValue !== undefined && option.value === exclusiveValue) {
+      update([option])
+      return
+    }
+    const selectedItems = exclusiveValue === undefined ? items : items.filter(item => item.value !== exclusiveValue)
+    if (limit && selectedItems.length >= limit) return
+    update([...selectedItems, option])
   }
 
   const handleItemRemove = (option: Option, e = null) => {

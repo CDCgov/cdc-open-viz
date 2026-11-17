@@ -1,3 +1,5 @@
+import { addValuesToDashboardFilters } from '../addValuesToDashboardFilters'
+import { filterData } from '../filterData'
 import { describe, it, expect } from 'vitest'
 import { cleanSharedFilters, stripConfig } from '../formatConfigBeforeSave'
 import { DashboardConfig } from '../../types/DashboardConfig'
@@ -335,4 +337,43 @@ describe('stripConfig', () => {
     expect(stripped.visualizations.chart1.runtime).toBeUndefined()
     expect(stripped.visualizations.chart1.editing).toBeUndefined()
   })
+})
+
+describe('DEV-13957 show-all persistence', () => {
+  it.each([true, false])(
+    'preserves explicit showAllOption %s and restores its default after JSON export',
+    showAllOption => {
+      const data = [{ substance: 'Acetone' }, { substance: 'Benzene' }, { substance: 'All' }]
+      const config = {
+        type: 'dashboard',
+        dashboard: {
+          sharedFilters: [
+            {
+              key: 'Substance',
+              type: 'datafilter',
+              filterStyle: 'multi-select',
+              showDropdown: true,
+              showAllOption,
+              columnName: 'substance',
+              defaultValue: 'All',
+              active: ['Acetone'],
+              queuedActive: ['Benzene'],
+              order: 'data',
+              values: []
+            }
+          ]
+        },
+        rows: [],
+        datasets: { small: { data } },
+        visualizations: { filters: { type: 'dashboardFilters', sharedFilterIndexes: [0] } }
+      } as any
+      const saved = JSON.parse(JSON.stringify(stripConfig(config, true)))
+      expect(saved.dashboard.sharedFilters[0].showAllOption).toBe(showAllOption)
+      expect(saved.dashboard.sharedFilters[0].active).toBeUndefined()
+      expect(saved.dashboard.sharedFilters[0].queuedActive).toBeUndefined()
+      const filters = addValuesToDashboardFilters(saved.dashboard.sharedFilters, { small: data })
+      expect(filters[0].active).toEqual(['All'])
+      expect(filterData(filters, data)).toEqual(showAllOption ? data : [data[2]])
+    }
+  )
 })

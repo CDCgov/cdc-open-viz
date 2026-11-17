@@ -1,6 +1,7 @@
 import filter from 'lodash/filter'
 import { SharedFilter } from '../types/SharedFilter'
 import { FILTER_STYLE } from '../types/FilterStyles'
+import { isShowAllSelection, isShowAllEnabled, normalizeMultiSelectActive } from './showAllOption'
 
 /**
  * Recursively calculates the tier/depth of a filter based on its parent dependencies.
@@ -63,6 +64,8 @@ export const isFilterAtResetState = (filter: SharedFilter): boolean => {
   // Only check filters that are visible to the user
   if (!filter.showDropdown) return false
 
+  if (isShowAllSelection(filter)) return false
+
   // Check if active value is empty/null/undefined
   const isEmptyValue = filter.active === '' || filter.active === null || filter.active === undefined
 
@@ -80,16 +83,29 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
   const activeFilters = filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
+      if (isShowAllSelection(filter)) return false
       const columnName = getClientSideFilterColumnName(filter)
       const currentValue = columnName ? row[columnName] : undefined
 
       const selectedValue =
-        filter.queuedActive || filter.filterStyle === FILTER_STYLE.nestedDropdown
+        filter.filterStyle === FILTER_STYLE.nestedDropdown
           ? [filter.active, filter.subGrouping?.active]
+          : isShowAllEnabled(filter)
+          ? normalizeMultiSelectActive(filter, filter.active)
           : filter.active
       let isNotTheSelectedValue = true
       if (Array.isArray(selectedValue)) {
-        isNotTheSelectedValue = !selectedValue.includes(currentValue)
+        isNotTheSelectedValue =
+          filter.type === 'datafilter' && filter.filterStyle === FILTER_STYLE.multiSelect
+            ? !selectedValue.some(
+                value =>
+                  value === currentValue ||
+                  (typeof currentValue === 'number' &&
+                    typeof value === 'string' &&
+                    value.trim() !== '' &&
+                    Number(value) === currentValue)
+              )
+            : !selectedValue.includes(currentValue)
       } else {
         isNotTheSelectedValue = selectedValue && currentValue != selectedValue
       }

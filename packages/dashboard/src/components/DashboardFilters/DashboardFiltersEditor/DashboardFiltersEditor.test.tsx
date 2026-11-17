@@ -878,3 +878,97 @@ describe('DashboardFiltersEditor', () => {
     )
   })
 })
+
+describe('DEV-13957 Show All editor setting', () => {
+  const makeFilter = (props = {}) => ({
+    key: 'Substance',
+    type: 'datafilter',
+    filterStyle: 'multi-select',
+    showDropdown: true,
+    columnName: 'substance',
+    active: ['Acetone'],
+    values: ['Acetone', 'Benzene'],
+    order: 'asc',
+    ...props
+  })
+
+  it('enables the synthetic option without changing a specific selection', () => {
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [makeFilter()],
+      [0],
+      {},
+      {
+        data: { small: [{ substance: 'Acetone' }, { substance: 'Benzene' }] }
+      }
+    )
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    fireEvent.click(screen.getByLabelText('Show All Option'))
+    const update = dispatch.mock.calls.filter(([action]) => action.type === 'SET_SHARED_FILTERS').at(-1)[0]
+    expect(update.payload[0].showAllOption).toBe(true)
+    expect(update.payload[0].values).toContain('All')
+    expect(update.payload[0].active).toEqual(['Acetone'])
+  })
+
+  it.each(['dropdown', 'combobox', 'nested-dropdown'])('does not expose Show All for %s', filterStyle => {
+    const { container } = renderEditor({ grayBackground: false }, [makeFilter({ filterStyle })], [0])
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    expect(screen.queryByLabelText('Show All Option')).not.toBeInTheDocument()
+  })
+
+  it('normalizes a newly selected multiselect default to an array', () => {
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [makeFilter({ showAllOption: true, values: ['All', 'Acetone', 'Benzene'] })],
+      [0]
+    )
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const defaultSelect = screen.getAllByLabelText('Filter Default Value', { selector: 'select' })[0]
+    fireEvent.change(defaultSelect, { target: { value: 'All' } })
+    const update = dispatch.mock.calls.filter(([action]) => action.type === 'SET_SHARED_FILTERS').at(-1)[0]
+    expect(update.payload[0].defaultValue).toBe('All')
+    expect(update.payload[0].active).toEqual(['All'])
+  })
+})
+
+describe('DEV-13957 leaving show-all multiselect style', () => {
+  it.each([false, true])(
+    'regenerates real options when switching to dropdown (literal All present: %s)',
+    hasLiteralAll => {
+      const sharedFilter = {
+        key: 'Substance',
+        type: 'datafilter',
+        filterStyle: 'multi-select',
+        showDropdown: true,
+        showAllOption: true,
+        columnName: 'substance',
+        active: ['All'],
+        defaultValue: 'All',
+        values: ['All', 'Acetone', 'Benzene'],
+        orderedValues: ['All', 'Acetone', 'Benzene'],
+        order: 'cust'
+      }
+      const rows = [
+        { substance: 'Acetone' },
+        { substance: 'Benzene' },
+        ...(hasLiteralAll ? [{ substance: 'All' }] : [])
+      ]
+      const { container, dispatch } = renderEditor(
+        { grayBackground: false },
+        [sharedFilter],
+        [0],
+        {},
+        { data: { small: rows } }
+      )
+      fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+      fireEvent.change(screen.getAllByLabelText('Filter Style', { selector: 'select' })[0], {
+        target: { value: 'dropdown' }
+      })
+      const filter = dispatch.mock.calls.filter(([action]) => action.type === 'SET_SHARED_FILTERS').at(-1)[0].payload[0]
+      expect(filter.filterStyle).toBe('dropdown')
+      expect(filter.values.includes('All')).toBe(hasLiteralAll)
+      expect(filter.active).toBe(hasLiteralAll ? 'All' : 'Acetone')
+      expect(filter.defaultValue).toBe(hasLiteralAll ? 'All' : '')
+    }
+  )
+})

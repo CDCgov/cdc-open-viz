@@ -3,6 +3,7 @@ import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/help
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
+import { isShowAllEnabled, normalizeMultiSelectActive, withShowAllOption } from './showAllOption'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -66,7 +67,10 @@ export const addValuesToDashboardFilters = (
 
     // Only generate values from data if not pre-configured
     const hasPreConfiguredValues = filter.values && filter.values.length > 0
-    const filterValues = hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
+    const filterValues = withShowAllOption(
+      filter,
+      hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
+    )
     const usesLiveSourceOrder = filter.order === 'data' && !hasPreConfiguredValues
 
     filterCopy.values = filterValues
@@ -81,6 +85,9 @@ export const addValuesToDashboardFilters = (
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
+      } else if (isShowAllEnabled(filterCopy)) {
+        const active = filterCopy.active ?? filterCopy.defaultValue ?? 'All'
+        filterCopy.active = normalizeMultiSelectActive(filterCopy, active).filter(value => filterValues.includes(value))
       } else if (usesLiveSourceOrder) {
         const fallbackValue =
           filterCopy.defaultValue && filterCopy.values.includes(filterCopy.defaultValue)
@@ -158,7 +165,17 @@ export const addValuesToDashboardFilters = (
       }
     }
 
-    return handleSorting(filterCopy)
+    if (filterCopy.filterStyle === 'multi-select') {
+      filterCopy.active = normalizeMultiSelectActive(filterCopy, filterCopy.active)
+      if (filterCopy.queuedActive !== undefined) {
+        filterCopy.queuedActive = normalizeMultiSelectActive(filterCopy, filterCopy.queuedActive)
+      }
+    }
+    const sortedFilter = handleSorting(filterCopy)
+    if (isShowAllEnabled(sortedFilter)) {
+      sortedFilter.orderedValues = withShowAllOption(sortedFilter, sortedFilter.orderedValues || sortedFilter.values)
+    }
+    return sortedFilter
   })
   return result
 }

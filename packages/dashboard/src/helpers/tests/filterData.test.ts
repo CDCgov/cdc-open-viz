@@ -118,3 +118,87 @@ describe('filterData', () => {
     expect(result).toEqual([{ name: 'John', age: 25, color: 'red' }])
   })
 })
+
+describe('DEV-13957 show-all data multiselect', () => {
+  const data = [
+    { substance: 'Acetone', year: '2022' },
+    { substance: 'Acrylamide', year: '2012' },
+    { substance: 'Benzene', year: '2022' },
+    { substance: 'All', year: '2020' }
+  ]
+  const makeFilter = (props = {}) =>
+    ({
+      key: 'Substance',
+      columnName: 'substance',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      showDropdown: true,
+      showAllOption: true,
+      active: ['All'],
+      values: ['All', 'Acetone', 'Acrylamide', 'Benzene'],
+      ...props
+    } as SharedFilter)
+
+  it.each(['All', ['All']])('shows every row for an explicitly enabled All selection: %j', active => {
+    expect(filterData([makeFilter({ active })], data)).toEqual(data)
+  })
+
+  it('still applies other category filters when one category is All', () => {
+    expect(filterData([makeFilter(), makeFilter({ key: 'Year', columnName: 'year', active: ['2022'] })], data)).toEqual(
+      [data[0], data[2]]
+    )
+  })
+
+  it('ORs specific selections and ANDs categories without Master columns', () => {
+    expect(
+      filterData(
+        [
+          makeFilter({ active: ['Acetone', 'Acrylamide'] }),
+          makeFilter({ key: 'Year', columnName: 'year', active: ['2022'] })
+        ],
+        data
+      )
+    ).toEqual([data[0]])
+  })
+
+  it('keeps applied multiselect values while a new selection is queued', () => {
+    expect(filterData([makeFilter({ active: ['Acetone'], queuedActive: ['Benzene'] })], data)).toEqual([data[0]])
+  })
+
+  it('uses specific selections for imported mixed All and specific values', () => {
+    expect(filterData([makeFilter({ active: ['All', 'Acetone'] })], data)).toEqual([data[0]])
+  })
+
+  it.each([undefined, false, null, 'true'])('retains literal All matching when flag is %j', showAllOption => {
+    expect(filterData([makeFilter({ showAllOption })], data)).toEqual([data[3]])
+  })
+
+  it.each([[], '', undefined])('does not treat an empty selection as All: %j', active => {
+    expect(filterData([makeFilter({ active })], data)).toEqual([])
+  })
+
+  it('does not reinterpret resetLabel as an All sentinel', () => {
+    expect(filterData([makeFilter({ resetLabel: 'Choose', active: ['Choose'] })], data)).toEqual([])
+  })
+
+  it('ignores the flag on unsupported styles', () => {
+    expect(filterData([makeFilter({ filterStyle: 'dropdown', active: 'All' })], data)).toEqual([data[3]])
+  })
+})
+
+describe('data multiselect numeric CSV compatibility', () => {
+  it('matches normalized scalar strings against numeric data without changing literal string matching', () => {
+    const filter = {
+      key: 'Year',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      columnName: 'year',
+      active: ['2022']
+    } as SharedFilter
+    expect(filterData([filter], [{ year: 2022 }, { year: '2022' }, { year: 2012 }])).toEqual([
+      { year: 2022 },
+      { year: '2022' }
+    ])
+    expect(filterData([{ ...filter, active: [''] }], [{ year: 0 }])).toEqual([])
+  })
+})
