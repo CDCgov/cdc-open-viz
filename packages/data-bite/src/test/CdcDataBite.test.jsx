@@ -2,10 +2,15 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { describe, it, expect, vi, afterEach } from 'vitest'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import CdcDataBite from '../CdcDataBite'
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn()
+}))
 
 vi.mock('resize-observer-polyfill', () => ({
   default: vi.fn(function ResizeObserver() {
@@ -318,6 +323,108 @@ describe('Data Bite', () => {
     expect(await screen.findByText('Percent positive: 0%')).toBeInTheDocument()
   })
 
+  it('loads a URL-only config once after remote data and metadata hydrate', async () => {
+    vi.mocked(fetchRemoteData).mockResolvedValue({
+      data: [{ value: '42' }],
+      dataMetadata: { source: 'Remote source' }
+    })
+
+    render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Remote data bite',
+          biteBody: 'Source: {{source}}',
+          dataUrl: '/remote-data.json',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          enableMarkupVariables: true,
+          markupVariables: [
+            {
+              sourceType: 'metadata',
+              name: 'Source',
+              tag: '{{source}}',
+              metadataKey: 'source',
+              conditions: [],
+              addCommas: false
+            }
+          ],
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          }
+        }}
+      />
+    )
+
+    expect(await screen.findByText('42')).toBeInTheDocument()
+    expect(screen.getByText('Source: Remote source')).toBeInTheDocument()
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(fetchRemoteData).toHaveBeenCalledTimes(1)
+    expect(fetchRemoteData).toHaveBeenCalledWith('/remote-data.json')
+  })
+
+  it('does not clear dashboard editing state before the editor config finishes loading', async () => {
+    const setConfig = vi.fn()
+
+    render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: '',
+          biteBody: '',
+          dataColumn: '',
+          dataFunction: '',
+          editing: true,
+          showEditorPanel: true
+        }}
+        isDashboard={true}
+        isEditor={true}
+        setConfig={setConfig}
+      />
+    )
+
+    expect(await screen.findByText('Configure Data Bites')).toBeInTheDocument()
+    await waitFor(() => expect(setConfig).toHaveBeenCalled())
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(setConfig.mock.calls.every(([config]) => config.editing && config.showEditorPanel)).toBe(true)
+  })
+
+  it('updates the rendered value when parent-provided data changes', async () => {
+    const config = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Inline data bite',
+      biteBody: '',
+      dataColumn: 'value',
+      dataFunction: 'Pass Through',
+      dataFormat: {
+        prefix: '',
+        suffix: '',
+        commas: false,
+        roundToPlace: 0
+      },
+      data: [{ value: '1' }]
+    }
+
+    const { rerender } = render(<CdcDataBite config={config} />)
+
+    expect(await screen.findByText('1')).toBeInTheDocument()
+
+    rerender(<CdcDataBite config={{ ...config, data: [{ value: '2' }] }} />)
+
+    expect(await screen.findByText('2')).toBeInTheDocument()
+
+    rerender(<CdcDataBite config={{ ...config, data: undefined }} />)
+
+    await waitFor(() => expect(screen.queryByText('2')).not.toBeInTheDocument())
+  })
+
   it('updates metadata-backed text and subtext markup variables when dataMetadata changes and data does not', async () => {
     const data = [{ value: 1 }]
     const config = {
@@ -349,6 +456,11 @@ describe('Data Bite', () => {
 
     expect(await screen.findByText('Body June file')).toBeInTheDocument()
     expect(screen.getByText('Subtext June file')).toBeInTheDocument()
+
+    rerender(<CdcDataBite config={{ ...config, dataMetadata: {} }} />)
+
+    expect(await screen.findByText('Body')).toBeInTheDocument()
+    expect(screen.getByText('Subtext')).toBeInTheDocument()
   })
 
   it.each(['Mean (Average)', 'Median'])('renders an empty value when %s has no numeric values', dataFunction => {

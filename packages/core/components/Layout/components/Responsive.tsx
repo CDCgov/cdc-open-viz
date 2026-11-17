@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import '../styles/editor-utils.scss'
-import '../styles/editor.scss'
+import '../styles/editor-utils.css'
+import '../styles/editor.css'
 
 import Icon from '../../ui/Icon'
 

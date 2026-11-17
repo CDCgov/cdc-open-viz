@@ -2,7 +2,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import Button from '../Button'
-import './button-audit.scss'
+import './button-audit.css'
 
 const classNames = ['', 'cove-button--success', 'cove-button--warn', 'cove-button--muted']
 
@@ -118,7 +118,7 @@ export const Primary: Story = {
             </Button>
             <p className='button-audit__meta'>
               Available shared success variant; uncommon in product UI. Ref:
-              `packages/core/components/elements/button.scss`
+              `packages/core/components/elements/button.css`
             </p>
           </div>
           <div className='button-audit__example'>
@@ -136,7 +136,7 @@ export const Primary: Story = {
             </Button>
             <p className='button-audit__meta'>
               Available shared muted variant; mostly a utility option. Ref:
-              `packages/core/components/elements/button.scss`
+              `packages/core/components/elements/button.css`
             </p>
           </div>
           <div className='button-audit__example'>
@@ -228,7 +228,7 @@ export const Primary: Story = {
           <div className='button-audit__example'>
             <button className='btn secondary'>secondary</button>
             <p className='button-audit__meta'>
-              Legacy editor modal/utility style variant. Ref: `packages/core/styles/_global.scss`
+              Legacy editor modal/utility style variant. Ref: `packages/core/styles/_global.css`
             </p>
           </div>
           <div className='button-audit__example'>
@@ -307,7 +307,7 @@ export const Primary: Story = {
             <div className='button-audit__example'>
               <button className='shared-filter-button button-audit__shared-filter-pill'>Shared Filter Pill</button>
               <p className='button-audit__meta'>
-                Used for shared filter chips in dashboard editing flows. Ref: `packages/dashboard/src/scss/main.scss`
+                Used for shared filter chips in dashboard editing flows. Ref: `packages/dashboard/src/css/main.css`
               </p>
             </div>
           </div>

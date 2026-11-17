@@ -1,0 +1,133 @@
+.cove-visualization .cdc-callout {
+  --cdc-callout-background: var(--colors-cyan-10, #eff9fa);
+  --cdc-callout-border-color: var(--colors-cyan-15, #dff2f6);
+  --cdc-callout-border-radius: 0.25rem;
+  --cdc-callout-padding: 1.25rem;
+  --cdc-callout-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+  background: var(--cdc-callout-background);
+  border: 1px solid var(--cdc-callout-border-color);
+  border-radius: var(--cdc-callout-border-radius);
+  box-shadow: var(--cdc-callout-shadow);
+  margin: 0;
+  padding: var(--cdc-callout-padding);
+  position: relative;
+}
+
+.cove-visualization .cdc-callout .cdc-callout__flag {
+  height: auto;
+  position: absolute;
+  right: 1.08rem;
+  top: -0.36rem;
+  width: 1.84rem;
+}
+
+.cove-visualization.type-markup-include .cove-visualization__body {
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+.cove-visualization.type-markup-include .cove-visualization__body.component--has-legacy-border,
+.cove-visualization.type-markup-include .cove-visualization__body.component--has-border-color-theme,
+.cove-visualization.type-markup-include .cove-visualization__body.component--has-background,
+.cove-visualization.type-markup-include .cove-visualization__body.component--has-accent {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 {
+  background: none !important;
+  border: none !important;
+  container-type: inline-size;
+  padding: 0 !important;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .markup-include-tp5 {
+  gap: 0.7rem;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout__heading {
+  font-size: 1.1rem;
+  width: 100%;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout__body {
+  flex: auto;
+  flex-wrap: nowrap;
+}
+@container (max-width: 480px) {
+  .cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout__body {
+    flex-wrap: wrap;
+  }
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout__content {
+  font-size: 1rem;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout--data-color .cdc-callout__heading,
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout--data-color .cdc-callout__content {
+  color: inherit;
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5.white-background-style .markup-include-tp5 {
+  background: transparent;
+  border: 1px solid #009ec1 !important;
+  box-shadow: 0 2px 4px rgba(159, 159, 159, 0.1);
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cdc-callout.cdc-callout--data-color {
+  border: 0 !important;
+}
+.cove-visualization.type-markup-include
+  .markup-include-component--tp5.white-background-style.display-border
+  .markup-include-tp5 {
+  box-shadow: 0 2px 4px rgba(159, 159, 159, 0.1);
+}
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cove-visualization__body-wrap,
+.cove-visualization.type-markup-include .markup-include-component--tp5 .cove-visualization__content-section {
+  padding: 0;
+}
+.cove-visualization.type-markup-include .cove-visualization__body-wrap {
+  padding-inline: 0;
+}
+.cove-visualization__body.component--has-legacy-border
+  .cove-visualization.type-markup-include
+  .cove-visualization__body-wrap,
+.cove-visualization__body.component--has-border-color-theme
+  .cove-visualization.type-markup-include
+  .cove-visualization__body-wrap,
+.cove-visualization__body.component--has-background
+  .cove-visualization.type-markup-include
+  .cove-visualization__body-wrap,
+.cove-visualization__body.component--has-accent .cove-visualization.type-markup-include .cove-visualization__body-wrap {
+  padding-inline: 1rem;
+}
+.cove-visualization.type-markup-include .cove-visualization__body-wrap h1,
+.cove-visualization.type-markup-include .cove-visualization__body-wrap h2,
+.cove-visualization.type-markup-include .cove-visualization__body-wrap h3 {
+  margin-top: 0;
+}
+.cove-visualization.type-markup-include .cove-visualization__body-wrap p {
+  margin-bottom: auto;
+  margin-top: auto;
+}
+.cove-visualization.type-markup-include .cove-visualization__body-wrap span > img {
+  display: inline;
+}
+.cove-visualization.type-markup-include .cove-visualization__body.component--hide-background-color {
+  background: transparent;
+}
+.cove-visualization.type-markup-include .cove-editor__content .cove-editor__content-wrap {
+  margin: 0 auto;
+}
+.cove-visualization.type-markup-include .cove-editor .cove-editor__content {
+  left: unset;
+  position: unset;
+  width: 100%;
+}
+
+.cove-accordion__panel-section {
+  overflow: auto;
+}
+.cove-accordion__panel-section label {
+  display: block;
+  float: left;
+}
+
+.cove-editor .cove-editor__content {
+  display: flex;
+  padding-left: 350px;
+}

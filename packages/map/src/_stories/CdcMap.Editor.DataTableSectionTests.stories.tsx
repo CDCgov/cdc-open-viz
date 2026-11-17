@@ -202,9 +202,10 @@ export const DataTableSectionTests: Story = {
       const label = textarea.closest('label')
       return label?.textContent?.includes('Screen Reader Description')
     }) as HTMLTextAreaElement
+    expect(screenReaderDescTextarea).toBeTruthy()
 
     await performAndAssert(
-      'Screen Reader Description → Set custom description',
+      'Screen Reader Description → Preserve markup as literal caption text',
       () => {
         const dataTable = canvasElement.querySelector('.data-table')
         const caption = dataTable?.querySelector('caption')
@@ -214,10 +215,10 @@ export const DataTableSectionTests: Story = {
       },
       async () => {
         await userEvent.clear(screenReaderDescTextarea)
-        await userEvent.type(screenReaderDescTextarea, 'Table showing state population data by region')
+        await userEvent.type(screenReaderDescTextarea, 'Table showing <strong>state population data</strong> by region')
       },
       (before, after) => {
-        return after.captionText.includes('Table showing state population data')
+        return after.captionText.includes('Table showing <strong>state population data</strong> by region')
       }
     )
 

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import '../scss/choose-vis-tab.scss'
+import '../css/choose-vis-tab.css'
 
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'

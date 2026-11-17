@@ -2,7 +2,7 @@ import { memo, useContext } from 'react'
 
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import '@cdc/core/components/EditorPanel/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.css'
 import Accordion from '@cdc/core/components/ui/Accordion'
 
 import ConfigContext from '../../ConfigContext'

@@ -1,0 +1,209 @@
+.cove-input__slider,
+.cove-input__slider--large,
+.cove-input__slider--small {
+  cursor: pointer;
+  display: inline-block;
+  height: 26px;
+  padding: 3px;
+  position: relative;
+  width: 60px;
+}
+
+.cove-input__slider.active .cove-input__slider-button,
+.active.cove-input__slider--large .cove-input__slider-button,
+.active.cove-input__slider--small .cove-input__slider-button {
+  left: 100%;
+  transform: translateX(-100%);
+}
+
+.cove-input__slider.active .cove-input__slider-track,
+.active.cove-input__slider--large .cove-input__slider-track,
+.active.cove-input__slider--small .cove-input__slider-track {
+  background-color: #75b936;
+}
+
+.cove-input__slider.slider--block,
+.slider--block.cove-input__slider--large,
+.slider--block.cove-input__slider--small {
+  aspect-ratio: 1.85/1;
+  padding: 4px;
+  width: unset;
+}
+
+.cove-input__slider.slider--block .cove-input__slider-button,
+.slider--block.cove-input__slider--large .cove-input__slider-button,
+.slider--block.cove-input__slider--small .cove-input__slider-button {
+  border-radius: 10%;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.cove-input__slider.slider--block .cove-input__slider-track,
+.slider--block.cove-input__slider--large .cove-input__slider-track,
+.slider--block.cove-input__slider--small .cove-input__slider-track {
+  border-radius: 4px;
+  box-shadow: 0 0 0 transparent;
+}
+
+.cove-input__slider.slider--block.active .cove-input__slider-track,
+.slider--block.active.cove-input__slider--large .cove-input__slider-track,
+.slider--block.active.cove-input__slider--small .cove-input__slider-track {
+  box-shadow: inset -40px 0 10px -10px rgba(0, 0, 0, 0.15);
+}
+
+.cove-input__slider.slider--pill,
+.slider--pill.cove-input__slider--large,
+.slider--pill.cove-input__slider--small {
+  height: 25px;
+  width: 60px;
+}
+
+.cove-input__slider.slider--pill .cove-input__slider-button,
+.slider--pill.cove-input__slider--large .cove-input__slider-button,
+.slider--pill.cove-input__slider--small .cove-input__slider-button {
+  aspect-ratio: 1.75/1;
+  border-radius: 999px;
+}
+
+.cove-input__slider.slider--pill .cove-input__slider-button::before,
+.slider--pill.cove-input__slider--large .cove-input__slider-button::before,
+.slider--pill.cove-input__slider--small .cove-input__slider-button::before,
+.cove-input__slider.slider--pill .cove-input__slider-button::after,
+.slider--pill.cove-input__slider--large .cove-input__slider-button::after,
+.slider--pill.cove-input__slider--small .cove-input__slider-button::after {
+  background: linear-gradient(
+    0deg,
+    rgb(255, 255, 255) 0%,
+    rgb(227, 227, 227) 30%,
+    rgb(227, 227, 227) 70%,
+    rgb(255, 255, 255) 100%
+  );
+  content: '';
+  display: block;
+  height: calc(100% - 10px);
+  position: absolute;
+  top: 5px;
+  width: 1px;
+}
+
+.cove-input__slider.slider--pill .cove-input__slider-button::before,
+.slider--pill.cove-input__slider--large .cove-input__slider-button::before,
+.slider--pill.cove-input__slider--small .cove-input__slider-button::before {
+  left: 42%;
+}
+
+.cove-input__slider.slider--pill .cove-input__slider-button::after,
+.slider--pill.cove-input__slider--large .cove-input__slider-button::after,
+.slider--pill.cove-input__slider--small .cove-input__slider-button::after {
+  right: 42%;
+}
+
+.cove-input__slider.slider--3d .cove-input__slider-button,
+.slider--3d.cove-input__slider--large .cove-input__slider-button,
+.slider--3d.cove-input__slider--small .cove-input__slider-button {
+  background: radial-gradient(circle at 100% 0%, rgb(255, 255, 255) 45%, rgb(200, 200, 200) 100%);
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4), inset 0 0 3px 2px #fff;
+  height: 160%;
+  top: -30%;
+  transform: translateX(-20%);
+}
+
+.cove-input__slider.slider--3d .cove-input__slider-button:after,
+.slider--3d.cove-input__slider--large .cove-input__slider-button:after,
+.slider--3d.cove-input__slider--small .cove-input__slider-button:after {
+  border: 1px solid #ececec;
+  border-radius: 999px;
+  content: '';
+  display: block;
+  height: calc(100% - 6px);
+  left: 0;
+  margin: 3px;
+  position: absolute;
+  top: 0;
+  width: calc(100% - 6px);
+}
+
+.cove-input__slider.slider--3d .cove-input__slider-track,
+.slider--3d.cove-input__slider--large .cove-input__slider-track,
+.slider--3d.cove-input__slider--small .cove-input__slider-track {
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.cove-input__slider.slider--3d.active .cove-input__slider-button,
+.slider--3d.active.cove-input__slider--large .cove-input__slider-button,
+.slider--3d.active.cove-input__slider--small .cove-input__slider-button {
+  transform: translateX(-80%);
+}
+
+.cove-input__slider.slider--3d.active .cove-input__slider-track,
+.slider--3d.active.cove-input__slider--large .cove-input__slider-track,
+.slider--3d.active.cove-input__slider--small .cove-input__slider-track {
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.cove-input__slider--small {
+  height: 20px;
+  width: 40px;
+}
+
+.cove-input__slider--small.slider--pill {
+  height: 20px;
+  width: 45px;
+}
+
+.cove-input__slider--small.slider--pill .cove-input__slider-button {
+  aspect-ratio: 1.5/1;
+}
+
+.cove-input__slider--small.slider--pill .cove-input__slider-button:before,
+.cove-input__slider--small.slider--pill .cove-input__slider-button:after {
+  display: none;
+}
+
+.cove-input__slider--small.slider--3d .cove-input__slider-button {
+  box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.22), inset 0 0 3px 2px #fff;
+}
+
+.cove-input__slider--small.slider--3d .cove-input__slider-button:after {
+  height: calc(100% - 4px);
+  margin: 2px;
+  width: calc(100% - 4px);
+}
+
+.cove-input__slider--large {
+  height: 35px;
+  width: 80px;
+}
+
+.cove-input__slider--large.slider--pill {
+  height: 30px;
+  width: 80px;
+}
+
+.cove-input__slider--large.slider--3d .cove-input__slider-button:after {
+  height: calc(100% - 8px);
+  margin: 4px;
+  width: calc(100% - 8px);
+}
+
+.cove-input__slider-button {
+  aspect-ratio: 1/1;
+  background-color: #fff;
+  border-radius: 100%;
+  box-shadow: -2px 4px 10px -7px rgb(0, 0, 0);
+  height: 100%;
+  left: 0;
+  position: relative;
+  transition: all 200ms var(--transition-expo-out);
+  z-index: 2;
+}
+
+.cove-input__slider-track {
+  background-color: #ccc;
+  border-radius: 999px;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: all 200ms var(--transition-expo-out);
+  width: 100%;
+}

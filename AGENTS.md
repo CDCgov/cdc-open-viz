@@ -65,6 +65,7 @@ The repo is set up so SI tools can discover and run tests without being prompted
 - `*.smoke.stories.*` are excluded in quick mode (`COVE_QUICK_TESTS=1`).
 - Unit tests: `packages/**/src/**/*.{test,spec}.{js,ts,jsx,tsx}`.
 - Test wiring: `vitest.config.ts` and `vitest.setup.ts`.
+- `vitest.setup.ts` pre-warms lazy modules to avoid dynamic-import failures in sharded tests.
 
 ### Shared test helpers
 

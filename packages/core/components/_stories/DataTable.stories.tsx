@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 
 import DataTable from '../DataTable'
-import './styles.scss'
+import './styles.css'
 import NoDataConfig from './_mocks/DataTable/no-data.json'
 import Example_1 from './_mocks/dashboard_no_filter.json'
 import CityStateExample from './_mocks/example-city-state.json'

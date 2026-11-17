@@ -1,6 +1,6 @@
 // main visualization wrapper
 import React, { forwardRef } from 'react'
-import './visualizations.scss'
+import './visualizations.css'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
 
 export type VisualizationShellConfig = Partial<AnyVisualization> & {

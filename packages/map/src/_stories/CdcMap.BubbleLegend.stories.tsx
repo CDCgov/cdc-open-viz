@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
+  openAccordion,
   performAndAssert,
   waitForEditor,
   waitForPresence
@@ -97,6 +98,70 @@ export const Bubble_Legend_Custom_Text: Story = {
       expect(canvasElement.querySelector('circle.bubble.country--Brazil')).toHaveAttribute('fill', initialInfluenzaFill)
       expect(within(canvasElement).queryByRole('button', { name: 'Show All' })).not.toBeInTheDocument()
     })
+  }
+}
+
+export const Bubble_Legend_Textarea_Html: Story = {
+  args: {
+    config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['general', 'showSidebar'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'description'], value: '' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'description'], value: '' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('circle.bubble', canvasElement)
+    await openAccordion(canvas, 'Bubble Layers')
+
+    const layerButton = canvas.getByRole('button', { name: /^Layer 1:/ })
+    await userEvent.click(layerButton)
+    const layerSection = layerButton.closest('.accordion__item') as HTMLElement
+    expect(layerSection).toBeTruthy()
+
+    const layerCanvas = within(layerSection)
+    await userEvent.click(layerCanvas.getByRole('button', { name: 'Legend', exact: true }))
+
+    const colorDescription = layerCanvas.getByLabelText('Legend Description')
+    const sizeDescription = layerCanvas.getByLabelText('Size Legend Description')
+    expect(colorDescription.tagName).toBe('TEXTAREA')
+    expect(sizeDescription.tagName).toBe('TEXTAREA')
+
+    await performAndAssert(
+      'Bubble legend description → Render HTML',
+      () => {
+        const legendList = canvasElement.querySelector('ul[aria-label="Bubble legend items"]')
+        const description = legendList?.parentElement?.querySelector(':scope > .mb-3 p')
+        return {
+          text: description?.textContent || '',
+          hasStrongMarkup: Boolean(description?.querySelector('strong'))
+        }
+      },
+      async () => {
+        await userEvent.type(colorDescription, 'Bubble <strong>color description</strong>')
+      },
+      (before, after) => !before.hasStrongMarkup && after.text === 'Bubble color description' && after.hasStrongMarkup
+    )
+
+    await performAndAssert(
+      'Bubble size legend description → Render HTML',
+      () => {
+        const legendList = canvasElement.querySelector('ul[aria-label="Bubble size legend items"]')
+        const description = legendList?.parentElement?.querySelector(':scope > .mb-3 p')
+        return {
+          text: description?.textContent || '',
+          hasEmMarkup: Boolean(description?.querySelector('em'))
+        }
+      },
+      async () => {
+        await userEvent.type(sizeDescription, 'Bubble <em>size description</em>')
+      },
+      (before, after) => !before.hasEmMarkup && after.text === 'Bubble size description' && after.hasEmMarkup
+    )
   }
 }
 

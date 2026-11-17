@@ -1,5 +1,5 @@
 import { previewTheme } from './coveSbThemes'
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 export const parameters = {
   options: {

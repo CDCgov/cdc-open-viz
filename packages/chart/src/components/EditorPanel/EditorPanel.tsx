@@ -24,7 +24,7 @@ import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
 import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
-import './editor-panel.scss'
+import './editor-panel.css'
 import EditorPanelContext from './EditorPanelContext'
 import cloneDeep from 'lodash/cloneDeep'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
