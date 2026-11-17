@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fireEvent, fn, userEvent, within } from 'storybook/test'
+import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
   openAccordion,
@@ -24,6 +24,9 @@ export default meta
 type Story = StoryObj<typeof CdcEditor>
 
 const WORLD_DATA_URL = 'packages/map/examples/gallery/world.json'
+const COUNTRY_ALIAS_CSV = `Country,Rate
+Republic of Chad,10
+Democratic Republic of Congo,20`
 const ROUND_ONE_LABELS = ['0 - 19.2', '19.3 - 40.4', '40.5 - 59.6', '59.7 - 77.8', '77.9 - 99.0']
 const ROUND_ZERO_LABELS = ['0 - 19', '19 - 40', '40 - 60', '60 - 78', '78 - 99']
 
@@ -613,6 +616,84 @@ export const MAP003: Story = {
       window.open = originalOpen
       console.error = originalConsoleError
       window.removeEventListener('unhandledrejection', recordUnhandledRejection)
+    }
+  }
+}
+
+export const WorldCountryAliasImport: Story = {
+  name: 'World Country Alias Import',
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(await canvas.findByRole('button', { name: 'World' }))
+    await user.click(canvas.getByText('2. Import Data'))
+
+    const upload = canvasElement.querySelector<HTMLInputElement>('input[type="file"]')
+    expect(upload, 'Expected the editor data-import file input').toBeTruthy()
+    await user.upload(upload!, new File([COUNTRY_ALIAS_CSV], 'world-country-aliases.csv', { type: 'text/csv' }))
+
+    expect(await canvas.findByText('Data Preview')).toBeVisible()
+    expect(canvas.getByText('Republic of Chad')).toBeVisible()
+    expect(canvas.getByText('Democratic Republic of Congo')).toBeVisible()
+
+    const vertical = canvas.getByRole('button', { name: /^Vertical/ })
+    await user.click(vertical)
+    expect(vertical).toHaveClass('active')
+    const noSeries = canvas.getByRole('button', { name: 'No', exact: true })
+    const yesSeries = canvas.getByRole('button', { name: 'Yes', exact: true })
+    await performAndAssert(
+      'No is the active multiple-series selection',
+      () => ({ no: noSeries.style.backgroundColor, yes: yesSeries.style.backgroundColor }),
+      async () => {
+        await user.click(noSeries)
+        await user.tab()
+      },
+      (_before, after) => after.no === 'rgb(1, 93, 170)' && after.yes === 'rgb(0, 52, 93)'
+    )
+    await user.click(canvas.getByRole('button', { name: 'Configure your visualization' }))
+    await waitForEditor(canvas)
+
+    const columnsAccordion = await ensureEditorAccordionOpen(canvas, canvasElement, 'Columns')
+    const geographySelect = columnsAccordion.querySelector<HTMLSelectElement>(
+      '[data-required-field-control="map-geography"]'
+    )!
+    expect(geographySelect, 'Expected the map Geography column control').toBeTruthy()
+    await waitForOptionsToPopulate(geographySelect)
+    await user.selectOptions(geographySelect, 'Country')
+
+    const dataSelect = columnsAccordion.querySelector<HTMLSelectElement>(
+      '[data-required-field-control="map-data-column"]'
+    )!
+    expect(dataSelect, 'Expected the map Data column control').toBeTruthy()
+    await waitForOptionsToPopulate(dataSelect)
+    await user.selectOptions(dataSelect, 'Rate')
+
+    await waitForPresence('path[data-country-code="TCD"]', canvasElement)
+    await waitForPresence('path[data-country-code="COD"]', canvasElement)
+    await assertVisualizationRendered(canvasElement)
+
+    await waitFor(() => {
+      expect(getCountryTooltipHtml(canvasElement, 'TCD')).toContain('Rate: 10</li>')
+      expect(getCountryTooltipHtml(canvasElement, 'COD')).toContain('Rate: 20</li>')
+    })
+
+    for (const [code, heading, rate] of [
+      ['TCD', 'Chad', 'Rate: 10'],
+      ['COD', 'Democratic Republic of the Congo', 'Rate: 20']
+    ]) {
+      await user.hover(getCountryGroup(canvasElement, code))
+      await waitFor(() => {
+        const tooltip = getVisibleTooltip(canvasElement)
+        expect(tooltip, `Expected a visible tooltip for ${code}`).toBeTruthy()
+        expect(tooltip!.querySelector('.tooltip-heading')).toHaveTextContent(heading)
+        expect(tooltip!.querySelector('.tooltip-heading')?.textContent?.trim()).toBe(heading)
+        expect(Array.from(tooltip!.querySelectorAll('.tooltip-body')).map(item => item.textContent?.trim())).toContain(
+          rate
+        )
+      })
+      await user.unhover(getCountryGroup(canvasElement, code))
     }
   }
 }
