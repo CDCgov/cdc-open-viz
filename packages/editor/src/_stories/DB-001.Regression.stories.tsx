@@ -22,6 +22,7 @@ const meta: Meta<typeof CdcEditor> = {
 export default meta
 type Story = StoryObj<typeof CdcEditor>
 type Canvas = ReturnType<typeof within>
+type User = ReturnType<typeof userEvent.setup>
 
 const CSV = `Category,Current,Previous,Status,Report Date,Optional
 Total,1234,1200,High,2026-01-15,Present
@@ -54,10 +55,10 @@ const replaceText = async (input: HTMLElement, value: string) => {
   if (value) await userEvent.type(input, value)
 }
 
-const pasteText = async (input: HTMLElement, value: string) => {
-  await userEvent.clear(input)
-  await userEvent.click(input)
-  await userEvent.paste(value)
+const pasteText = async (user: User, input: HTMLElement, value: string) => {
+  await user.clear(input)
+  await user.click(input)
+  await user.paste(value)
 }
 
 export const DB001: Story = {
@@ -134,18 +135,66 @@ export const DB001: Story = {
         (before, after) => before && !after
       )
       await user.click(canvas.getByLabelText('Show Title'))
+
+      // Supported HTML is parsed semantically across all three General text fields.
+      const tp5Root = canvasElement.querySelector<HTMLElement>('.bite__style--tp5')!
+      expect(tp5Root).toBeVisible()
+
       await performAndAssert(
-        'Message renders',
-        () => renderedMessage(canvasElement),
-        () => replaceText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Current report value'),
-        (_before, after) => after === 'Current report value'
+        'Title parses supported HTML',
+        () => {
+          const title = tp5Root.querySelector<HTMLElement>('.cdc-callout__heading')
+          return {
+            text: normalize(title?.textContent),
+            strong: normalize(title?.querySelector(':scope > span > strong')?.textContent),
+            emphasis: normalize(title?.querySelector(':scope > span > em')?.textContent)
+          }
+        },
+        () => pasteText(user, canvas.getByLabelText('Title'), '<strong>Data Bite</strong> <em>Regression</em>'),
+        (before, after) =>
+          !before.strong &&
+          !before.emphasis &&
+          after.text === 'Data Bite Regression' &&
+          after.strong === 'Data Bite' &&
+          after.emphasis === 'Regression'
       )
+      expect(tp5Root.querySelector('.cdc-callout__heading')).toBeVisible()
+
       await performAndAssert(
-        'Subtext renders',
-        () => normalize(canvasElement.querySelector('.bite-subtext')?.textContent),
-        () => replaceText(canvas.getByLabelText(/Subtext\/Citation/), 'Regression citation'),
-        (_before, after) => after === 'Regression citation'
+        'Message parses supported HTML',
+        () => {
+          const message = tp5Root.querySelector<HTMLElement>('.cdc-callout__content > p:first-child')
+          return {
+            text: normalize(message?.textContent),
+            superscript: normalize(message?.querySelector(':scope > sup')?.textContent),
+            strong: normalize(message?.querySelector(':scope > strong')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            user,
+            canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+            'Current<sup>1</sup> <strong>report value</strong>'
+          ),
+        (_before, after) =>
+          after.text === 'Current1 report value' && after.superscript === '1' && after.strong === 'report value'
       )
+      expect(tp5Root.querySelector('.cdc-callout__content > p:first-child')).toBeVisible()
+
+      await performAndAssert(
+        'Subtext parses supported HTML',
+        () => {
+          const subtext = tp5Root.querySelector<HTMLElement>('.cdc-callout__content > .bite-subtext')
+          return {
+            text: normalize(subtext?.textContent),
+            emphasis: normalize(subtext?.querySelector(':scope > em')?.textContent),
+            subscript: normalize(subtext?.querySelector(':scope > sub')?.textContent)
+          }
+        },
+        () => pasteText(user, canvas.getByLabelText(/Subtext\/Citation/), '<em>Source</em><sub>2026</sub>'),
+        (_before, after) => after.text === 'Source2026' && after.emphasis === 'Source' && after.subscript === '2026'
+      )
+      expect(tp5Root.querySelector('.cdc-callout__content > .bite-subtext')).toBeVisible()
 
       // Data aggregation, formatting, zero handling, and filter restoration.
       await openSection(canvas, canvasElement, 'Data')
@@ -387,7 +436,11 @@ export const DB001: Story = {
       await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
       await user.selectOptions(variable().querySelector('select[name="selectionMode"]') as HTMLSelectElement, 'no')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Reported value: {{reported-value}}')
+      await pasteText(
+        user,
+        canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+        'Reported value: {{reported-value}}'
+      )
       await waitFor(() => expect(renderedMessage(canvasElement)).toBe('Reported value: 1234'))
 
       await openSection(canvas, canvasElement, 'Markup Variables')
@@ -414,7 +467,11 @@ export const DB001: Story = {
       expect(variableColumn()).toHaveValue('Report Date')
       expect(within(variable()).getByLabelText('Tag (auto-generated)')).toHaveValue('{{report-date}}')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Reported value: {{report-date}}')
+      await pasteText(
+        user,
+        canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+        'Reported value: {{report-date}}'
+      )
       await waitFor(() => expect(renderedMessage(canvasElement)).toBe('Reported value: January 15, 2026'))
       await user.selectOptions(canvas.getByLabelText(/Language for dates and numbers/), 'es-MX')
       await waitFor(() => expect(renderedMessage(canvasElement)).toBe('Reported value: enero 15, 2026'))
@@ -426,7 +483,7 @@ export const DB001: Story = {
       await user.selectOptions(variableColumn(), 'Optional')
       expect(within(variable()).getByLabelText('Tag (auto-generated)')).toHaveValue('{{optional}}')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Reported value: {{optional}}')
+      await pasteText(user, canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Reported value: {{optional}}')
       await waitFor(() => expect(renderedMessage(canvasElement)).toBe('Reported value: Present'))
       await openSection(canvas, canvasElement, 'Markup Variables')
       await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
