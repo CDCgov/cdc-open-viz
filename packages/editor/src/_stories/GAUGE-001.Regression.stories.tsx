@@ -21,6 +21,7 @@ const meta: Meta<typeof CdcEditor> = {
 export default meta
 type Story = StoryObj<typeof CdcEditor>
 type Canvas = ReturnType<typeof within>
+type User = ReturnType<typeof userEvent.setup>
 
 const CSV = `Category,Current,Previous,Denominator,Status,Report Date,Optional
 Total,40,30,100,High,2026-01-15,Present
@@ -51,10 +52,10 @@ const replaceText = async (input: HTMLElement, value: string) => {
   await userEvent.clear(input)
   if (value) await userEvent.type(input, value)
 }
-const pasteText = async (input: HTMLElement, value: string) => {
-  await userEvent.clear(input)
-  await userEvent.click(input)
-  await userEvent.paste(value)
+const pasteText = async (user: User, input: HTMLElement, value: string) => {
+  await user.clear(input)
+  await user.click(input)
+  await user.paste(value)
 }
 
 export const GAUGE001: Story = {
@@ -132,11 +133,17 @@ export const GAUGE001: Story = {
       )
       await user.selectOptions(canvas.getByLabelText(/Chart Type/), 'TP5 Gauge')
       await waitForPresence('.cove-gauge-chart', canvasElement)
+      expect(chartType).toHaveValue('TP5 Gauge')
+      const gauge = canvasElement.querySelector<HTMLElement>('.cove-gauge-chart')!
+      const gaugeCallout = gauge.closest<HTMLElement>('.cdc-callout')!
+      expect(gaugeCallout).toBeVisible()
       await replaceText(canvas.getByLabelText(/^Title$/, { selector: 'input' }), 'Gauge Regression')
-      expect(await canvas.findByText('Gauge Regression')).toBeVisible()
+      await waitFor(() =>
+        expect(normalize(gaugeCallout.querySelector('.cdc-callout__heading')?.textContent)).toBe('Gauge Regression')
+      )
       await performAndAssert(
         'Show title changes rendered heading',
-        () => !!canvasElement.querySelector('.cdc-callout__heading'),
+        () => !!gaugeCallout.querySelector('.cdc-callout__heading'),
         () => user.click(canvas.getByLabelText(/show title/i)),
         (before, after) => before && !after
       )
@@ -145,17 +152,77 @@ export const GAUGE001: Story = {
         'Message renders',
         () =>
           normalize(
-            canvasElement.querySelector('.cove-gauge-chart__content .cove-waffle-chart__data--text')?.textContent
+            gaugeCallout.querySelector('.cove-gauge-chart__content .cove-waffle-chart__data--text')?.textContent
           ),
         () => replaceText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Current gauge value'),
         (_before, after) => after === 'Current gauge value'
       )
       await performAndAssert(
         'Citation renders',
-        () => normalize(canvasElement.querySelector('.cove-waffle-chart__subtext')?.textContent),
+        () => normalize(gaugeCallout.querySelector('.cove-gauge-chart .cove-waffle-chart__subtext')?.textContent),
         () => replaceText(canvas.getByLabelText(/Subtext\/Citation/), 'Gauge citation'),
         (_before, after) => after === 'Gauge citation'
       )
+
+      // Preserve plain-text coverage above, then verify supported HTML renders semantically in each field.
+      await performAndAssert(
+        'Gauge title parses supported HTML',
+        () => {
+          const title = gaugeCallout.querySelector<HTMLElement>('.cdc-callout__heading')
+          return {
+            text: normalize(title?.textContent),
+            strong: normalize(title?.querySelector(':scope > strong')?.textContent),
+            emphasis: normalize(title?.querySelector(':scope > em')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            user,
+            canvas.getByLabelText(/^Title$/, { selector: 'input' }),
+            '<strong>Gauge</strong> <em>Regression</em>'
+          ),
+        (_before, after) =>
+          after.text === 'Gauge Regression' && after.strong === 'Gauge' && after.emphasis === 'Regression'
+      )
+      expect(gaugeCallout.querySelector('.cdc-callout__heading')).toBeVisible()
+
+      await performAndAssert(
+        'Gauge message parses supported HTML',
+        () => {
+          const message = gaugeCallout.querySelector<HTMLElement>(
+            '.cove-gauge-chart__content .cove-waffle-chart__data--text'
+          )
+          return {
+            text: normalize(message?.textContent),
+            superscript: normalize(message?.querySelector(':scope > sup')?.textContent),
+            strong: normalize(message?.querySelector(':scope > strong')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            user,
+            canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+            'Current<sup>1</sup> <strong>gauge value</strong>'
+          ),
+        (_before, after) =>
+          after.text === 'Current1 gauge value' && after.superscript === '1' && after.strong === 'gauge value'
+      )
+      expect(gaugeCallout.querySelector('.cove-gauge-chart__content .cove-waffle-chart__data--text')).toBeVisible()
+
+      await performAndAssert(
+        'Gauge citation parses supported HTML',
+        () => {
+          const subtext = gaugeCallout.querySelector<HTMLElement>('.cove-gauge-chart .cove-waffle-chart__subtext')
+          return {
+            text: normalize(subtext?.textContent),
+            emphasis: normalize(subtext?.querySelector(':scope > em')?.textContent),
+            subscript: normalize(subtext?.querySelector(':scope > sub')?.textContent)
+          }
+        },
+        () => pasteText(user, canvas.getByLabelText(/Subtext\/Citation/), '<em>Source</em><sub>2026</sub>'),
+        (_before, after) => after.text === 'Source2026' && after.emphasis === 'Source' && after.subscript === '2026'
+      )
+      expect(gaugeCallout.querySelector('.cove-gauge-chart .cove-waffle-chart__subtext')).toBeVisible()
 
       // Data calculation and validation.
       await openSection(canvas, canvasElement, 'Data')
@@ -336,7 +403,11 @@ export const GAUGE001: Story = {
       await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
       await user.selectOptions(variable().querySelector('select[name="selectionMode"]') as HTMLSelectElement, 'no')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Reported value: {{reported-value}}')
+      await pasteText(
+        user,
+        canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+        'Reported value: {{reported-value}}'
+      )
       await waitFor(() =>
         expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
           'Reported value: 40'
@@ -366,7 +437,7 @@ export const GAUGE001: Story = {
       await replaceText(within(variable()).getByLabelText('Date Parse Format'), '%Y-%m-%d')
       await replaceText(within(variable()).getByLabelText('Date Display Format'), '%B %-d, %Y')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Report date: {{report-date}}')
+      await pasteText(user, canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Report date: {{report-date}}')
       await waitFor(() =>
         expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
           'January 15, 2026'
@@ -383,7 +454,7 @@ export const GAUGE001: Story = {
       await user.selectOptions(variableColumn(), 'Optional')
       expect(within(variable()).getByLabelText('Tag (auto-generated)')).toHaveValue('{{optional}}')
       await openSection(canvas, canvasElement, 'General')
-      await pasteText(canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Optional: {{optional}}')
+      await pasteText(user, canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Optional: {{optional}}')
       await waitFor(() =>
         expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
           'Optional: Present'

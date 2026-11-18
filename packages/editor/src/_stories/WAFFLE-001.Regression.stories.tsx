@@ -138,6 +138,42 @@ export const WAFFLE001: Story = {
         expect(accordionButton(canvasElement, section)).toBeVisible()
       }
 
+      // TP5 Waffle Visual treatment is reversible and changes rendered output.
+      await openSection(canvas, canvasElement, 'Visual')
+      const tp5WhiteBackground = canvas.getByLabelText('Use White Background Style')
+      const tp5VisualState = () => {
+        const callout = canvasElement.querySelector<HTMLElement>('.cdc-callout')
+        return {
+          whiteBackground: Boolean(canvasElement.querySelector('.type-waffle-chart.white-background-style')),
+          dataCallout: Boolean(callout?.classList.contains('cdc-callout--data')),
+          flag: Boolean(callout?.querySelector('.cdc-callout__flag'))
+        }
+      }
+      await performAndAssert(
+        'TP5 Waffle enables white background style',
+        tp5VisualState,
+        () => user.click(tp5WhiteBackground),
+        (before, after) =>
+          !before.whiteBackground &&
+          before.dataCallout &&
+          before.flag &&
+          after.whiteBackground &&
+          !after.dataCallout &&
+          !after.flag
+      )
+      await performAndAssert(
+        'TP5 Waffle restores the data callout style',
+        tp5VisualState,
+        () => user.click(tp5WhiteBackground),
+        (before, after) =>
+          before.whiteBackground &&
+          !before.dataCallout &&
+          !before.flag &&
+          !after.whiteBackground &&
+          after.dataCallout &&
+          after.flag
+      )
+
       // Use standard Waffle before asserting authorable theme colors.
       await openSection(canvas, canvasElement, 'General')
       const chartType = canvas.getByLabelText('Chart Type') as HTMLSelectElement
@@ -246,7 +282,7 @@ export const WAFFLE001: Story = {
         (before, after) => !before && after
       )
 
-      // Exact theme color and reversible accent treatment.
+      // Exact theme color and every standard Visual checkbox, each restored after verification.
       await openSection(canvas, canvasElement, 'Visual')
       await performAndAssert(
         'Purple theme sets exact node fill',
@@ -258,18 +294,30 @@ export const WAFFLE001: Story = {
 
       const body = canvasElement.querySelector<HTMLElement>('.cove-visualization__body')
       expect(body).toBeTruthy()
-      await performAndAssert(
-        'Accent treatment appears',
-        () => body!.classList.contains('component--has-accent'),
-        () => user.click(canvas.getByLabelText('Use Accent Style')),
-        (before, after) => !before && after
-      )
-      await performAndAssert(
-        'Accent treatment restores',
-        () => body!.classList.contains('component--has-accent'),
-        () => user.click(canvas.getByLabelText('Use Accent Style')),
-        (before, after) => before && !after
-      )
+      const assertReversibleVisualCheckbox = async (label: string, className: string, initiallyPresent = false) => {
+        const checkbox = canvas.getByLabelText(label)
+        const hasClass = () => body!.classList.contains(className)
+        expect(hasClass(), `${label} should start ${initiallyPresent ? 'enabled' : 'disabled'}`).toBe(initiallyPresent)
+        await performAndAssert(
+          `${label} toggles rendered treatment`,
+          hasClass,
+          () => user.click(checkbox),
+          (before, after) => before === initiallyPresent && after === !initiallyPresent
+        )
+        await performAndAssert(
+          `${label} restores rendered treatment`,
+          hasClass,
+          () => user.click(checkbox),
+          (before, after) => before === !initiallyPresent && after === initiallyPresent
+        )
+      }
+
+      await assertReversibleVisualCheckbox('Display Border', 'component--has-legacy-border', true)
+      expect(body).not.toHaveClass('no-borders')
+      await assertReversibleVisualCheckbox('Use Border Color Theme', 'component--has-border-color-theme')
+      await assertReversibleVisualCheckbox('Use Accent Style', 'component--has-accent')
+      await assertReversibleVisualCheckbox('Use Theme Background Color', 'component--has-background')
+      await assertReversibleVisualCheckbox('Hide Background Color', 'component--hide-background-color')
 
       expect(consoleErrors, `Unexpected console errors:\n${consoleErrors.join('\n')}`).toEqual([])
       expect(unhandledRejections, 'Unexpected unhandled rejections').toEqual([])
