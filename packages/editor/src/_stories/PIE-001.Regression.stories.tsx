@@ -113,9 +113,63 @@ const getDataTable = (canvasElement: HTMLElement) =>
 const getDataTableRows = (canvasElement: HTMLElement) =>
   Array.from(getDataTable(canvasElement)?.querySelectorAll<HTMLElement>('tbody tr') || [])
 
+const getPercentage = (value: string | null | undefined) => normalize(value).match(/\d+(?:\.\d+)?%/)?.[0] || ''
+
+const toUniqueRecord = (entries: [string, string][], label: string) => {
+  const keys = entries.map(([key]) => key)
+  expect(new Set(keys).size, `${label} must not contain duplicate categories`).toBe(entries.length)
+  return Object.fromEntries(entries)
+}
+
+const getPieCategoryPercentages = (canvasElement: HTMLElement) =>
+  toUniqueRecord(
+    getPieSegments(canvasElement).map(segment => {
+      const category = Array.from(segment.classList)
+        .find(className => className.startsWith('slice-'))!
+        .slice(6)
+      return [category, getPercentage(segment.textContent)]
+    }),
+    'Rendered Pie'
+  )
+
+const getTableCategoryPercentages = (canvasElement: HTMLElement) =>
+  toUniqueRecord(
+    getDataTableRows(canvasElement).map(row => {
+      const category = expectedSegments.find(({ category }) => normalize(row.textContent).includes(category))?.category
+      expect(category, `Expected a known category in data-table row: ${normalize(row.textContent)}`).toBeTruthy()
+      return [category!, getPercentage(row.textContent)] as [string, string]
+    }),
+    'Rendered data table'
+  )
+
+const getPieCategoryColors = (canvasElement: HTMLElement) =>
+  toUniqueRecord(
+    getPieSegments(canvasElement).map(segment => {
+      const category = Array.from(segment.classList)
+        .find(className => className.startsWith('slice-'))!
+        .slice(6)
+      const fill = segment.querySelector<SVGPathElement>('path')?.getAttribute('fill') || ''
+      return [category, fill]
+    }),
+    'Rendered Pie colors'
+  )
+
+const isPieVisible = (canvasElement: HTMLElement) => {
+  const pie = canvasElement.querySelector<SVGSVGElement>('svg.animated-pie')
+  if (!pie) return false
+  const style = getComputedStyle(pie)
+  return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0'
+}
+
 const replaceText = async (input: HTMLElement, value: string, user: ReturnType<typeof userEvent.setup>) => {
   await user.clear(input)
   if (value) await user.type(input, value)
+}
+
+const pasteText = async (input: HTMLElement, value: string, user: ReturnType<typeof userEvent.setup>) => {
+  await user.clear(input)
+  await user.click(input)
+  await user.paste(value)
 }
 
 const expectedSegments = [
@@ -253,6 +307,14 @@ export const PIE001: Story = {
         expect(row, `Expected data-table row for ${category}`).toBeTruthy()
         expect(row).toHaveTextContent(percentage)
       }
+      const expectedCategoryPercentages = Object.fromEntries(
+        expectedSegments.map(({ category, percentage }) => [category, percentage])
+      )
+      expect(getPieCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+      expect(getTableCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+      const baselineColors = getPieCategoryColors(canvasElement)
+      expect(Object.keys(baselineColors)).toEqual(['Alpha', 'Beta', 'Gamma', 'Delta'])
+      expect(Object.values(baselineColors).every(Boolean)).toBe(true)
 
       // Expose paired category/percentage labels in the rendered Pie.
       await openAccordion(canvas, 'General')
@@ -283,6 +345,63 @@ export const PIE001: Story = {
         () => replaceText(titleInput, 'Pie Settings Regression', user),
         (_before, after) => after === 'Pie Settings Regression'
       )
+
+      // Supported HTML is parsed semantically across every authored display textarea.
+      await performAndAssert(
+        'Message parses supported HTML',
+        () => {
+          const message = canvasElement.querySelector<HTMLElement>('.cove-visualization__message')
+          return {
+            text: normalize(message?.textContent),
+            strong: normalize(message?.querySelector('strong')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+            '<strong>Pie interaction guidance</strong>',
+            user
+          ),
+        (_before, after) => after.text === 'Pie interaction guidance' && after.strong === 'Pie interaction guidance'
+      )
+      await performAndAssert(
+        'Subtext/Citation parses supported HTML',
+        () => {
+          const subtext = canvasElement.querySelector<HTMLElement>('.cove-visualization__body-subtext-section')
+          return {
+            text: normalize(subtext?.textContent),
+            emphasis: normalize(subtext?.querySelector('em')?.textContent),
+            subscript: normalize(subtext?.querySelector('sub')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            canvas.getByLabelText(/Subtext\/Citation/, { selector: 'textarea' }),
+            '<em>Source</em><sub>2026</sub>',
+            user
+          ),
+        (_before, after) => after.text === 'Source2026' && after.emphasis === 'Source' && after.subscript === '2026'
+      )
+      await performAndAssert(
+        'Legacy Footnotes parses supported HTML',
+        () => {
+          const footnotes = canvasElement.querySelector<HTMLElement>('section.footnotes.cove-prose')
+          return {
+            text: normalize(footnotes?.textContent),
+            superscript: normalize(footnotes?.querySelector('sup')?.textContent)
+          }
+        },
+        () =>
+          pasteText(canvas.getByLabelText(/^Footnotes/, { selector: 'textarea' }), 'Fixture note<sup>1</sup>', user),
+        (_before, after) => after.text === 'Fixture note1' && after.superscript === '1'
+      )
+      for (const selector of [
+        '.cove-visualization__message',
+        '.cove-visualization__body-subtext-section',
+        'section.footnotes.cove-prose'
+      ]) {
+        expect(canvasElement.querySelector(selector)?.textContent).not.toMatch(/<(strong|em|sub|sup)\b/i)
+      }
       const pieType = canvas.getByRole('combobox', { name: /^Pie Chart Type/ })
       await performAndAssert(
         'Donut moves every category label outside the chart',
@@ -452,6 +571,26 @@ export const PIE001: Story = {
 
       // Legend: bottom placement, hide, and full restoration.
       await openAccordion(canvas, 'Legend')
+      await performAndAssert(
+        'Legend Description parses supported HTML',
+        () => {
+          const description = canvasElement.querySelector<HTMLElement>(
+            '[role="region"][aria-label="legend"] p.cove-prose'
+          )
+          return {
+            text: normalize(description?.textContent),
+            emphasis: normalize(description?.querySelector('em')?.textContent)
+          }
+        },
+        () =>
+          pasteText(
+            canvas.getByLabelText(/^Legend Description/, { selector: 'textarea' }),
+            '<em>Stable category colors</em>',
+            user
+          ),
+        (_before, after) => after.text === 'Stable category colors' && after.emphasis === 'Stable category colors'
+      )
+      expect(canvasElement.querySelector('[role="region"][aria-label="legend"]')?.textContent).not.toMatch(/<em\b/i)
       const hideLegend = canvas
         .getAllByRole('checkbox', { name: /^Hide Legend/ })
         .find(control => control.getAttribute('name') === 'hide')
@@ -494,15 +633,29 @@ export const PIE001: Story = {
       await openAccordion(canvas, 'Filters')
       await user.click(canvas.getByRole('button', { name: /^Add Filter/ }))
       await performAndAssert(
-        'Category filter initializes the first category',
-        () => getRenderedCategories(canvasElement),
-        () => user.selectOptions(canvas.getByRole('combobox', { name: /^Filter$/ }), 'Category'),
-        (before, after) => before.length === 4 && after.length === 1 && after[0] === 'Alpha'
-      )
-      await performAndAssert(
-        'Beta filter leaves only Beta in the rendered Pie and table',
+        'Category filter initializes Alpha without changing its color or Pie/table parity',
         () => ({
           categories: getRenderedCategories(canvasElement),
+          colors: getPieCategoryColors(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          table: getTableCategoryPercentages(canvasElement)
+        }),
+        () => user.selectOptions(canvas.getByRole('combobox', { name: /^Filter$/ }), 'Category'),
+        (before, after) =>
+          before.categories.length === 4 &&
+          after.categories.length === 1 &&
+          after.categories[0] === 'Alpha' &&
+          after.colors.Alpha === baselineColors.Alpha &&
+          after.pie.Alpha === '100%' &&
+          JSON.stringify(after.pie) === JSON.stringify(after.table)
+      )
+      await performAndAssert(
+        'Beta filter leaves only Beta with its stable color and matching Pie/table percentage',
+        () => ({
+          categories: getRenderedCategories(canvasElement),
+          colors: getPieCategoryColors(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          tablePercentages: getTableCategoryPercentages(canvasElement),
           legend: normalize(canvasElement.querySelector('.legend-container')?.textContent),
           table: normalize(getDataTable(canvasElement)?.textContent)
         }),
@@ -512,6 +665,9 @@ export const PIE001: Story = {
           before.categories[0] === 'Alpha' &&
           after.categories.length === 1 &&
           after.categories[0] === 'Beta' &&
+          after.colors.Beta === baselineColors.Beta &&
+          after.pie.Beta === '100%' &&
+          JSON.stringify(after.pie) === JSON.stringify(after.tablePercentages) &&
           after.legend.includes('Beta') &&
           ['Alpha', 'Gamma', 'Delta'].every(category => !after.legend.includes(category)) &&
           after.table.includes('Beta') &&
@@ -520,9 +676,12 @@ export const PIE001: Story = {
           !after.table.includes('Delta')
       )
       await performAndAssert(
-        'Removing the filter restores all four categories',
+        'Removing the filter restores all categories, colors, and Pie/table percentages',
         () => ({
           categories: getRenderedCategories(canvasElement),
+          colors: getPieCategoryColors(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          tablePercentages: getTableCategoryPercentages(canvasElement),
           legend: normalize(canvasElement.querySelector('.legend-container')?.textContent),
           table: normalize(getDataTable(canvasElement)?.textContent)
         }),
@@ -530,6 +689,9 @@ export const PIE001: Story = {
         (before, after) =>
           before.categories.length === 1 &&
           after.categories.length === 4 &&
+          JSON.stringify(after.colors) === JSON.stringify(baselineColors) &&
+          JSON.stringify(after.pie) === JSON.stringify(expectedCategoryPercentages) &&
+          JSON.stringify(after.tablePercentages) === JSON.stringify(expectedCategoryPercentages) &&
           expectedSegments.every(
             ({ category }) =>
               after.categories.includes(category) && after.legend.includes(category) && after.table.includes(category)
@@ -559,6 +721,119 @@ export const PIE001: Story = {
         expect(row, `Expected restored data-table row for ${category}`).toBeTruthy()
         expect(row).toHaveTextContent(percentage)
       }
+      expect(getPieCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+      expect(getTableCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+
+      // Repeat the high-risk interactions in Donut mode with animation enabled.
+      await openAccordion(canvas, 'General')
+      await performAndAssert(
+        'Donut replay moves all four labels outside while preserving exact data and colors',
+        () => ({
+          inside: canvasElement.querySelectorAll('.pie-label--inside').length,
+          outside: canvasElement.querySelectorAll('.pie-label--outside').length,
+          pie: getPieCategoryPercentages(canvasElement),
+          colors: getPieCategoryColors(canvasElement)
+        }),
+        () => user.selectOptions(canvas.getByRole('combobox', { name: /^Pie Chart Type/ }), 'Donut'),
+        (before, after) =>
+          before.inside > 0 &&
+          before.outside < 4 &&
+          after.inside === 0 &&
+          after.outside === 4 &&
+          JSON.stringify(after.pie) === JSON.stringify(expectedCategoryPercentages) &&
+          JSON.stringify(after.colors) === JSON.stringify(baselineColors)
+      )
+
+      await openAccordion(canvas, 'Visual')
+      const animateVisualization = canvas.getByRole('checkbox', { name: /^Animate Visualization/ })
+      expect(animateVisualization).not.toBeChecked()
+      await user.click(animateVisualization)
+      expect(animateVisualization).toBeChecked()
+      expect(isPieVisible(canvasElement)).toBe(true)
+      expect(canvasElement.querySelectorAll('.pie-label--outside')).toHaveLength(4)
+      expect(getPieCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+      expect(getTableCategoryPercentages(canvasElement)).toEqual(expectedCategoryPercentages)
+      expect(getPieCategoryColors(canvasElement)).toEqual(baselineColors)
+
+      await openAccordion(canvas, 'Filters')
+      await user.click(canvas.getByRole('button', { name: /^Add Filter/ }))
+      await user.selectOptions(canvas.getByRole('combobox', { name: /^Filter$/ }), 'Category')
+      await performAndAssert(
+        'Animated Donut filtering preserves Beta color and Pie/table parity',
+        () => ({
+          categories: getRenderedCategories(canvasElement),
+          colors: getPieCategoryColors(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          table: getTableCategoryPercentages(canvasElement),
+          outside: canvasElement.querySelectorAll('.pie-label--outside').length,
+          visible: isPieVisible(canvasElement)
+        }),
+        () => user.selectOptions(canvas.getByRole('combobox', { name: /^Filter Default Value \(Category\)/ }), 'Beta'),
+        (before, after) =>
+          before.categories[0] === 'Alpha' &&
+          after.categories.length === 1 &&
+          after.categories[0] === 'Beta' &&
+          after.colors.Beta === baselineColors.Beta &&
+          after.pie.Beta === '100%' &&
+          JSON.stringify(after.pie) === JSON.stringify(after.table) &&
+          after.outside === 1 &&
+          after.visible
+      )
+      await performAndAssert(
+        'Animated Donut filter removal restores exact data, colors, labels, legend, and table',
+        () => ({
+          colors: getPieCategoryColors(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          table: getTableCategoryPercentages(canvasElement),
+          outside: canvasElement.querySelectorAll('.pie-label--outside').length,
+          legend: normalize(canvasElement.querySelector('.legend-container')?.textContent),
+          visible: isPieVisible(canvasElement)
+        }),
+        () => user.click(canvas.getByRole('button', { name: /^Remove$/ })),
+        (_before, after) =>
+          JSON.stringify(after.colors) === JSON.stringify(baselineColors) &&
+          JSON.stringify(after.pie) === JSON.stringify(expectedCategoryPercentages) &&
+          JSON.stringify(after.table) === JSON.stringify(expectedCategoryPercentages) &&
+          after.outside === 4 &&
+          after.visible &&
+          expectedSegments.every(({ category }) => after.legend.includes(category))
+      )
+
+      await openAccordion(canvas, 'Data Table')
+      await performAndAssert(
+        'Animated Donut data table hides without disturbing the rendered Donut',
+        () => ({
+          table: Boolean(getDataTable(canvasElement)),
+          pie: getPieCategoryPercentages(canvasElement),
+          outside: canvasElement.querySelectorAll('.pie-label--outside').length,
+          visible: isPieVisible(canvasElement)
+        }),
+        () => user.click(canvas.getByRole('checkbox', { name: /^Show Data Table/ })),
+        (before, after) =>
+          before.table &&
+          !after.table &&
+          JSON.stringify(after.pie) === JSON.stringify(expectedCategoryPercentages) &&
+          after.outside === 4 &&
+          after.visible
+      )
+      await performAndAssert(
+        'Animated Donut data table restores exact Pie/table parity',
+        () => ({
+          table: getTableCategoryPercentages(canvasElement),
+          pie: getPieCategoryPercentages(canvasElement),
+          colors: getPieCategoryColors(canvasElement),
+          outside: canvasElement.querySelectorAll('.pie-label--outside').length,
+          visible: isPieVisible(canvasElement)
+        }),
+        () => user.click(canvas.getByRole('checkbox', { name: /^Show Data Table/ })),
+        (before, after) =>
+          Object.keys(before.table).length === 0 &&
+          JSON.stringify(after.table) === JSON.stringify(expectedCategoryPercentages) &&
+          JSON.stringify(after.pie) === JSON.stringify(expectedCategoryPercentages) &&
+          JSON.stringify(after.colors) === JSON.stringify(baselineColors) &&
+          after.outside === 4 &&
+          after.visible
+      )
 
       expect(consoleErrors, `Unexpected console errors:\n${consoleErrors.join('\n')}`).toEqual([])
       expect(unhandledRejections, 'Unexpected unhandled rejections').toEqual([])
