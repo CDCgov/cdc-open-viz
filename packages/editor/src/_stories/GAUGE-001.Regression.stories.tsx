@@ -227,12 +227,42 @@ export const GAUGE001: Story = {
       // Data calculation and validation.
       await openSection(canvas, canvasElement, 'Data')
       const getDataSelect = (name: string) => canvasElement.querySelector<HTMLSelectElement>(`select[name="${name}"]`)!
+      const numeratorFunctions = [
+        ['Count', '3%'],
+        ['Max', '40%'],
+        ['Mean (Average)', '20%'],
+        ['Median', '20%'],
+        ['Min', '0%'],
+        ['Sum', '60%']
+      ] as const
+      for (const [dataFunction, expectedValue] of numeratorFunctions) {
+        await performAndAssert(
+          `${dataFunction} calculates the exact Gauge numerator`,
+          () => ({
+            dataFunction: getDataSelect('dataFunction').value,
+            value: primaryText(canvasElement)
+          }),
+          () => user.selectOptions(getDataSelect('dataFunction'), dataFunction),
+          (_before, after) => after.dataFunction === dataFunction && after.value === expectedValue
+        )
+      }
+
+      await user.selectOptions(getDataSelect('dataFunction'), 'Mean (Average)')
       await performAndAssert(
-        'Mean changes numerator',
-        () => primaryText(canvasElement),
-        () => user.selectOptions(getDataSelect('dataFunction'), 'Mean (Average)'),
-        (before, after) => before !== after && after.includes('20')
+        'Previous data column calculates its exact mean',
+        () => ({ column: getDataSelect('dataColumn').value, value: primaryText(canvasElement) }),
+        () => user.selectOptions(getDataSelect('dataColumn'), 'Previous'),
+        (before, after) =>
+          before.column === 'Current' && before.value === '20%' && after.column === 'Previous' && after.value === '15%'
       )
+      await performAndAssert(
+        'Current data column restores its exact mean',
+        () => ({ column: getDataSelect('dataColumn').value, value: primaryText(canvasElement) }),
+        () => user.selectOptions(getDataSelect('dataColumn'), 'Current'),
+        (before, after) =>
+          before.column === 'Previous' && before.value === '15%' && after.column === 'Current' && after.value === '20%'
+      )
+
       await user.selectOptions(getDataSelect('dataConditionalColumn'), 'Category')
       await user.selectOptions(getDataSelect('dataConditionalOperator'), '=')
       const comparate = canvasElement.querySelector<HTMLInputElement>(
@@ -244,14 +274,41 @@ export const GAUGE001: Story = {
         () => replaceText(comparate, 'Total'),
         (before, after) => before !== after && after.includes('40')
       )
-      await user.selectOptions(getDataSelect('dataConditionalColumn'), 'Current')
-      await user.selectOptions(getDataSelect('dataConditionalOperator'), '>')
       await performAndAssert(
-        'Numeric condition filters numerator',
-        () => primaryText(canvasElement),
-        () => replaceText(comparate, '30'),
-        (_before, after) => after === '40%'
+        'Does Not Equal text condition excludes the matching row',
+        () => ({
+          operator: getDataSelect('dataConditionalOperator').value,
+          value: primaryText(canvasElement)
+        }),
+        () => user.selectOptions(getDataSelect('dataConditionalOperator'), '≠'),
+        (_before, after) => after.operator === '≠' && after.value === '10%'
       )
+
+      await user.selectOptions(getDataSelect('dataConditionalColumn'), 'Current')
+      const numericConditions = [
+        ['<', '30', '10%'],
+        ['<=', '20', '10%'],
+        ['>', '30', '40%'],
+        ['>=', '20', '30%']
+      ] as const
+      for (const [operator, comparison, expectedValue] of numericConditions) {
+        await performAndAssert(
+          `${operator} condition calculates the exact Gauge numerator`,
+          () => ({
+            operator: getDataSelect('dataConditionalOperator').value,
+            comparison: comparate.value,
+            value: primaryText(canvasElement)
+          }),
+          async () => {
+            await user.selectOptions(getDataSelect('dataConditionalOperator'), operator)
+            await replaceText(comparate, comparison)
+          },
+          (_before, after) =>
+            after.operator === operator && after.comparison === comparison && after.value === expectedValue
+        )
+      }
+
+      await user.selectOptions(getDataSelect('dataConditionalOperator'), '>')
       await replaceText(comparate, 'not-a-number')
       expect(await canvas.findByText('Non-numerical comparate values can only be used with = or ≠.')).toBeVisible()
       await user.selectOptions(getDataSelect('dataConditionalColumn'), '')
@@ -294,18 +351,30 @@ export const GAUGE001: Story = {
       await waitFor(() => expect(primaryText(canvasElement)).not.toContain('300'))
 
       await user.selectOptions(getDataSelect('dataFunction'), 'Sum')
-      const unfiltered = primaryText(canvasElement)
+      await waitFor(() => expect(primaryText(canvasElement)).toBe('$60.00 total of all'))
       await user.click(canvas.getByRole('button', { name: 'Add Filter' }))
-      const filter = canvasElement.querySelector('fieldset.edit-block') as HTMLElement
-      await user.selectOptions(filter.querySelectorAll('select')[0], 'Category')
-      const filterValue = (canvasElement.querySelector('fieldset.edit-block') as HTMLElement).querySelectorAll(
-        'select'
-      )[1] as HTMLSelectElement
-      await waitForOptionsToPopulate(filterValue)
-      await user.selectOptions(filterValue, 'Other')
-      await waitFor(() => expect(primaryText(canvasElement)).toBe('$20.00 total of all'))
-      await user.click(canvas.getByRole('button', { name: 'Remove' }))
-      await waitFor(() => expect(primaryText(canvasElement)).toBe(unfiltered))
+      const filterRows = () =>
+        Array.from(canvasElement.querySelectorAll<HTMLElement>('.filters-list fieldset.edit-block'))
+      await waitFor(() => expect(filterRows()).toHaveLength(1))
+      await user.selectOptions(within(filterRows()[0]).getByLabelText('Column'), 'Category')
+      const filterValue = within(filterRows()[0]).getByLabelText('Column Value') as HTMLSelectElement
+      await waitFor(() => expect(Array.from(filterValue.options, option => option.value)).toContain('Other'))
+      await performAndAssert(
+        'Category filter changes the Gauge output',
+        () => primaryText(canvasElement),
+        () => user.selectOptions(filterValue, 'Other'),
+        (before, after) => before === '$60.00 total of all' && after === '$20.00 total of all'
+      )
+      await performAndAssert(
+        'Removing the Gauge filter restores unfiltered output',
+        () => ({ rows: filterRows().length, value: primaryText(canvasElement) }),
+        () => user.click(within(filterRows()[0]).getByRole('button', { name: 'Remove' })),
+        (before, after) =>
+          before.rows === 1 &&
+          before.value === '$20.00 total of all' &&
+          after.rows === 0 &&
+          after.value === '$60.00 total of all'
+      )
 
       // Trends.
       await replaceText(canvas.getByLabelText('Prefix'), '')
