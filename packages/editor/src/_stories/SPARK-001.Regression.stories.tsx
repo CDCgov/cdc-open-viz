@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-sparkline.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts',
+  title: 'Regression Tests/Misc Scripts/Chart Scripts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

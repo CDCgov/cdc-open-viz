@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-waffle-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Waffle Chart Scripts',
+  title: 'Regression Tests/Misc Scripts/Waffle Chart Scripts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
