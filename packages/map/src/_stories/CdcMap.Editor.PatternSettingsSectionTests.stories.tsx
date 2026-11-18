@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, userEvent, expect } from 'storybook/test'
+import { within, userEvent, expect, waitFor } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
@@ -131,7 +131,7 @@ export const PatternSettingsSectionTests: Story = {
     expect(canvasElement.querySelector('select[name="pattern-size--0"]')).toHaveValue('medium')
     expect(canvasElement.querySelector('input[id="pattern-label--0"]')).toHaveValue('')
     expect(canvasElement.querySelector('input[name="patternColor"]')).toHaveValue('')
-    expect(canvas.getByText('This pattern passes contrast checks')).toBeVisible()
+    await waitFor(() => expect(canvas.getByText('This pattern passes contrast checks')).toBeVisible())
 
     // ==========================================================================
     // TEST: Set dataKey to STATE and dataValue to Colorado
