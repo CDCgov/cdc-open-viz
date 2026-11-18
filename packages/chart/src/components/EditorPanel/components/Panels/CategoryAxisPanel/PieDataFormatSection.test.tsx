@@ -15,6 +15,7 @@ vi.mock('@cdc/core/components/EditorPanel/Inputs', () => ({
       <input
         data-field={fieldName}
         data-testid={fieldName}
+        data-value-was-undefined={value === undefined ? 'true' : 'false'}
         name={fieldName}
         value={value ?? ''}
         onChange={event => updateField(section, null, fieldName, event.target.value)}
@@ -191,6 +192,9 @@ describe('PieDataFormatSection', () => {
     expect(screen.getByTestId('roundTo')).toHaveValue(0)
     expect(screen.getByTestId('prefix')).toHaveValue('')
     expect(screen.getByTestId('suffix')).toHaveValue('')
+    for (const field of ['label', 'roundTo', 'prefix', 'suffix']) {
+      expect(screen.getByTestId(field)).toHaveAttribute('data-value-was-undefined', 'false')
+    }
   })
 
   it('preserves Pie-specific help copy', () => {

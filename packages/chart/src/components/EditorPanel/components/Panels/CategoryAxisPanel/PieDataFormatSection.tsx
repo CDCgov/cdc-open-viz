@@ -33,7 +33,7 @@ const PieDataFormatSection = () => {
         }
       />
       <TextField
-        value={model.label}
+        value={model.label ?? ''}
         section='yAxis'
         fieldName='label'
         label='Data Label'
@@ -116,7 +116,7 @@ const PieDataFormatSection = () => {
         }
       />
       <TextField
-        value={model.roundTo ? model.roundTo : 0}
+        value={model.roundTo ?? 0}
         type='number'
         section='dataFormat'
         fieldName='roundTo'
@@ -151,7 +151,7 @@ const PieDataFormatSection = () => {
       />
       <div className='two-col-inputs'>
         <TextField
-          value={model.prefix}
+          value={model.prefix ?? ''}
           section='dataFormat'
           fieldName='prefix'
           label='Prefix'
@@ -168,7 +168,7 @@ const PieDataFormatSection = () => {
           }
         />
         <TextField
-          value={model.suffix}
+          value={model.suffix ?? ''}
           section='dataFormat'
           fieldName='suffix'
           label='Suffix'
