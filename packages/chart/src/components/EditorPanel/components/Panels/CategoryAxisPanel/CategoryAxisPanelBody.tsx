@@ -377,7 +377,7 @@ const CategoryAxisPanelBody = () => {
                     </Tooltip.Content>
                   </Tooltip>
                 }
-                value={config.xAxis.dateParseFormat}
+                value={config.xAxis.dateParseFormat ?? ''}
                 section='xAxis'
                 fieldName='dateParseFormat'
                 placeholder='Ex. %Y-%m-%d'
@@ -398,7 +398,7 @@ const CategoryAxisPanelBody = () => {
                     </Tooltip.Content>
                   </Tooltip>
                 }
-                value={config.xAxis.dateDisplayFormat}
+                value={config.xAxis.dateDisplayFormat ?? ''}
                 section='xAxis'
                 fieldName='dateDisplayFormat'
                 placeholder='Ex. %Y-%m-%d'
@@ -422,7 +422,7 @@ const CategoryAxisPanelBody = () => {
                     </Tooltip.Content>
                   </Tooltip>
                 }
-                value={config.table.dateDisplayFormat}
+                value={config.table.dateDisplayFormat ?? ''}
                 section='table'
                 fieldName='dateDisplayFormat'
                 placeholder='Ex. %Y-%m-%d'
@@ -446,7 +446,7 @@ const CategoryAxisPanelBody = () => {
                     </Tooltip.Content>
                   </Tooltip>
                 }
-                value={config.tooltips.dateDisplayFormat}
+                value={config.tooltips.dateDisplayFormat ?? ''}
                 section='tooltips'
                 fieldName='dateDisplayFormat'
                 placeholder='Ex. %Y-%m-%d'
