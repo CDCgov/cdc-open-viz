@@ -61,10 +61,10 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `title` | `string` | No | `Chart Title` | Main heading text for the chart. | Hidden when empty or when `showTitle` is `false`. |
+| `title` | `string` | No | `Chart Title` | Main heading text for the chart. | Officially supported inline tags are `strong`, `em`, `sup`, and `sub`; use trusted authored HTML only. Hidden when empty or when `showTitle` is `false`. |
 | `showTitle` | `boolean` | No | `true` | Shows or hides the heading. | `true`, `false` |
-| `content` | `string` | No | `''` | Supporting message shown with the chart. | Supports basic inline HTML. |
-| `subtext` | `string` | No | `''` | Citation or secondary note below the chart. | Supports basic inline HTML. |
+| `content` | `string` | No | `''` | Supporting message shown with the chart. | Officially supported inline tags are `strong`, `em`, `sup`, and `sub`; use trusted authored HTML only. |
+| `subtext` | `string` | No | `''` | Citation or secondary note below the chart. | Officially supported inline tags are `strong`, `em`, `sup`, and `sub`; use trusted authored HTML only. |
 | `enableMarkupVariables` | `boolean` | No | `false` | Enables placeholder replacement in supported text fields. | Shared behavior is documented in core. |
 | `markupVariables` | [`MarkupVariable[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupvariable) | No | `[]` | Variable definitions available to authored text. | Shared behavior is documented in core. |
 
