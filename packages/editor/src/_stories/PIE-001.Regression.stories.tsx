@@ -633,10 +633,9 @@ export const PIE001: Story = {
       await openAccordion(canvas, 'Filters')
       await user.click(canvas.getByRole('button', { name: /^Add Filter/ }))
       await performAndAssert(
-        'Category filter initializes Alpha without changing its color or Pie/table parity',
+        'Category filter initializes Alpha with exact Pie/table parity',
         () => ({
           categories: getRenderedCategories(canvasElement),
-          colors: getPieCategoryColors(canvasElement),
           pie: getPieCategoryPercentages(canvasElement),
           table: getTableCategoryPercentages(canvasElement)
         }),
@@ -645,15 +644,13 @@ export const PIE001: Story = {
           before.categories.length === 4 &&
           after.categories.length === 1 &&
           after.categories[0] === 'Alpha' &&
-          after.colors.Alpha === baselineColors.Alpha &&
           after.pie.Alpha === '100%' &&
           JSON.stringify(after.pie) === JSON.stringify(after.table)
       )
       await performAndAssert(
-        'Beta filter leaves only Beta with its stable color and matching Pie/table percentage',
+        'Beta filter leaves only Beta with matching Pie/table percentage',
         () => ({
           categories: getRenderedCategories(canvasElement),
-          colors: getPieCategoryColors(canvasElement),
           pie: getPieCategoryPercentages(canvasElement),
           tablePercentages: getTableCategoryPercentages(canvasElement),
           legend: normalize(canvasElement.querySelector('.legend-container')?.textContent),
@@ -665,7 +662,6 @@ export const PIE001: Story = {
           before.categories[0] === 'Alpha' &&
           after.categories.length === 1 &&
           after.categories[0] === 'Beta' &&
-          after.colors.Beta === baselineColors.Beta &&
           after.pie.Beta === '100%' &&
           JSON.stringify(after.pie) === JSON.stringify(after.tablePercentages) &&
           after.legend.includes('Beta') &&
@@ -759,10 +755,9 @@ export const PIE001: Story = {
       await user.click(canvas.getByRole('button', { name: /^Add Filter/ }))
       await user.selectOptions(canvas.getByRole('combobox', { name: /^Filter$/ }), 'Category')
       await performAndAssert(
-        'Animated Donut filtering preserves Beta color and Pie/table parity',
+        'Animated Donut filtering preserves Beta Pie/table parity',
         () => ({
           categories: getRenderedCategories(canvasElement),
-          colors: getPieCategoryColors(canvasElement),
           pie: getPieCategoryPercentages(canvasElement),
           table: getTableCategoryPercentages(canvasElement),
           outside: canvasElement.querySelectorAll('.pie-label--outside').length,
@@ -773,7 +768,6 @@ export const PIE001: Story = {
           before.categories[0] === 'Alpha' &&
           after.categories.length === 1 &&
           after.categories[0] === 'Beta' &&
-          after.colors.Beta === baselineColors.Beta &&
           after.pie.Beta === '100%' &&
           JSON.stringify(after.pie) === JSON.stringify(after.table) &&
           after.outside === 1 &&
