@@ -24,10 +24,10 @@ type Story = StoryObj<typeof CdcEditor>
 type Canvas = ReturnType<typeof within>
 type User = ReturnType<typeof userEvent.setup>
 
-const CSV = `Category,Current,Previous,Status,Report Date,Optional
-Total,1234,1200,High,2026-01-15,Present
-Other,5678,6000,Low,2026-02-20,
-Zero,0,0,Stable,2026-03-01,Zero`
+const CSV = `Category,Current,Previous,Status,Report Date,Optional,Function Value,Mode Value
+Total,1234,1200,High,2026-01-15,Present,10,10
+Other,5678,6000,Low,2026-02-20,,4,2
+Zero,0,0,Stable,2026-03-01,Zero,1,2`
 
 const DEFAULT_IMAGE =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="20" height="20"%3E%3Crect width="20" height="20" fill="%23005ea8"/%3E%3C/svg%3E'
@@ -90,7 +90,16 @@ export const DB001: Story = {
       expect(upload, 'Expected Data Import file input').toBeTruthy()
       await user.upload(upload!, new File([CSV], 'data-bite-regression.csv', { type: 'text/csv' }))
       expect(await canvas.findByText('Data Preview')).toBeVisible()
-      for (const heading of ['Category', 'Current', 'Previous', 'Status', 'Report Date', 'Optional']) {
+      for (const heading of [
+        'Category',
+        'Current',
+        'Previous',
+        'Status',
+        'Report Date',
+        'Optional',
+        'Function Value',
+        'Mode Value'
+      ]) {
         expect(canvasElement.querySelector(`table.data-table th[title="${heading}"]`)).toBeVisible()
       }
       const previewRows = canvasElement.querySelectorAll('table.data-table tbody tr')
@@ -198,14 +207,48 @@ export const DB001: Story = {
 
       // Data aggregation, formatting, zero handling, and filter restoration.
       await openSection(canvas, canvasElement, 'Data')
-      await performAndAssert(
-        'Sum aggregates imported rows',
-        () => metric(canvasElement),
-        () => user.selectOptions(dataFunction, 'Sum'),
-        (before, after) => before === '1,234%' && after === '6,912%'
-      )
-      const prefix = canvas.getByLabelText('Prefix')
       const suffix = canvas.getByLabelText('Suffix')
+      await replaceText(suffix, '')
+      const aggregateExpectations = [
+        ['Count', 'Function Value', '3'],
+        ['Max', 'Function Value', '10'],
+        ['Mean (Average)', 'Function Value', '5'],
+        ['Median', 'Function Value', '4'],
+        ['Min', 'Function Value', '1'],
+        ['Mode', 'Mode Value', '2'],
+        ['Pass Through', 'Current', '1,234'],
+        ['Range', 'Function Value', '1 - 10'],
+        ['Sum', 'Function Value', '15']
+      ] as const
+      const functionOptions = Array.from(dataFunction.options)
+        .filter(option => option.value)
+        .map(option => ({ label: option.textContent?.trim(), value: option.value }))
+      expect(functionOptions.map(option => option.value).sort()).toEqual(
+        aggregateExpectations.map(([dataFunctionName]) => dataFunctionName).sort()
+      )
+      for (const option of functionOptions) expect(option.label).toBe(option.value)
+      for (const [dataFunctionName, dataColumnName, expectedMetric] of aggregateExpectations) {
+        await performAndAssert(
+          `${dataFunctionName} calculates selected numeric values`,
+          () => ({
+            selectedColumn: dataColumn.value,
+            selectedFunction: dataFunction.value,
+            renderedMetric: metric(canvasElement)
+          }),
+          async () => {
+            await user.selectOptions(dataColumn, dataColumnName)
+            await user.selectOptions(dataFunction, dataFunctionName)
+          },
+          (_before, after) =>
+            after.selectedColumn === dataColumnName &&
+            after.selectedFunction === dataFunctionName &&
+            after.renderedMetric === expectedMetric
+        )
+      }
+      await user.selectOptions(dataColumn, 'Current')
+      await user.selectOptions(dataFunction, 'Sum')
+      await waitFor(() => expect(metric(canvasElement)).toBe('6,912'))
+      const prefix = canvas.getByLabelText('Prefix')
       await replaceText(prefix, '$')
       await replaceText(suffix, ' total')
       await waitFor(() => expect(metric(canvasElement)).toBe('$6,912 total'))
