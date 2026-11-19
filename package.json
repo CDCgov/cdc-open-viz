@@ -175,6 +175,7 @@
     "prepare": "husky install",
     "publish": "npx lerna publish",
     "reset": "lerna clean -y && rm -rf node_modules && yarn install && lerna run build",
+    "reset:windows": "lerna clean -y && if exist node_modules rmdir /s /q node_modules && yarn install && lerna run build",
     "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
     "sync:check": "syncpack list-mismatches",
