@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, waitFor, within } from 'storybook/test'
+import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
   openAccordion,
@@ -22,11 +22,11 @@ export default meta
 type Story = StoryObj<typeof CdcEditor>
 type Canvas = ReturnType<typeof within>
 
-const CSV = `Region,Year,Participants
-North,2024,20
-South,2024,15
-North,2025,10
-West,2025,15`
+const CSV = `Region,Year,Participants,Report Date,Optional
+North,2024,20,2026-01-15,Present
+South,2024,15,2026-02-20,
+North,2025,10,2026-03-01,Zero
+West,2025,15,2026-04-10,`
 
 const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() || ''
 
@@ -103,7 +103,7 @@ export const WAFFLE001: Story = {
       await user.upload(upload!, new File([CSV], 'waffle-chart-regression.csv', { type: 'text/csv' }))
 
       expect(await canvas.findByText('Data Preview')).toBeVisible()
-      for (const heading of ['Region', 'Year', 'Participants']) {
+      for (const heading of ['Region', 'Year', 'Participants', 'Report Date', 'Optional']) {
         expect(canvasElement.querySelector(`table.data-table th[title="${heading}"]`)).toBeVisible()
       }
       const previewRows = canvasElement.querySelectorAll('table.data-table tbody tr')
@@ -111,10 +111,10 @@ export const WAFFLE001: Story = {
       expect(
         Array.from(previewRows, row => Array.from(row.querySelectorAll('td'), cell => normalize(cell.textContent)))
       ).toEqual([
-        ['North', '2024', '20'],
-        ['South', '2024', '15'],
-        ['North', '2025', '10'],
-        ['West', '2025', '15']
+        ['North', '2024', '20', '2026-01-15', 'Present'],
+        ['South', '2024', '15', '2026-02-20', ''],
+        ['North', '2025', '10', '2026-03-01', 'Zero'],
+        ['West', '2025', '15', '2026-04-10', '']
       ])
 
       const vertical = canvas.getByRole('button', { name: /^Vertical/ })
@@ -138,6 +138,42 @@ export const WAFFLE001: Story = {
         expect(accordionButton(canvasElement, section)).toBeVisible()
       }
 
+      // TP5 Waffle Visual treatment is reversible and changes rendered output.
+      await openSection(canvas, canvasElement, 'Visual')
+      const tp5WhiteBackground = canvas.getByLabelText('Use White Background Style')
+      const tp5VisualState = () => {
+        const callout = canvasElement.querySelector<HTMLElement>('.cdc-callout')
+        return {
+          whiteBackground: Boolean(canvasElement.querySelector('.type-waffle-chart.white-background-style')),
+          dataCallout: Boolean(callout?.classList.contains('cdc-callout--data')),
+          flag: Boolean(callout?.querySelector('.cdc-callout__flag'))
+        }
+      }
+      await performAndAssert(
+        'TP5 Waffle enables white background style',
+        tp5VisualState,
+        () => user.click(tp5WhiteBackground),
+        (before, after) =>
+          !before.whiteBackground &&
+          before.dataCallout &&
+          before.flag &&
+          after.whiteBackground &&
+          !after.dataCallout &&
+          !after.flag
+      )
+      await performAndAssert(
+        'TP5 Waffle restores the data callout style',
+        tp5VisualState,
+        () => user.click(tp5WhiteBackground),
+        (before, after) =>
+          before.whiteBackground &&
+          !before.dataCallout &&
+          !before.flag &&
+          !after.whiteBackground &&
+          after.dataCallout &&
+          after.flag
+      )
+
       // Use standard Waffle before asserting authorable theme colors.
       await openSection(canvas, canvasElement, 'General')
       const chartType = canvas.getByLabelText('Chart Type') as HTMLSelectElement
@@ -158,6 +194,74 @@ export const WAFFLE001: Story = {
       await user.selectOptions(dataFunction, 'Sum')
       await waitForPresence('.cove-waffle-chart__data--primary', canvasElement)
       await assertVisualizationRendered(canvasElement)
+      await expectMetricAndNodes(canvasElement, '60%', 60)
+
+      // Numerator functions and every conditional operator produce exact metrics and node counts.
+      const numeratorFunctions = [
+        ['Count', '4%', 4],
+        ['Max', '20%', 20],
+        ['Mean (Average)', '15%', 15],
+        ['Median', '15%', 15],
+        ['Min', '10%', 10],
+        ['Sum', '60%', 60]
+      ] as const
+      for (const [functionName, expectedMetric, expectedFilled] of numeratorFunctions) {
+        await performAndAssert(
+          `${functionName} calculates the exact Waffle numerator`,
+          () => ({
+            functionName: dataFunction.value,
+            metric: metric(canvasElement),
+            filled: filledNodeCount(canvasElement)
+          }),
+          () => user.selectOptions(dataFunction, functionName),
+          (_before, after) =>
+            after.functionName === functionName && after.metric === expectedMetric && after.filled === expectedFilled
+        )
+      }
+
+      const conditionalColumn = canvasElement.querySelector<HTMLSelectElement>('select[name="dataConditionalColumn"]')!
+      const conditionalOperator = canvasElement.querySelector<HTMLSelectElement>(
+        'select[name="dataConditionalOperator"]'
+      )!
+      const conditionalComparison = canvasElement.querySelector<HTMLInputElement>(
+        'input[name="null-null-dataConditionalComparate"]'
+      )!
+      const numeratorConditions = [
+        ['Year', '=', '2024', '35%', 35],
+        ['Year', '≠', '2024', '25%', 25],
+        ['Participants', '<', '15', '10%', 10],
+        ['Participants', '<=', '15', '40%', 40],
+        ['Participants', '>', '15', '20%', 20],
+        ['Participants', '>=', '15', '50%', 50],
+        ['Participants', '=', '10', '10%', 10],
+        ['Participants', '≠', '10', '50%', 50]
+      ] as const
+      for (const [column, operator, comparison, expectedMetric, expectedFilled] of numeratorConditions) {
+        await performAndAssert(
+          `${column} ${operator} ${comparison} calculates the exact Waffle numerator`,
+          () => ({
+            column: conditionalColumn.value,
+            operator: conditionalOperator.value,
+            comparison: conditionalComparison.value,
+            metric: metric(canvasElement),
+            filled: filledNodeCount(canvasElement)
+          }),
+          async () => {
+            await user.selectOptions(conditionalColumn, column)
+            await user.selectOptions(conditionalOperator, operator)
+            await replaceText(conditionalComparison, comparison)
+          },
+          (_before, after) =>
+            after.column === column &&
+            after.operator === operator &&
+            after.comparison === comparison &&
+            after.metric === expectedMetric &&
+            after.filled === expectedFilled
+        )
+      }
+      await user.selectOptions(conditionalColumn, '')
+      await replaceText(conditionalComparison, '')
+      await user.selectOptions(dataFunction, 'Sum')
       await expectMetricAndNodes(canvasElement, '60%', 60)
 
       // Supported HTML is parsed semantically across all three General fields.
@@ -246,7 +350,7 @@ export const WAFFLE001: Story = {
         (before, after) => !before && after
       )
 
-      // Exact theme color and reversible accent treatment.
+      // Exact theme color and every standard Visual checkbox, each restored after verification.
       await openSection(canvas, canvasElement, 'Visual')
       await performAndAssert(
         'Purple theme sets exact node fill',
@@ -258,18 +362,131 @@ export const WAFFLE001: Story = {
 
       const body = canvasElement.querySelector<HTMLElement>('.cove-visualization__body')
       expect(body).toBeTruthy()
-      await performAndAssert(
-        'Accent treatment appears',
-        () => body!.classList.contains('component--has-accent'),
-        () => user.click(canvas.getByLabelText('Use Accent Style')),
-        (before, after) => !before && after
+      const assertReversibleVisualCheckbox = async (label: string, className: string, initiallyPresent = false) => {
+        const checkbox = canvas.getByLabelText(label)
+        const hasClass = () => body!.classList.contains(className)
+        expect(hasClass(), `${label} should start ${initiallyPresent ? 'enabled' : 'disabled'}`).toBe(initiallyPresent)
+        await performAndAssert(
+          `${label} toggles rendered treatment`,
+          hasClass,
+          () => user.click(checkbox),
+          (before, after) => before === initiallyPresent && after === !initiallyPresent
+        )
+        await performAndAssert(
+          `${label} restores rendered treatment`,
+          hasClass,
+          () => user.click(checkbox),
+          (before, after) => before === !initiallyPresent && after === initiallyPresent
+        )
+      }
+
+      await assertReversibleVisualCheckbox('Display Border', 'component--has-legacy-border', true)
+      expect(body).not.toHaveClass('no-borders')
+      await assertReversibleVisualCheckbox('Use Border Color Theme', 'component--has-border-color-theme')
+      await assertReversibleVisualCheckbox('Use Accent Style', 'component--has-accent')
+      await assertReversibleVisualCheckbox('Use Theme Background Color', 'component--has-background')
+      await assertReversibleVisualCheckbox('Hide Background Color', 'component--hide-background-color')
+
+      // Shared Markup Variables lifecycle, formatting, conditions, locale, and null handling.
+      await openSection(canvas, canvasElement, 'Markup Variables')
+      await user.click(canvas.getByLabelText('Enable Markup Variables'))
+      await user.click(canvas.getByRole('button', { name: /Add Variable/ }))
+      const variable = () => canvasElement.querySelector('.variable-item') as HTMLElement
+      const variableColumn = () => variable().querySelector('select[name="columnName"]') as HTMLSelectElement
+      await user.click(within(variable()).getByRole('button', { name: 'Basic Settings' }))
+      await user.selectOptions(variableColumn(), 'Participants')
+      await replaceText(within(variable()).getByLabelText('Variable Name'), 'Participant Total')
+      await waitFor(() =>
+        expect(within(variable()).getByLabelText('Tag (auto-generated)')).toHaveValue('{{participant-total}}')
       )
-      await performAndAssert(
-        'Accent treatment restores',
-        () => body!.classList.contains('component--has-accent'),
-        () => user.click(canvas.getByLabelText('Use Accent Style')),
-        (before, after) => before && !after
+      await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
+      await user.selectOptions(variable().querySelector('select[name="selectionMode"]') as HTMLSelectElement, 'no')
+      await openSection(canvas, canvasElement, 'General')
+      await pasteText(
+        user,
+        canvas.getByLabelText(/Message/, { selector: 'textarea' }),
+        'Participants: {{participant-total}}'
       )
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'Participants: 20'
+        )
+      )
+
+      await openSection(canvas, canvasElement, 'Markup Variables')
+      await user.click(within(variable()).getByRole('button', { name: 'Formatting Options' }))
+      await user.click(within(variable()).getByLabelText('Format numbers with commas'))
+      await user.type(within(variable()).getByRole('spinbutton'), '2')
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'Participants: 20.00'
+        )
+      )
+      expect(within(variable()).getByLabelText('Hide section when value is null')).toBeVisible()
+      await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
+      await user.click(within(variable()).getByRole('button', { name: /Add Condition/ }))
+      await user.selectOptions(within(variable()).getByLabelText('Column'), 'Region')
+      await user.selectOptions(within(variable()).getByLabelText('Value'), 'South')
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'Participants: 15.00'
+        )
+      )
+      await user.click(within(variable()).getByRole('button', { name: 'Remove Condition' }))
+
+      await user.click(within(variable()).getByRole('button', { name: 'Basic Settings' }))
+      await user.selectOptions(variableColumn(), 'Report Date')
+      await user.click(within(variable()).getByRole('button', { name: 'Formatting Options' }))
+      await replaceText(within(variable()).getByLabelText('Date Parse Format'), '%Y-%m-%d')
+      await replaceText(within(variable()).getByLabelText('Date Display Format'), '%B %-d, %Y')
+      await openSection(canvas, canvasElement, 'General')
+      await pasteText(user, canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Report: {{report-date}}')
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'January 15, 2026'
+        )
+      )
+      await user.selectOptions(canvas.getByLabelText(/Language for dates and numbers/), 'es-MX')
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'enero 15, 2026'
+        )
+      )
+
+      await openSection(canvas, canvasElement, 'Markup Variables')
+      await user.click(within(variable()).getByRole('button', { name: 'Basic Settings' }))
+      await user.selectOptions(variableColumn(), 'Optional')
+      expect(within(variable()).getByLabelText('Tag (auto-generated)')).toHaveValue('{{optional}}')
+      await openSection(canvas, canvasElement, 'General')
+      await pasteText(user, canvas.getByLabelText(/Message/, { selector: 'textarea' }), 'Optional: {{optional}}')
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toContain(
+          'Optional: Present'
+        )
+      )
+      await openSection(canvas, canvasElement, 'Markup Variables')
+      await user.click(within(variable()).getByRole('button', { name: 'Conditions' }))
+      await user.click(within(variable()).getByRole('button', { name: /Add Condition/ }))
+      await user.selectOptions(within(variable()).getByLabelText('Column'), 'Region')
+      await user.selectOptions(within(variable()).getByLabelText('Value'), 'South')
+      await user.click(within(variable()).getByRole('button', { name: 'Formatting Options' }))
+      const hideOnNull = within(variable()).getByLabelText('Hide section when value is null')
+      await user.click(hideOnNull)
+      expect(hideOnNull).toBeChecked()
+      await waitFor(() =>
+        expect(normalize(canvasElement.querySelector('.cove-waffle-chart__data--text')?.textContent)).toBe('Optional:')
+      )
+      await user.click(within(variable()).getByRole('button', { name: 'Close' }))
+      await user.click(within(variable()).getByRole('button', { name: 'Edit' }))
+      await user.click(canvas.getByRole('button', { name: /Add Variable/ }))
+      const unnamed = canvas.getByText('Unnamed Variable').closest('.variable-item') as HTMLElement
+      const confirmDelete = spyOn(window, 'confirm').mockReturnValue(true)
+      try {
+        await user.click(within(unnamed).getByRole('button', { name: 'Delete Variable' }))
+        await waitFor(() => expect(canvasElement.querySelectorAll('.variable-item')).toHaveLength(1))
+      } finally {
+        confirmDelete.mockRestore()
+      }
 
       expect(consoleErrors, `Unexpected console errors:\n${consoleErrors.join('\n')}`).toEqual([])
       expect(unhandledRejections, 'Unexpected unhandled rejections').toEqual([])

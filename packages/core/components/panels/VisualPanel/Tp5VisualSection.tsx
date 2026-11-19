@@ -17,7 +17,7 @@ export const Tp5VisualSection = <TConfig extends Tp5VisualSectionConfig = Tp5Vis
 }: Tp5VisualSectionProps<TConfig>) => {
   return (
     <CheckBox
-      value={config.visual?.whiteBackground}
+      value={Boolean(config.visual?.whiteBackground)}
       section='visual'
       fieldName='whiteBackground'
       label='Use White Background Style'
