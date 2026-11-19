@@ -21,14 +21,19 @@ every editor panel, including style-dependent controls and their rendered effect
   - `Status`: data-driven color and categorical-trend value
   - `Report Date`: ISO date for localized markup output
   - `Optional`: nullable markup value
+  - `Function Value`: purpose-built values for Count, Max, Mean, Median, Min, Range, and Sum
+  - `Mode Value`: purpose-built repeated values with a unique mode
 - Values important to this regression:
 
 ```csv
-Category,Current,Previous,Status,Report Date,Optional
-Total,1234,1200,High,2026-01-15,Present
-Other,5678,6000,Low,2026-02-20,
-Zero,0,0,Stable,2026-03-01,Zero
+Category,Current,Previous,Status,Report Date,Optional,Function Value,Mode Value
+Total,1234,1200,High,2026-01-15,Present,10,10
+Other,5678,6000,Low,2026-02-20,,4,2
+Zero,0,0,Stable,2026-03-01,Zero,1,2
 ```
+
+- Expected data-function results with prefix and suffix cleared: Count `3`, Max `10`, Mean `5`, Median `4`, Min
+  `1`, Mode `2`, Pass Through `1,234`, Range `1 - 10`, and Sum `15`.
 
 ## Preconditions
 
@@ -39,10 +44,10 @@ Zero,0,0,Stable,2026-03-01,Zero
 
 | #   | User action                                                 | Input or selection                                                                       | Expected visible result                                                                                 |
 | --- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 1   | Select Data Bite and upload the CSV from Import Data        | Vertical; no multiple series                                                             | Preview shows six named columns, all three rows, and their key cell values                              |
+| 1   | Select Data Bite and upload the CSV from Import Data        | Vertical; no multiple series                                                             | Preview shows eight named columns, all three rows, and their key cell values                             |
 | 2   | Configure required Data settings                            | Current; Pass Through                                                                    | A TP5 callout renders the first imported value                                                          |
 | 3   | Configure General                                           | HTML-formatted title, message, and subtext; title visibility                             | Supported `strong`, `em`, `sup`, and `sub` markup renders semantically, and title visibility toggles    |
-| 4   | Configure Data and number formatting                        | aggregation, prefix, suffix, rounding, commas, ignore zeros                              | The rendered metric changes for every setting                                                           |
+| 4   | Configure Data and number formatting                        | all nine data functions, prefix, suffix, rounding, commas, ignore zeros                  | Every function produces its documented metric; subsequent checks cover each formatting control          |
 | 5   | Add and remove a filter                                     | Category = Other                                                                         | The metric changes to the filtered value and restores exactly after removal                             |
 | 6   | Configure numeric and categorical trends                    | up, down, flat, threshold, labels, mappings, invalid Count mode                          | Accessible trend direction and visible validation/conditional controls match each configuration         |
 | 7   | Configure TP5 Visual                                        | white background, wrapped value, circle off/light/dark and size                          | Callout classes, layout, and rendered value styling change                                              |
