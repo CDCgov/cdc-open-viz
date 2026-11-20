@@ -9,6 +9,7 @@ import {
 import { SharedFilter } from '../types/SharedFilter'
 import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { FILTER_STYLE } from '../types/FilterStyles'
+import { getChangedMultiSelectActive } from './showAllOption'
 
 const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   const parentKey = sharedFilters[parentIndex].key
@@ -38,6 +39,9 @@ export const changeFilterActive = (
 ): [SharedFilter[], number[]] => {
   const sharedFiltersCopy = cloneDeep(sharedFilters)
   const currentFilter = sharedFiltersCopy[filterIndex]
+  if (currentFilter?.type === 'datafilter' && currentFilter.filterStyle === FILTER_STYLE.multiSelect) {
+    value = getChangedMultiSelectActive(currentFilter, value)
+  }
   if (vizConfig.filterBehavior !== FilterBehavior.Apply || vizConfig.autoLoad) {
     if (currentFilter?.filterStyle === FILTER_STYLE.nestedDropdown) {
       sharedFiltersCopy[filterIndex].active = value[0]

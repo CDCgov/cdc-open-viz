@@ -21,6 +21,7 @@ export type SharedFilter = FilterBase & {
   order: OrderBy
   parents?: string[]
   setBy?: string
+  showAllOption?: boolean
   selectLimit?: number
   resetLabel?: string
   descriptionSelector?: string

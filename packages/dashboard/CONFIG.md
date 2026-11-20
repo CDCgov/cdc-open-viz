@@ -129,6 +129,7 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
+| `dashboard.sharedFilters[].showAllOption` | `boolean` | No | `false` | Adds an All choice that leaves this category unrestricted. | Only strict `true` on `datafilter` + `multi-select` enables it; omitted, false or invalid values preserve literal matching. Reserves the exact value `All`; leave off when All is a real aggregate to filter. Selecting a specific value replaces All; selecting All replaces specifics. Mixed imported selections keep specifics. Empty selections still show no data. This is separate from `resetLabel`. Use real source columns without duplicated All rows or Master columns. |
 | `dashboard.sharedFilters[].columnName` | `string` | Yes for `datafilter` | None | Source column used to generate filter values. | Must exist in the active dataset. |
 | `dashboard.sharedFilters[].values` | `string[]` | No | Generated from data when omitted | Values shown by data filters. | For `order: data`, the editor omits `values` and `orderedValues` on save so newly encountered source values appear without another editor save. Other orders preserve preconfigured non-empty values; URL-filter values are generated from API state and usually do not need to be authored. |
 | `dashboard.sharedFilters[].setBy` | `string` | No | None | Visualization key that seeds the filter from its selected datum. | Only used by data filters. |

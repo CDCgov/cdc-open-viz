@@ -275,7 +275,11 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           }
         )
       } else {
-        newSharedFilters[index].queuedActive = value
+        // changeFilterActive already normalizes pending selections for Apply blocks.
+        // Other blocks in a mixed dashboard must replace their previous queue.
+        if (visualizationConfig.filterBehavior !== FilterBehavior.Apply || visualizationConfig.autoLoad) {
+          newSharedFilters[index].queuedActive = value
+        }
 
         // Don't clear data immediately - keep existing data until new data loads
         // Only update the dashboard filters and prepare for reload

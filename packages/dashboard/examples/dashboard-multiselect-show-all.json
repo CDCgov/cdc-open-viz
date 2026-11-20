@@ -1,0 +1,2262 @@
+{
+  "type": "dashboard",
+  "version": "4.26.8",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "DEV-13957: Multiselect All with original-size data",
+    "titleStyle": "small",
+    "sharedFilters": [
+      {
+        "key": "Tox Profile",
+        "type": "datafilter",
+        "filterStyle": "multi-select",
+        "columnName": "Tox Profile",
+        "showDropdown": true,
+        "showAllOption": true,
+        "defaultValue": "All",
+        "active": ["All"],
+        "resetLabel": "Select values",
+        "values": [],
+        "order": "asc",
+        "parents": [],
+        "usedBy": ["complex-table"]
+      },
+      {
+        "key": "Year Published",
+        "type": "datafilter",
+        "filterStyle": "multi-select",
+        "columnName": "Year Published",
+        "showDropdown": true,
+        "showAllOption": true,
+        "defaultValue": "All",
+        "active": ["All"],
+        "resetLabel": "Select values",
+        "values": [],
+        "order": "asc",
+        "parents": [],
+        "usedBy": ["complex-table"]
+      },
+      {
+        "key": "Substance",
+        "type": "datafilter",
+        "filterStyle": "multi-select",
+        "columnName": "Substance",
+        "showDropdown": true,
+        "showAllOption": true,
+        "defaultValue": "All",
+        "active": ["All"],
+        "resetLabel": "Select values",
+        "values": [],
+        "order": "asc",
+        "parents": [],
+        "usedBy": ["complex-table"]
+      },
+      {
+        "key": "CAS RN",
+        "type": "datafilter",
+        "filterStyle": "multi-select",
+        "columnName": "CAS RN",
+        "showDropdown": true,
+        "showAllOption": true,
+        "defaultValue": "All",
+        "active": ["All"],
+        "resetLabel": "Select values",
+        "values": [],
+        "order": "asc",
+        "parents": [],
+        "usedBy": ["complex-table"]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "complex-filters"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "complex-table"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "complex-filters": {
+      "uid": "complex-filters",
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "filterBehavior": "Filter Change",
+      "autoLoad": true,
+      "sharedFilterIndexes": [0, 1, 2, 3],
+      "applyFiltersButtonText": "Apply"
+    },
+    "complex-table": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "uid": "complex-table",
+      "type": "table",
+      "table": {
+        "label": "Complex table without duplicated All rows",
+        "show": true,
+        "showDownloadUrl": false,
+        "showVertical": true,
+        "expanded": true,
+        "collapsible": false,
+        "groupBy": "",
+        "pivot": {
+          "columnName": "",
+          "valueColumns": []
+        },
+        "showDatasetLink": false,
+        "sharedFilterColumns": ["Tox Profile", "Year Published", "Substance", "CAS RN"],
+        "stickyFirstColumn": false,
+        "defaultSort": {},
+        "download": true,
+        "showDownloadLinkBelow": true,
+        "downloadVisibleDataOnly": true,
+        "limitHeight": true,
+        "height": "500"
+      },
+      "columns": {
+        "Tox Profile": {
+          "name": "Tox Profile",
+          "dataTable": true,
+          "order": 1
+        },
+        "Year Published": {
+          "label": "Year Published",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "",
+          "forestPlot": false,
+          "startingPoint": "0",
+          "forestPlotAlignRight": false,
+          "roundToPlace": 0,
+          "commas": false,
+          "showInViz": false,
+          "forestPlotStartingPoint": 0,
+          "order": 2,
+          "name": "Year Published"
+        },
+        "Substance": {
+          "label": "Substance",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "",
+          "forestPlot": false,
+          "startingPoint": "0",
+          "forestPlotAlignRight": false,
+          "roundToPlace": 0,
+          "commas": false,
+          "showInViz": false,
+          "forestPlotStartingPoint": 0,
+          "order": 3,
+          "name": "Substance"
+        },
+        "CAS RN": {
+          "label": "CAS RN",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "",
+          "forestPlot": false,
+          "startingPoint": "0",
+          "forestPlotAlignRight": false,
+          "roundToPlace": 0,
+          "commas": false,
+          "showInViz": false,
+          "forestPlotStartingPoint": 0,
+          "order": 4,
+          "name": "CAS RN"
+        },
+        "Num": {
+          "name": "Num",
+          "dataTable": true,
+          "order": 9
+        }
+      },
+      "dataFormat": {},
+      "visualizationType": "table",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "complex-table.csv",
+      "titleStyle": "small",
+      "locale": "en-US",
+      "showEditorPanel": false
+    }
+  },
+  "datasets": {
+    "complex-table.csv": {
+      "data": [
+        {
+          "Tox Profile": "Acetone",
+          "Year Published": "2022",
+          "Substance": "Acetone",
+          "CAS RN": "67-64-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Acrylamide",
+          "Year Published": "2012",
+          "Substance": "Acrylamide",
+          "CAS RN": "79-06-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ammonia",
+          "Year Published": "2004",
+          "Substance": "Ammonia",
+          "CAS RN": "7664-41-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ammonia",
+          "Year Published": "2005",
+          "Substance": "Ammonium acetate",
+          "CAS RN": "631-61-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ammonia",
+          "Year Published": "2006",
+          "Substance": "Ammonium chloride",
+          "CAS RN": "12125-02-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ammonia",
+          "Year Published": "2007",
+          "Substance": "Ammonium sulfamate",
+          "CAS RN": "7773-06-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2007",
+          "Substance": "3-nitro-4-hydroxyphenylarsonic acid",
+          "CAS RN": "121-19-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2008",
+          "Substance": "Arsenic",
+          "CAS RN": "7440-38-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2009",
+          "Substance": "Arsenic trioxide",
+          "CAS RN": "1327-53-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2010",
+          "Substance": "Arsenic, pentavalent",
+          "CAS RN": "17428-41-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2011",
+          "Substance": "Arsenic, trivalent",
+          "CAS RN": "22541-54-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2012",
+          "Substance": "Calcium arsenate",
+          "CAS RN": "7778-44-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2013",
+          "Substance": "Dimethylarsinic acid",
+          "CAS RN": "75-60-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2014",
+          "Substance": "Lead arsenate",
+          "CAS RN": "3687-31-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2015",
+          "Substance": "Monomethyl arsenic acid",
+          "CAS RN": "70786-76-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2016",
+          "Substance": "Monomethylarsonic acid",
+          "CAS RN": "124-58-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Arsenic",
+          "Year Published": "2017",
+          "Substance": "Sodium methanearsonate",
+          "CAS RN": "2163-80-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Asbestos",
+          "Year Published": "2001",
+          "Substance": "Amosite asbestos",
+          "CAS RN": "12172-73-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Asbestos",
+          "Year Published": "2002",
+          "Substance": "Asbestos",
+          "CAS RN": "1332-21-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Asbestos",
+          "Year Published": "2003",
+          "Substance": "Chrysotile asbestos",
+          "CAS RN": "12001-29-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Asbestos",
+          "Year Published": "2004",
+          "Substance": "Crocidolite asbestos",
+          "CAS RN": "12001-28-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Asbestos",
+          "Year Published": "2005",
+          "Substance": "Tremolite asbestos",
+          "CAS RN": "14567-73-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Atrazine",
+          "Year Published": "2003",
+          "Substance": "Atrazine",
+          "CAS RN": "1912-24-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Barium",
+          "Year Published": "2007",
+          "Substance": "Barium",
+          "CAS RN": "7440-39-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Barium",
+          "Year Published": "2008",
+          "Substance": "Barium chloride",
+          "CAS RN": "10361-37-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Barium",
+          "Year Published": "2009",
+          "Substance": "Not reported",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Benzene",
+          "Year Published": "2007",
+          "Substance": "Benzene",
+          "CAS RN": "71-43-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Benzidine",
+          "Year Published": "2001",
+          "Substance": "Benzidine",
+          "CAS RN": "92-87-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2,3-Benzofuran",
+          "Year Published": "1992",
+          "Substance": "2,3-benzofuran",
+          "CAS RN": "271-89-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2023",
+          "Substance": "Bertrandite ore",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2024",
+          "Substance": "Beryl ore",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2025",
+          "Substance": "Beryllium",
+          "CAS RN": "7440-41-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2026",
+          "Substance": "Beryllium aluminum",
+          "CAS RN": "12770-50-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2027",
+          "Substance": "Beryllium carbonate",
+          "CAS RN": "66104-24-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2028",
+          "Substance": "Beryllium chloride",
+          "CAS RN": "7787-47-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2029",
+          "Substance": "Beryllium fluoride",
+          "CAS RN": "7787-49-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2030",
+          "Substance": "Beryllium oxide",
+          "CAS RN": "1304-56-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2031",
+          "Substance": "Beryllium phosphate",
+          "CAS RN": "35089-00-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2032",
+          "Substance": "Beryllium sulfate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2033",
+          "Substance": "Beryllium sulfate tetrahydrate",
+          "CAS RN": "7787-56-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Beryllium",
+          "Year Published": "2034",
+          "Substance": "Beryllium sulfate; pre-sensitized",
+          "CAS RN": "13510-49-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Boron",
+          "Year Published": "2010",
+          "Substance": "Borate",
+          "CAS RN": "11129-12-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Boron",
+          "Year Published": "2010",
+          "Substance": "Borax",
+          "CAS RN": "1303-96-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Boron",
+          "Year Published": "2010",
+          "Substance": "Boric acid",
+          "CAS RN": "10043-35-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Boron",
+          "Year Published": "2010",
+          "Substance": "Boric oxide",
+          "CAS RN": "1303-86-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Boron",
+          "Year Published": "2010",
+          "Substance": "Boron",
+          "CAS RN": "7440-42-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Bromodichloromethane",
+          "Year Published": "2020",
+          "Substance": "Bromodichloromethane",
+          "CAS RN": "75-27-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Bromoform",
+          "Year Published": "2005",
+          "Substance": "Bromoform",
+          "CAS RN": "75-25-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Bromoform",
+          "Year Published": "2005",
+          "Substance": "Chlorodibromomethane",
+          "CAS RN": "124-48-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Bromomethane",
+          "Year Published": "2020",
+          "Substance": "Bromomethane",
+          "CAS RN": "74-83-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1-Bromopropane",
+          "Year Published": "2017",
+          "Substance": "1-bromopropane",
+          "CAS RN": "106-94-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,3-Butadiene",
+          "Year Published": "2012",
+          "Substance": "1,3-butadiene",
+          "CAS RN": "106-99-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Butanone",
+          "Year Published": "2020",
+          "Substance": "2-butanone",
+          "CAS RN": "78-93-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Butoxyethanol",
+          "Year Published": "1998",
+          "Substance": "2-butoxyethanol",
+          "CAS RN": "111-76-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Butoxyethanol",
+          "Year Published": "1998",
+          "Substance": "2-butoxyethanol acetate",
+          "CAS RN": "112-07-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Butoxyethanol",
+          "Year Published": "1998",
+          "Substance": "Butyl cellosolve",
+          "CAS RN": "111-76-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Butoxyethanol",
+          "Year Published": "1998",
+          "Substance": "N-butoxyacetic acid",
+          "CAS RN": "2516-93-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cadmium",
+          "Year Published": "2012",
+          "Substance": "Cadmium",
+          "CAS RN": "7440-43-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cesium",
+          "Year Published": "2004",
+          "Substance": "Cesium",
+          "CAS RN": "7440-46-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cesium",
+          "Year Published": "2004",
+          "Substance": "Cesium-137",
+          "CAS RN": "10045-97-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cesium",
+          "Year Published": "2004",
+          "Substance": "Cesium-137 nitrate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlordane",
+          "Year Published": "2018",
+          "Substance": "Chlordane, form not specified",
+          "CAS RN": "57-74-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlordane",
+          "Year Published": "2018",
+          "Substance": "Chlordane, technical",
+          "CAS RN": "12789-03-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlordane",
+          "Year Published": "2018",
+          "Substance": "Cis-chlordane",
+          "CAS RN": "5103-71-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlordane",
+          "Year Published": "2018",
+          "Substance": "Trans-chlordane",
+          "CAS RN": "5103-74-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorfenvinphos",
+          "Year Published": "1997",
+          "Substance": "Chlorfenvinphos",
+          "CAS RN": "470-90-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorine",
+          "Year Published": "2010",
+          "Substance": "Chlorine",
+          "CAS RN": "7782-50-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorine",
+          "Year Published": "2010",
+          "Substance": "Chlorine gas",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorine",
+          "Year Published": "2010",
+          "Substance": "Hypochlorous acid and sodium hypochlorite",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorobenzene",
+          "Year Published": "2020",
+          "Substance": "Chlorobenzene",
+          "CAS RN": "108-90-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,4,6,7,8,9-octachlorodibenzofuran",
+          "CAS RN": "39001-02-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,4,6,7,8-heptachlorodibenzofuran",
+          "CAS RN": "67562-39-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,4,7,8-hexachlorodibenzofuran",
+          "CAS RN": "70648-26-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,4,8-pentachlorodibenzofuran",
+          "CAS RN": "67517-48-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,6,7,8-hexachlorodibenzofuran",
+          "CAS RN": "57117-44-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "1,2,3,7,8-pentachlorodibenzofuran",
+          "CAS RN": "57117-41-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "2,3,4,7,8-pentachlorodibenzofuran",
+          "CAS RN": "57117-31-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "2,3,7,8-tetrachlorodibenzofuran",
+          "CAS RN": "51207-31-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorodibenzofurans",
+          "Year Published": "2023",
+          "Substance": "Dibenzofurans, chlorinated",
+          "CAS RN": "42934-53-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chloromethane",
+          "Year Published": "2023",
+          "Substance": "Chloromethane",
+          "CAS RN": "74-87-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,3,4,5-tetrachlorophenol",
+          "CAS RN": "4901-51-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,3,4,6-tetrachlorophenol",
+          "CAS RN": "58-90-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,3,5,6-tetrachlorophenol",
+          "CAS RN": "935-95-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,3-dichlorophenol",
+          "CAS RN": "576-24-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,4,5-trichlorophenol",
+          "CAS RN": "95-95-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,4,6-trichlorophenol",
+          "CAS RN": "88-06-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,4-dichlorophenol",
+          "CAS RN": "120-83-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2,5-dichlorophenol",
+          "CAS RN": "583-78-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "2-chlorophenol",
+          "CAS RN": "95-57-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "3,4-dichlorophenol",
+          "CAS RN": "95-77-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "3,5-dichlorophenol",
+          "CAS RN": "591-35-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorophenols",
+          "Year Published": "2022",
+          "Substance": "4-chlorophenol",
+          "CAS RN": "106-48-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chlorpyrifos",
+          "Year Published": "1997",
+          "Substance": "Chlorpyrifos",
+          "CAS RN": "2921-88-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chromium",
+          "Year Published": "2012",
+          "Substance": "Chromium, hexavalent",
+          "CAS RN": "18540-29-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Chromium",
+          "Year Published": "2012",
+          "Substance": "Chromium, trivalent",
+          "CAS RN": "16065-83-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cresols",
+          "Year Published": "2008",
+          "Substance": "Cresol, meta-",
+          "CAS RN": "108-39-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cresols",
+          "Year Published": "2008",
+          "Substance": "Cresol, ortho-",
+          "CAS RN": "95-48-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cresols",
+          "Year Published": "2008",
+          "Substance": "Cresol, para-",
+          "CAS RN": "106-44-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cresols",
+          "Year Published": "2008",
+          "Substance": "Cresols",
+          "CAS RN": "1319-77-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cyanide",
+          "Year Published": "2006",
+          "Substance": "Cyanide",
+          "CAS RN": "57-12-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cyanide",
+          "Year Published": "2006",
+          "Substance": "Hydrogen cyanide",
+          "CAS RN": "74-90-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cyanide",
+          "Year Published": "2006",
+          "Substance": "Potassium cyanide",
+          "CAS RN": "151-50-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cyanide",
+          "Year Published": "2006",
+          "Substance": "Potassium thiocyanate",
+          "CAS RN": "333-20-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Cyanide",
+          "Year Published": "2006",
+          "Substance": "Sodium cyanide",
+          "CAS RN": "143-33-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "DDD (ns)",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "DDD technical",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "DDE (ns)",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "DDT (ns)",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "DDT technical",
+          "CAS RN": "8017-34-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "o,p'-DDD",
+          "CAS RN": "53-19-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "o,p'-DDE",
+          "CAS RN": "3424-82-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "o,p-DDT",
+          "CAS RN": "789-02-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "p,p'-DDD",
+          "CAS RN": "72-54-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "p,p'-DDE",
+          "CAS RN": "72-55-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "DDT, DDE, and DDD",
+          "Year Published": "2022",
+          "Substance": "p,p'-DDT",
+          "CAS RN": "50-29-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Di-(2-ethylhexyl)phthalate",
+          "Year Published": "2022",
+          "Substance": "Di(2-ethylhexyl)phthalate",
+          "CAS RN": "117-81-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Diazinon",
+          "Year Published": "2008",
+          "Substance": "Diazinon",
+          "CAS RN": "333-41-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,2-Dibromoethane",
+          "Year Published": "2018",
+          "Substance": "1,2-dibromoethane",
+          "CAS RN": "106-93-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "3,3'-Dichlorobenzidine",
+          "Year Published": "2022",
+          "Substance": "3,3-dichlorobenzidine",
+          "CAS RN": "91-94-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1-Dichloroethane",
+          "Year Published": "2015",
+          "Substance": "1,1-dichloroethane",
+          "CAS RN": "75-34-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1-Dichloroethene",
+          "Year Published": "2022",
+          "Substance": "1,1-dichloroethene",
+          "CAS RN": "75-35-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,2-Dichloropropane",
+          "Year Published": "2021",
+          "Substance": "1,2-dichloropropane",
+          "CAS RN": "78-87-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichlorobenzenes",
+          "Year Published": "2006",
+          "Substance": "1,2-dichlorobenzene",
+          "CAS RN": "95-50-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichlorobenzenes",
+          "Year Published": "2006",
+          "Substance": "1,3-dichlorobenzene",
+          "CAS RN": "541-73-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichlorobenzenes",
+          "Year Published": "2006",
+          "Substance": "1,4-dichlorobenzene",
+          "CAS RN": "106-46-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichloropropene",
+          "Year Published": "2008",
+          "Substance": "1,3-dichloropropene",
+          "CAS RN": "542-75-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichloropropene",
+          "Year Published": "2008",
+          "Substance": "2,3-dichloropropene",
+          "CAS RN": "78-88-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dichlorvos",
+          "Year Published": "1997",
+          "Substance": "Dichlorvos",
+          "CAS RN": "62-73-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Di-n-octylphthalate",
+          "Year Published": "1997",
+          "Substance": "Di-n-octyl phthalate",
+          "CAS RN": "117-84-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dinitrocresol",
+          "Year Published": "2018",
+          "Substance": "4,6-dinitro-o-cresol",
+          "CAS RN": "534-52-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Dinitrophenols",
+          "Year Published": "2021",
+          "Substance": "2,4-dinitrophenol",
+          "CAS RN": "51-28-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,4-Dioxane",
+          "Year Published": "2012",
+          "Substance": "1,4-dioxane",
+          "CAS RN": "123-91-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,2-Diphenylhydrazine",
+          "Year Published": "2020",
+          "Substance": "1,2-diphenylhydrazine",
+          "CAS RN": "122-66-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Disulfoton",
+          "Year Published": "2022",
+          "Substance": "Disulfoton",
+          "CAS RN": "298-04-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Endosulfan",
+          "Year Published": "2015",
+          "Substance": "Endosulfan",
+          "CAS RN": "115-29-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ethion",
+          "Year Published": "2000",
+          "Substance": "Ethion",
+          "CAS RN": "563-12-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ethylbenzene",
+          "Year Published": "2010",
+          "Substance": "Ethyl benzene",
+          "CAS RN": "100-41-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Ethylene oxide",
+          "Year Published": "2020",
+          "Substance": "Ethylene oxide",
+          "CAS RN": "75-21-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fluorides",
+          "Year Published": "2003",
+          "Substance": "Fluorine",
+          "CAS RN": "7782-41-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fluorides",
+          "Year Published": "2003",
+          "Substance": "Hydrogen fluoride",
+          "CAS RN": "7664-39-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fluorides",
+          "Year Published": "2003",
+          "Substance": "Monofluorophosphate",
+          "CAS RN": "10163-15-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fluorides",
+          "Year Published": "2003",
+          "Substance": "Sodium fluoride",
+          "CAS RN": "7681-49-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Formaldehyde",
+          "Year Published": "1999",
+          "Substance": "Formaldehyde",
+          "CAS RN": "50-00-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fuel oils",
+          "Year Published": "1995",
+          "Substance": "Diesel fuel",
+          "CAS RN": "68334-30-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fuel oils",
+          "Year Published": "1995",
+          "Substance": "Fuel oil no. 2",
+          "CAS RN": "68476-30-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Fuel oils",
+          "Year Published": "1995",
+          "Substance": "Kerosene",
+          "CAS RN": "8008-20-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Gasoline",
+          "Year Published": "1995",
+          "Substance": "Automotive gasoline",
+          "CAS RN": "8006-61-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Glutaraldehyde",
+          "Year Published": "2017",
+          "Substance": "Glutaraldehyde",
+          "CAS RN": "111-30-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Glyphosate",
+          "Year Published": "2020",
+          "Substance": "Glyphosate formulations",
+          "CAS RN": "1071-83-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Glyphosate",
+          "Year Published": "2020",
+          "Substance": "Glyphosate technical",
+          "CAS RN": "1071-83-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Guthion",
+          "Year Published": "2008",
+          "Substance": "Guthion",
+          "CAS RN": "86-50-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Heptachlor",
+          "Year Published": "2007",
+          "Substance": "Heptachlor",
+          "CAS RN": "76-44-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Heptachlor",
+          "Year Published": "2007",
+          "Substance": "Heptachlor epoxide",
+          "CAS RN": "1024-57-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorobenzene",
+          "Year Published": "2015",
+          "Substance": "Hexachlorobenzene",
+          "CAS RN": "118-74-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorobutadiene",
+          "Year Published": "2021",
+          "Substance": "Hexachlorobutadiene",
+          "CAS RN": "87-68-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Hexachlorocyclohexane, alpha-",
+          "CAS RN": "319-84-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Hexachlorocyclohexane, beta-",
+          "CAS RN": "319-85-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Hexachlorocyclohexane, delta-",
+          "CAS RN": "319-86-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Hexachlorocyclohexane, gamma-",
+          "CAS RN": "58-89-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Hexachlorocyclohexane, unspecified",
+          "CAS RN": "6108-11-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclohexane",
+          "Year Published": "2024",
+          "Substance": "Technical - grade hexachlorocyclohexane",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachlorocyclopentadiene",
+          "Year Published": "1999",
+          "Substance": "Hexachlorocyclopentadiene",
+          "CAS RN": "77-47-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hexachloroethane",
+          "Year Published": "1997",
+          "Substance": "Hexachloroethane",
+          "CAS RN": "67-72-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2-Hexanone",
+          "Year Published": "2020",
+          "Substance": "2-hexanone",
+          "CAS RN": "591-78-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hydrazines",
+          "Year Published": "1997",
+          "Substance": "1,1-dimethylhydrazine",
+          "CAS RN": "57-14-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hydrazines",
+          "Year Published": "1997",
+          "Substance": "1,2-dimethylhydrazine",
+          "CAS RN": "540-73-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Hydrazines",
+          "Year Published": "1997",
+          "Substance": "Hydrazine",
+          "CAS RN": "302-01-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Iodine",
+          "CAS RN": "7553-56-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Iodine-131",
+          "CAS RN": "10043-66-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Iodine; iodide ion",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Iodine; sodium triiodide",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Iodized oil",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Potassium iodide",
+          "CAS RN": "7681-11-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Sea-kelp",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Iodine",
+          "Year Published": "2004",
+          "Substance": "Sodium iodine",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Isophorone",
+          "Year Published": "2018",
+          "Substance": "Isophorone",
+          "CAS RN": "78-59-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Jet fuels/ JP-4 and JP-7",
+          "Year Published": "1995",
+          "Substance": "Jp-4",
+          "CAS RN": "50815-00-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Jet fuels/ JP-4 and JP-8",
+          "Year Published": "1995",
+          "Substance": "Jp-7",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Jet fuels JP-5 and JP-8",
+          "Year Published": "2017",
+          "Substance": "Jet A",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Jet fuels JP-5 and JP-9",
+          "Year Published": "2017",
+          "Substance": "Jp-5",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Jet fuels JP-5 and JP-10",
+          "Year Published": "2017",
+          "Substance": "Jp-8",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Malathion",
+          "Year Published": "2003",
+          "Substance": "Malathion",
+          "CAS RN": "121-75-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganese",
+          "CAS RN": "7439-96-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganese carbonate",
+          "CAS RN": "598-62-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganese dioxide",
+          "CAS RN": "1313-13-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganese tetroxide",
+          "CAS RN": "1317-35-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganous chloride",
+          "CAS RN": "7773-01-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Manganous sulfate",
+          "CAS RN": "7785-87-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Manganese",
+          "Year Published": "2012",
+          "Substance": "Methylcyclopentadienyl manganese tricarbonyl",
+          "CAS RN": "12108-13-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Methoxychlor",
+          "Year Published": "2002",
+          "Substance": "Methoxychlor",
+          "CAS RN": "72-43-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Ammonium dimolybdate",
+          "CAS RN": "27546-07-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Ammonium heptamolybdate",
+          "CAS RN": "12027-67-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Ammonium molybdate",
+          "CAS RN": "13106-76-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Molybdate",
+          "CAS RN": "14259-85-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Molybdenum",
+          "CAS RN": "7439-98-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Molybdenum trioxide",
+          "CAS RN": "1313-27-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Molybdenum",
+          "Year Published": "2020",
+          "Substance": "Sodium molybdate",
+          "CAS RN": "7631-95-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "N-nitrosodi-n-propylamine",
+          "Year Published": "2019",
+          "Substance": "N-nitrosodi-n-propylamine",
+          "CAS RN": "621-64-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Nitrobenzene",
+          "Year Published": "2024",
+          "Substance": "Nitrobenzene",
+          "CAS RN": "98-95-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Nitrophenols",
+          "Year Published": "2023",
+          "Substance": "2-nitrophenol",
+          "CAS RN": "88-75-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Nitrophenols",
+          "Year Published": "2023",
+          "Substance": "3-nitrophenol",
+          "CAS RN": "554-84-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Nitrophenols",
+          "Year Published": "2023",
+          "Substance": "4-nitrophenol",
+          "CAS RN": "1000-02-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Parathion",
+          "Year Published": "2017",
+          "Substance": "Parathion",
+          "CAS RN": "56-38-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Pentachlorophenol",
+          "Year Published": "2022",
+          "Substance": "Pentachlorophenol",
+          "CAS RN": "87-86-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perchlorates",
+          "Year Published": "2008",
+          "Substance": "Ammonium perchlorate",
+          "CAS RN": "7790-98-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perchlorates",
+          "Year Published": "2008",
+          "Substance": "Perchlorate",
+          "CAS RN": "14797-73-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perchlorates",
+          "Year Published": "2008",
+          "Substance": "Potassium perchlorate",
+          "CAS RN": "7778-74-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perchlorates",
+          "Year Published": "2008",
+          "Substance": "Sodium perchlorate",
+          "CAS RN": "7601-89-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorobutane sulfonic acid (pfbs)",
+          "CAS RN": "375-73-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorobutyric acid (pfba)",
+          "CAS RN": "375-22-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorodecanoic acid (pfda)",
+          "CAS RN": "335-76-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorohexanesulfonic acid (pfhxs)",
+          "CAS RN": "355-46-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorohexanoic acid (pfhxa)",
+          "CAS RN": "307-24-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorononanoic acid (pfna)",
+          "CAS RN": "375-95-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorooctane sulfonamide (fosa)",
+          "CAS RN": "2355-31-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorooctane sulfonic acid (pfos)",
+          "CAS RN": "1763-23-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluorooctanoic acid (pfoa)",
+          "CAS RN": "335-67-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Perfluoroalkyls",
+          "Year Published": "2021",
+          "Substance": "Perfluoroundecanoic acid (pfuna)",
+          "CAS RN": "2058-94-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Phenol",
+          "Year Published": "2008",
+          "Substance": "Phenol",
+          "CAS RN": "108-95-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Plutonium",
+          "Year Published": "2010",
+          "Substance": "Plutonium-238 dioxide",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Plutonium",
+          "Year Published": "2010",
+          "Substance": "Plutonium-239 dioxide",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Plutonium",
+          "Year Published": "2010",
+          "Substance": "Plutonium-239 nitrate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Pyridine",
+          "Year Published": "1992",
+          "Substance": "Pyridine",
+          "CAS RN": "110-86-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Rdx",
+          "Year Published": "2012",
+          "Substance": "RDX (Cyclonite)",
+          "CAS RN": "121-82-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Hydrogen selenide",
+          "CAS RN": "7783-07-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenium",
+          "CAS RN": "7782-49-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenium dioxide",
+          "CAS RN": "7446-08-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenium disulfide",
+          "CAS RN": "7488-56-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenium sulfide",
+          "CAS RN": "7446-34-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenocystine",
+          "CAS RN": "1464-43-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Selenomethionine",
+          "CAS RN": "1464-42-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Sodium selenate",
+          "CAS RN": "13410-01-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Selenium",
+          "Year Published": "2003",
+          "Substance": "Sodium selenite",
+          "CAS RN": "10102-18-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Silica",
+          "Year Published": "2019",
+          "Substance": "Crystalline (granite)",
+          "CAS RN": "7631-86-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Silica",
+          "Year Published": "2019",
+          "Substance": "Crystalline (quartz)",
+          "CAS RN": "7631-86-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Silica",
+          "Year Published": "2019",
+          "Substance": "Synthetic a-silica (ns)",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Silver",
+          "Year Published": "1990",
+          "Substance": "Silver",
+          "CAS RN": "7440-22-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium",
+          "CAS RN": "7440-24-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium carbonate",
+          "CAS RN": "1633-05-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium chloride",
+          "CAS RN": "10476-85-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium chloride hexahydrate",
+          "CAS RN": "10025-70-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium nitrate",
+          "CAS RN": "10042-76-9",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium phosphate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium-90",
+          "CAS RN": "10098-97-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium-90 (chloride)",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium-90 fused-clay particles",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Strontium",
+          "Year Published": "2004",
+          "Substance": "Strontium-90/yttrium-90",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Styrene",
+          "Year Published": "2010",
+          "Substance": "Styrene",
+          "CAS RN": "100-42-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1,2,2-Tetrachloroethane",
+          "Year Published": "2008",
+          "Substance": "1,1,2,2-tetrachloroethane",
+          "CAS RN": "79-34-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Tetrachloroethylene",
+          "Year Published": "2019",
+          "Substance": "Tetrachloroethylene",
+          "CAS RN": "127-18-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Thorium",
+          "Year Published": "2019",
+          "Substance": "Thorium",
+          "CAS RN": "7440-29-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Thorium",
+          "Year Published": "2019",
+          "Substance": "Thorium-232",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Toluene",
+          "Year Published": "2017",
+          "Substance": "Toluene",
+          "CAS RN": "108-88-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Toxaphene",
+          "Year Published": "2014",
+          "Substance": "Toxaphene",
+          "CAS RN": "8001-35-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Tribufos",
+          "Year Published": "2020",
+          "Substance": "S,S,S-tributyl phosphorotrithioate",
+          "CAS RN": "78-48-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Trichlorobenzenes",
+          "Year Published": "2014",
+          "Substance": "1,2,3-trichlorobenzene",
+          "CAS RN": "87-61-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Trichlorobenzenes",
+          "Year Published": "2014",
+          "Substance": "1,2,4-trichlorobenzene",
+          "CAS RN": "120-82-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Trichlorobenzenes",
+          "Year Published": "2014",
+          "Substance": "1,3,5-trichlorobenzene",
+          "CAS RN": "108-70-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1,1-Trichloroethane",
+          "Year Published": "2024",
+          "Substance": "1,1,1-trichloroethane",
+          "CAS RN": "71-55-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1,1-Trichloroethane",
+          "Year Published": "2024",
+          "Substance": "Trichloroethylene",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,1,2-Trichloroethane",
+          "Year Published": "2021",
+          "Substance": "1,1,2-trichloroethane",
+          "CAS RN": "79-00-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Trichloroethylene",
+          "Year Published": "2019",
+          "Substance": "Trichloroethylene",
+          "CAS RN": "79-01-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "1,2,3-Trichloropropane",
+          "Year Published": "2021",
+          "Substance": "1,2,3-trichloropropane",
+          "CAS RN": "96-18-4",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "2,4,6-Trinitrotoluene",
+          "Year Published": "1995",
+          "Substance": "2,4,6-trinitrotoluene",
+          "CAS RN": "118-96-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Tungsten",
+          "Year Published": "2005",
+          "Substance": "Tungsten",
+          "CAS RN": "7440-33-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Tungsten",
+          "Year Published": "2005",
+          "Substance": "Tungsten carbide",
+          "CAS RN": "11130-73-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Depleted uranyl nitrate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium",
+          "CAS RN": "7440-61-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium as radionuclide",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium hexafluoride",
+          "CAS RN": "7783-81-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium tetrachloride",
+          "CAS RN": "10026-10-5",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium tetrafluoride",
+          "CAS RN": "10049-14-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium trioxide",
+          "CAS RN": "7440-61-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium, insoluble compounds",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranium, soluble salts",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Uranium",
+          "Year Published": "2013",
+          "Substance": "Uranyl fluoride",
+          "CAS RN": "13536-84-0",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Ammonium metavanadate",
+          "CAS RN": "7803-55-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Ammonium vanadyl tartrate",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Not reported",
+          "CAS RN": "N/A",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Sodium metavanadate",
+          "CAS RN": "13718-26-8",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Sodium orthovanadate",
+          "CAS RN": "13721-39-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Vanadium",
+          "CAS RN": "7440-62-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Vanadium pentoxide",
+          "CAS RN": "1314-62-1",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Vanadium",
+          "Year Published": "2012",
+          "Substance": "Vanadyl sulfate",
+          "CAS RN": "27774-13-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Xylene",
+          "Year Published": "2007",
+          "Substance": "M-xylene",
+          "CAS RN": "108-38-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Xylene",
+          "Year Published": "2007",
+          "Substance": "O-xylene",
+          "CAS RN": "95-47-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Xylene",
+          "Year Published": "2007",
+          "Substance": "P-xylene",
+          "CAS RN": "106-42-3",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Xylene",
+          "Year Published": "2007",
+          "Substance": "Total xylenes",
+          "CAS RN": "1330-20-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Zinc",
+          "Year Published": "2005",
+          "Substance": "Zinc",
+          "CAS RN": "7440-66-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Zinc",
+          "Year Published": "2005",
+          "Substance": "Zinc acetate",
+          "CAS RN": "557-34-6",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Zinc",
+          "Year Published": "2005",
+          "Substance": "Zinc chloride",
+          "CAS RN": "7646-85-7",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Zinc",
+          "Year Published": "2005",
+          "Substance": "Zinc oxide",
+          "CAS RN": "1314-13-2",
+          "Num": "1"
+        },
+        {
+          "Tox Profile": "Zinc",
+          "Year Published": "2005",
+          "Substance": "Zinc sulfate",
+          "CAS RN": "7733-02-0",
+          "Num": "1"
+        }
+      ],
+      "dataFileName": "complex-table.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "table": {
+    "show": false
+  }
+}
