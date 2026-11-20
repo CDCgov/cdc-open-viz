@@ -362,6 +362,12 @@
   height: 23px;
   width: 50px;
 }
+.cove-visualization.type-chart .legend-preliminary > svg.effect-legend-swatch--circle {
+  flex: 0 0 1em;
+  height: 1em;
+  margin-right: 0.5rem;
+  width: 1em;
+}
 .cove-visualization.type-chart .legend-preliminary > p {
   margin: 0;
 }

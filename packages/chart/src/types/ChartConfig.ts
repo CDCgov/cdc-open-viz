@@ -89,6 +89,8 @@ export interface PreliminaryDataItem {
   circleSize: number
   displayGray: boolean
   weight?: number
+  /** Derives the effect legend swatch from the currently matching series. */
+  inheritSeriesStyle?: boolean
   /** Styles the segment after a matching point; omitted to style both adjacent segments. */
   lineEffectScope?: 'outgoing'
 }
