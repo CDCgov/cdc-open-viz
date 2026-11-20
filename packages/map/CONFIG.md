@@ -202,6 +202,8 @@ The standard **Legend** controls apply to density: `general.showSidebar`, `legen
 
 `dotDensity.series[].color` is retained and rendered when present on imported series. New series omit this field and use `general.palette`.
 
+Counties without a matching row in the current runtime data use the standard gray background (`#DFE1E2`) and have no county hover tooltip. With dot density active, counties with a matching row use a lighter neutral background (`#F5F6F7`) unless an authored base Data Column supplies their fill. Reported zero and positive counts below one dot remain data-bearing counties; they are not treated as missing rows.
+
 `dotDensity.unit` is retained for compatibility with earlier configs but has no rendered effect; author unit information in Legend Description.
 
 Earlier prototype configs with `dotDensity.legend.show` and `dotDensity.legend.title` are normalized into the shared fields when imported or activated as county density maps, and the old object is removed. Dormant legacy density settings do not alter the base map legend. An existing nonempty shared title takes precedence. New exports use the standard legend fields.
@@ -210,7 +212,7 @@ Keep `columns.primary.name` empty for a neutral base map. A configured density s
 
 Dots show approximate distribution within county geometry, not individual locations or population-adjusted risk. Remainders below one dot per county and series are omitted. Count-column existence is checked against the unfiltered source rows, including sparse fields first appearing after the initial row. Filtering away every value of one count column does not hide valid counts in other series. Missing, negative, nonnumeric, and nonfinite counts contribute no dots and are reported as omitted values; the native tooltip/table preserves source values. Distinct count fields are added to those views at runtime without saving synthetic column mappings.
 
-The renderer rejects requests above 100,000 dots across matched runtime counties and all configured series, including hidden series and counties outside the selected state. It also rejects sampling shortfalls rather than showing a partial distribution. Increase `dotValue` to reduce the request. Dot density uses the normal county filters, focus, selection, and zoom; series toggles change drawing only and do not modify filters, source counts, or saved configuration.
+There is no fixed dot-count cap. The renderer still rejects counts that cannot be represented as safe integers and sampling shortfalls rather than showing a partial distribution. Sampling allows up to 1,000,000 candidate attempts per county/series; this bounds placement attempts, not the map's total dot count. Increase `dotValue` to reduce the request when placement cannot complete. Dot density uses the normal county filters, focus, selection, and zoom; series toggles change drawing only and do not modify filters, source counts, or saved configuration.
 
 ```json
 {

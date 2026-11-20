@@ -9,6 +9,7 @@ const defaultRows = [{ FIPS: '04013', Cases: 50 }]
 
 /** Keep the real county renderer mounted across runtime config changes. */
 export default function CountyDotDensityRuntimeHarness({ rows = defaultRows }: { rows?: typeof defaultRows }) {
+  const [container, setContainer] = useState<HTMLDivElement | null>(null)
   const [config, setConfig] = useState(() =>
     createNewMapConfig({
       type: 'map',
@@ -36,7 +37,7 @@ export default function CountyDotDensityRuntimeHarness({ rows = defaultRows }: {
   const memo = useRef(new Map())
   const tooltipRef = useRef<HTMLDivElement>(null)
   return (
-    <div className='cdc-map cove-visualization' style={{ width: 800 }}>
+    <div ref={setContainer} className='cdc-map cove-visualization' style={{ width: 800 }}>
       <button
         type='button'
         onClick={() =>
@@ -60,6 +61,7 @@ export default function CountyDotDensityRuntimeHarness({ rows = defaultRows }: {
           value={
             {
               config,
+              container,
               runtimeData,
               runtimeLegend,
               runtimeFilters,
