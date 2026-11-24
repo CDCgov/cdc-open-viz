@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-gauge-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Charts/Scripts',
+  title: 'Regression Tests/Charts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

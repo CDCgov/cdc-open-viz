@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/configure-an-open-circle-special-line.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Charts/Scripts/Line Chart',
+  title: 'Regression Tests/Charts/Line Chart',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

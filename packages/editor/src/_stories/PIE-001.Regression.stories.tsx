@@ -40,14 +40,17 @@ Named chooser-to-editor chart regressions and their current coverage.
 - **PAIRED-001 — Paired Bar:** Paired Bar authoring and editor behavior.
 - **SANKEY-001 — Sankey Diagram:** Sankey data mapping, required fields, and editor configuration.
 - **SCATTER-001 — Scatter Plot:** Scatter Plot data mapping and editor configuration.
-
-## Gaps
-
-- Add a chooser-to-editor brush-slider script to complement the component-level brush stories.
-- Add complete scripts for HeatMap, Epi Chart, Horizon Chart, Radar, Warming Stripes, Network, and Dendrogram.`
+- **CHART-005 — Brush Slider Authoring:** Editor selection changes and recent-date defaults with rendered brush output.
+- **CHART-006 — HeatMap Spacing and Cell Values:** HeatMap spacing, categorical cells, and visible values.
+- **CHART-007 — Epi Chart:** Date-time parsing, daily bar rendering, and supporting table data.
+- **CHART-008 — Horizon Chart:** Multi-series horizon-band rendering from the maintained fixture.
+- **CHART-009 — Radar Chart:** Six-dimension program comparison without minimum-dimension errors.
+- **CHART-010 — Warming Stripes:** Temperature-anomaly stripes and gradient legend output.
+- **CHART-011 — Network:** Network editor configuration with observable nodes, links, and controls.
+- **CHART-012 — Dendrogram:** Dendrogram editor configuration with observable hierarchy output.`
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Charts/Scripts',
+  title: 'Regression Tests/Charts',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen',

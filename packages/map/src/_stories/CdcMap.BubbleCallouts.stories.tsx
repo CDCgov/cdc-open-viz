@@ -17,7 +17,7 @@ import { SVG_WIDTH, SVG_HEIGHT } from '../helpers/constants'
 import CdcMap from '../CdcMap'
 import fixture from './_mock/bubble-tabbed-numeric.json'
 
-export default { title: 'Components/Templates/Map/Bubble Callouts', component: CdcMap } as Meta<typeof CdcMap>
+export default { title: 'Regression Tests/Maps/Bubble Maps', component: CdcMap } as Meta<typeof CdcMap>
 type Story = StoryObj<typeof CdcMap>
 
 const states = [
@@ -209,6 +209,7 @@ const ReloadableCalloutMap = ({ config }) => {
 }
 
 export const Editor_Placement_And_Reload: Story = {
+  name: 'MAP-010 — Bubble Placement and Reload',
   args: { config: defaultConfig, isEditor: true },
   render: args => <ReloadableCalloutMap config={args.config} />,
   play: async ({ canvasElement }) => {

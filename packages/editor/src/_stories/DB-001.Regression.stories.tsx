@@ -27,14 +27,15 @@ Named regressions for visualization types outside maps, charts, and dashboards.
 - **MARKUP-001 — General Section:** Exercises Markup Include titles and general presentation settings.
 - **MARKUP-002 — Content Editor:** Exercises authored markup content and its rendered output.
 - **MARKUP-003 — Visual Section:** Exercises Markup Include visual styling controls and observable presentation changes.
-
-## Gaps
-
-- Data Table and Markup Include have section-level editor suites but not a single empty-editor, chooser-to-finished-output workflow.
-- Save/reload persistence and dashboard embedding are not covered by these focused Misc scripts.`
+- **MISC-001 — Data Table Empty-Editor Workflow:** Chooses Data Table, imports a CSV, completes data description, and verifies finished table output.
+- **MISC-002 — Markup Include Empty-Editor Workflow:** Chooses Markup Include, authors a title and inline content, and verifies rendered output.
+- **MISC-003 — Data Table Dashboard Embedding:** Verifies a configured table inside a dashboard.
+- **MISC-004 — Data Bite Dashboard Embedding:** Verifies configured Data Bite content inside a dashboard.
+- **MISC-005 — Markup Include Dashboard Embedding:** Verifies configured Markup Include content inside a dashboard.
+- **MISC-006 — Save and Reload Markup Configuration:** Serializes and reloads a Markup Include configuration while preserving output.`
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc/Scripts',
+  title: 'Regression Tests/Misc/Data Bite',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen',

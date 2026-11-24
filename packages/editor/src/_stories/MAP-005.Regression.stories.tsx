@@ -16,7 +16,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-a-us-geocode-map.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Maps/Scripts',
+  title: 'Regression Tests/Maps',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen'

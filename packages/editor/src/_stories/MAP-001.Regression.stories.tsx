@@ -23,20 +23,21 @@ Named map authoring regressions and their current coverage.
 - **MAP-001 — Standard U.S. State Map:** Builds a numeric state map and exercises data columns, titles, annotations, legends, filters, tables, and common presentation controls.
 - **MAP-002 — U.S. Regional Map:** Builds an HHS-region map and verifies regional columns, supporting data, links, filters, legends, and editor output.
 - **MAP-003 — World Numeric Map:** Loads nested world data and verifies country matching, numeric formatting, special classes, links, filtering, and table behavior.
+- **MAP-004 — U.S. County Map:** Completes county-map authoring from the chooser through county rendering and editor configuration.
 - **MAP-005 — U.S. Geocode Map:** Builds a point map from city, latitude, longitude, and value columns and verifies zoom behavior.
 - **MAP-006 — Single-State Map:** Builds an Alabama county map and verifies county rendering and state-specific authoring.
 - **MAP-007 — Multi-State Map:** Builds a county map spanning multiple selected states and verifies the combined geography.
 - **MAP-008 — Standard U.S. Categorical Map:** Builds a categorical state map with custom layers, patterns, and categorical presentation.
 - **MAP-009 — World Country Alias Import:** Verifies common country aliases normalize to their intended world geographies.
+- **MAP-010 — Bubble Placement and Reload:** Verifies bubble callout placement and configuration reload behavior.
+- **MAP-011 — Dot-Density Authoring and Reload:** Authors dot-density count series, verifies Canvas output, and reloads the saved configuration.
+- **MAP-012 — Time Playback Authoring:** Exercises editor controls and rendered playback behavior.
+- **MAP-013 — Custom Map Layer Authoring:** Exercises existing-layer editing, empty states, and custom-layer output.
 - **Filters:** The sibling Filters folder covers general, U.S. state, world, county, geocode, and navigation-hidden filter behavior.
-
-## Gaps
-
-- MAP-004 is intentionally unassigned; a complete county-map chooser-to-editor regression has not been added.
-- Bubble, dot-density, time-playback, and custom-layer authoring still rely on component-level or manual coverage rather than full scripts.`
+`
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Maps/Scripts',
+  title: 'Regression Tests/Maps',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen',

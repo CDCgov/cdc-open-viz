@@ -30,14 +30,12 @@ Named dashboard runtime regressions.
 - **DASH-008 — File-Name URL Filter:** A URL-driven filter keeping a chart plus static and dynamic Data Bites synchronized.
 - **DASH-EDITOR-001 — Delete Rows with Stale Shared-Filter Targets:** Repeated row deletion after shared-filter target indices become stale.
 - **DASH-EDITOR-002 — MultiViz Data Setup:** Dashboard selection, URL dataset loading, save and load, and MultiViz column configuration.
+- **DASH-EDITOR-003 — Author and Reload a Filtered Dashboard:** Adds a row and verifies placed visualizations and shared filters survive configuration reapplication.
 
-## Future enhancements
-
-- Add an end-to-end dashboard authoring script covering row creation, visualization placement, shared filters, save, and reload.
-- Add manual QA scripts for the API filter, MultiViz footnote, tiered-filter, and URL-filter workflows.`
+Manual QA companions for DASH-001, DASH-002, DASH-006, and DASH-008 are stored in docs/qa/regression-scripts.`
 
 const meta: Meta<typeof Dashboard> = {
-  title: 'Regression Tests/Dashboards/Scripts',
+  title: 'Regression Tests/Dashboards',
   component: Dashboard,
   parameters: {
     docs: {

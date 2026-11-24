@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/configure-suppressed-isolated-bar.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Charts/Scripts/Bar Chart',
+  title: 'Regression Tests/Charts/Bar Chart',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

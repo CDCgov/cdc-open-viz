@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-sankey-diagram.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Charts/Scripts/Sankey',
+  title: 'Regression Tests/Charts/Sankey',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

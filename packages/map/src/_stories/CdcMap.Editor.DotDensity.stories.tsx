@@ -77,7 +77,7 @@ function EditorHarness({ config }: { config: MapConfig }) {
 }
 
 const meta: Meta<typeof EditorHarness> = {
-  title: 'Components/Templates/Map/Editor Tests/Dot Density',
+  title: 'Regression Tests/Maps/Dot Density',
   component: EditorHarness,
   args: { config: fixture },
   parameters: { layout: 'fullscreen', coveDeveloperMode: 'true' },
@@ -115,6 +115,7 @@ const readMap = (root: HTMLElement) => {
 }
 
 export const AuthorAndReload: Story = {
+  name: 'MAP-011 — Dot-Density Authoring and Reload',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)

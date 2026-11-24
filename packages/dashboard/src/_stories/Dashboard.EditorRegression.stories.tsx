@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 import CdcEditor from '@cdc/editor/src/CdcEditor'
 import SharedFilterRowDeleteConfig from '../../examples/dashboard-shared-filter-row-delete-cleanup.json'
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Dashboards/Editor Scripts',
+  title: 'Regression Tests/Dashboards/Editor',
   component: CdcEditor
 }
 
@@ -69,5 +69,58 @@ export const Delete_Rows_With_Stale_Shared_Filter_Targets: Story = {
         !after.noDataVisible &&
         !after.crashTextVisible
     )
+  }
+}
+
+export const Author_Dashboard_And_Reapply_Configuration: Story = {
+  name: 'DASH-EDITOR-003 — Author and Reload a Filtered Dashboard',
+  args: { config: SharedFilterRowDeleteConfig },
+  parameters: { test: { timeout: 30000 } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await waitForPresence('.builder-grid', canvasElement)
+    const originalRows = canvasElement.querySelectorAll('.builder-row').length
+    const originalWidgets = canvasElement.querySelectorAll('.builder-row .widget').length
+    expect(originalRows).toBe(4)
+    expect(originalWidgets).toBeGreaterThan(0)
+    expect(canvasElement.textContent).toContain('Dashboard Filters')
+
+    await performAndAssert(
+      'Add Row preserves placed visualizations and shared filters',
+      () => ({
+        rows: canvasElement.querySelectorAll('.builder-row').length,
+        widgets: canvasElement.querySelectorAll('.builder-row .widget').length,
+        hasFilters: (canvasElement.textContent || '').includes('Dashboard Filters')
+      }),
+      () => user.click(canvas.getByRole('button', { name: 'Add Row' })),
+      (before, after) =>
+        after.rows === before.rows + 1 && after.widgets === before.widgets && before.hasFilters && after.hasFilters
+    )
+
+    const advancedOptions = canvas.getAllByText('Advanced Options').at(-1)
+    expect(advancedOptions).toBeTruthy()
+    await user.click(advancedOptions!)
+    const apply = await canvas.findByRole('button', { name: 'Apply Configuration Changes' })
+
+    await performAndAssert(
+      'Applying the authored configuration reloads rows, placements, and filters',
+      () => ({
+        rows: canvasElement.querySelectorAll('.builder-row').length,
+        widgets: canvasElement.querySelectorAll('.builder-row .widget').length,
+        hasFilters: (canvasElement.textContent || '').includes('Dashboard Filters')
+      }),
+      () => user.click(apply),
+      (before, after) =>
+        before.rows === originalRows + 1 &&
+        after.rows === originalRows + 1 &&
+        before.widgets === originalWidgets &&
+        after.widgets === originalWidgets &&
+        before.hasFilters &&
+        after.hasFilters
+    )
+
+    await waitFor(() => expect(canvasElement.querySelectorAll('.builder-row')).toHaveLength(originalRows + 1))
   }
 }

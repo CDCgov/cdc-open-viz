@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/us-regional-map-regression.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Maps/Scripts',
+  title: 'Regression Tests/Maps',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen'

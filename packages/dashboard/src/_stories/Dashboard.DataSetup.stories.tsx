@@ -4,7 +4,7 @@ import CdcEditor from '@cdc/editor/src/CdcEditor'
 import customOrderDemoData from '../../../../.storybook/assets/custom-order-demo-data.csv?raw'
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Dashboards/Editor Scripts',
+  title: 'Regression Tests/Dashboards/Editor',
   component: CdcEditor
 }
 
