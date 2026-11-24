@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/area-chart-categorical-y-axis-and-ordered-filtering.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Area Chart',
+  title: 'Regression Tests/Charts/Scripts/Area Chart',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

@@ -15,7 +15,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/world-map-regression.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Map Scripts',
+  title: 'Regression Tests/Maps/Scripts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
@@ -146,7 +146,7 @@ const setNumberInput = (input: HTMLInputElement, value: string) => {
 }
 
 export const MAP003: Story = {
-  name: 'World Numeric Map Regressions',
+  name: 'MAP-003 — World Numeric Map',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -621,7 +621,7 @@ export const MAP003: Story = {
 }
 
 export const WorldCountryAliasImport: Story = {
-  name: 'World Country Alias Import',
+  name: 'MAP-009 — World Country Alias Import',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/us-regional-map-regression.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Map Scripts',
+  title: 'Regression Tests/Maps/Scripts',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen'
@@ -163,7 +163,7 @@ const getSelectByLabel = (scope: HTMLElement, label: string) => {
 }
 
 export const MAP002: Story = {
-  name: 'US Regional Map Regression',
+  name: 'MAP-002 — U.S. Regional Map',
   args: {
     config: {}
   },

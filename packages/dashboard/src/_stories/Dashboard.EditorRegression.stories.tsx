@@ -5,7 +5,7 @@ import CdcEditor from '@cdc/editor/src/CdcEditor'
 import SharedFilterRowDeleteConfig from '../../examples/dashboard-shared-filter-row-delete-cleanup.json'
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Components/Pages/Dashboard/Regression Editor',
+  title: 'Regression Tests/Dashboards/Editor Scripts',
   component: CdcEditor
 }
 
@@ -13,6 +13,7 @@ export default meta
 type Story = StoryObj<typeof CdcEditor>
 
 export const Delete_Rows_With_Stale_Shared_Filter_Targets: Story = {
+  name: 'DASH-EDITOR-001 — Delete Rows with Stale Shared-Filter Targets',
   args: {
     config: SharedFilterRowDeleteConfig
   },

@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-horizontal-stacked-bar-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Horizontal Bar',
+  title: 'Regression Tests/Charts/Scripts/Horizontal Bar',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

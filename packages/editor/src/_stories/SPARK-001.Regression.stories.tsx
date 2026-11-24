@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-sparkline.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc Scripts/Chart Scripts',
+  title: 'Regression Tests/Charts/Scripts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
@@ -124,7 +124,7 @@ const requiredAlertText = (root: HTMLElement) =>
     .join('|')
 
 export const SPARK001: Story = {
-  name: 'SPARK-001 — Build and configure a Sparkline',
+  name: 'CHART-002 — Sparkline',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

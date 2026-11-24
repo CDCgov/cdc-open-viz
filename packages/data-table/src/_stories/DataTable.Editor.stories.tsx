@@ -17,7 +17,7 @@ import {
 } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcDataTable> = {
-  title: 'Components/Templates/DataTable/Editor Tests',
+  title: 'Regression Tests/Misc/Data Table',
   component: CdcDataTable,
   parameters: {
     layout: 'fullscreen'
@@ -136,6 +136,7 @@ const createEditorTestConfig = () => {
  * Tests all functionality within the Columns accordion
  */
 export const ColumnsSectionTests: Story = {
+  name: 'TABLE-001 — Columns Section',
   args: {
     config: {
       ...createEditorTestConfig(),
@@ -442,6 +443,7 @@ export const ColumnsSectionTests: Story = {
  * Tests all functionality within the Data Table accordion
  */
 export const DataTableSectionTests: Story = {
+  name: 'TABLE-002 — Data Table Section',
   args: {
     config: createEditorTestConfig(),
     isEditor: true
@@ -883,6 +885,7 @@ export const DataTableSectionTests: Story = {
  * Tests all functionality within the Filters accordion
  */
 export const FiltersSectionTests: Story = {
+  name: 'TABLE-003 — Filters Section',
   args: {
     config: createEditorTestConfig(),
     isEditor: true

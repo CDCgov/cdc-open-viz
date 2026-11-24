@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-paired-bar-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Paired Bar',
+  title: 'Regression Tests/Charts/Scripts/Paired Bar',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
