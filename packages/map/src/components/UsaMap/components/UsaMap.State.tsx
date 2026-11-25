@@ -223,7 +223,10 @@ const UsaMap = () => {
 
     let toolTip
 
-    let styles = {
+    let styles: React.CSSProperties & {
+      '--territory-hover-fill'?: string
+      '--territory-active-fill'?: string
+    } = {
       fill: geoFillColor,
       color: APP_FONT_COLOR,
       ...getLocationHighlightStyles(territory)
@@ -271,12 +274,8 @@ const UsaMap = () => {
         fill: legendColors[0],
         ...getLocationHighlightStyles(territory, territoryData),
         cursor: needsPointer ? 'pointer' : 'default',
-        '&:hover': {
-          fill: legendColors[1]
-        },
-        '&:active': {
-          fill: legendColors[2]
-        }
+        '--territory-hover-fill': legendColors[1],
+        '--territory-active-fill': legendColors[2]
       }
 
       return (

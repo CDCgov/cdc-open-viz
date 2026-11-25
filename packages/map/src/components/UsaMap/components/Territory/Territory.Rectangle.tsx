@@ -9,6 +9,7 @@ import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
 import BubbleMarker from '../../../BubbleMarker'
 import useMapHighlight from '../../../../hooks/useMapHighlight'
+import './Territory.Rectangle.styles.css'
 
 const EMPTY_BUBBLE_RENDER_ROWS: NonNullable<TerritoryShape['bubbleRenderRows']> = []
 
@@ -66,6 +67,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...otherProps}
+        className='territory-rectangle'
         style={style}
         strokeLinejoin='round'
         tabIndex={-1}
@@ -83,8 +85,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           stroke={stroke}
           strokeWidth={strokeWidth}
           d={rectanglePath}
-          style={{ pointerEvents: 'none' }}
           {...otherProps}
+          className='territory-rectangle__shape'
         />
 
         {(() => {
