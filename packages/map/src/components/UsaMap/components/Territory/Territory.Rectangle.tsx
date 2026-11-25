@@ -66,6 +66,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...otherProps}
+        className='territory-rectangle'
         style={style}
         strokeLinejoin='round'
         tabIndex={-1}
@@ -83,8 +84,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           stroke={stroke}
           strokeWidth={strokeWidth}
           d={rectanglePath}
-          style={{ pointerEvents: 'none' }}
           {...otherProps}
+          className='territory-rectangle__shape'
         />
 
         {(() => {

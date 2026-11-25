@@ -278,6 +278,12 @@
 .cdc-map-inner-container .territories {
   gap: 0.5em;
 }
+.cdc-map-inner-container .territory-rectangle:hover > .territory-rectangle__shape {
+  fill: var(--territory-hover-fill, inherit);
+}
+.cdc-map-inner-container .territory-rectangle:active > .territory-rectangle__shape {
+  fill: var(--territory-active-fill, inherit);
+}
 .cdc-map-inner-container .territories svg {
   max-width: var(--territory-svg-max-width, 30px);
   min-width: var(--territory-svg-min-width, 30px);
