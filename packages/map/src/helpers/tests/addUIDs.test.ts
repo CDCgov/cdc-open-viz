@@ -18,7 +18,30 @@ const createUsConfig = (stateName: string, displayAsHex = false) =>
     data: [{ State: stateName }]
   } as any)
 
+const createWorldConfig = (countryNames: string[]) =>
+  ({
+    general: {
+      displayAsHex: false,
+      geoType: 'world',
+      type: 'data'
+    },
+    columns: {
+      geo: { name: 'Location' },
+      latitude: {},
+      longitude: {}
+    },
+    data: countryNames.map(Location => ({ Location }))
+  } as any)
+
 describe('addUIDs', () => {
+  it('assigns canonical world geography keys to the new country aliases', () => {
+    const config = createWorldConfig(['Republic of Chad', 'Democratic Republic of Congo'])
+
+    addUIDs(config, 'Location')
+
+    expect(config.data.map(row => row.uid)).toEqual(['TCD', 'COD'])
+  })
+
   it.each(['District of Columbia', 'DISTRICT OF COLUMBIA', 'DC'])(
     'maps %s to the DC geography key through state matching',
     stateName => {

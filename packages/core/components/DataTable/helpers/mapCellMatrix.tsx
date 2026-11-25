@@ -114,6 +114,7 @@ const mapCellArray = ({
   displayGeoName,
   formatLegendLocation,
   navigationHandler,
+  mapLinkSettings,
   setFilteredCountryCode,
   legendMemo,
   legendSpecialClassLastMemo,
@@ -176,6 +177,8 @@ const mapCellArray = ({
               columns={columns}
               navigationHandler={navigationHandler}
               mapZoomHandler={mapZoomHandler}
+              linksEnabled={mapLinkSettings?.enabled ?? true}
+              navigationTarget={mapLinkSettings?.target ?? '_blank'}
             />
           </div>
         )

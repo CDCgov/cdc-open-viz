@@ -2,7 +2,8 @@ import config from './../../examples/tech-adoption-with-links.json'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChart'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForEditor } from '@cdc/core/helpers/testing'
+import { within } from 'storybook/test'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Bar Chart/Horizontal Bar Chart Link Titles',
@@ -17,6 +18,7 @@ export const horizontal_barchart_links: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
     await assertVisualizationRendered(canvasElement)
   }
 }
@@ -27,6 +29,7 @@ export const horizontal_barchart_links_single_series: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
     await assertVisualizationRendered(canvasElement)
   }
 }

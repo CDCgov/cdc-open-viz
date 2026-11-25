@@ -1,0 +1,78 @@
+.cove-visualization .sankey-chart {
+  --sankey-label-size: 0.875rem;
+  min-height: 16rem;
+  width: 100%;
+}
+.cove-visualization .sankey-chart--compact {
+  --sankey-label-size: 0.6875rem;
+  --sankey-story-label-size: 0.75rem;
+}
+.cove-visualization .sankey-chart--empty {
+  align-items: center;
+  border: 1px dashed #b7b7b7;
+  color: #555;
+  display: flex;
+  justify-content: center;
+  min-height: 12rem;
+  padding: 1rem;
+  text-align: center;
+}
+.cove-visualization .sankey-chart .sankey-chart__diagram {
+  display: block;
+  font-family: 'Roboto', sans-serif;
+  max-width: 100%;
+  overflow: visible;
+}
+.cove-visualization .sankey-chart .sankey-chart__scroll-area {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.cove-visualization .sankey-chart--compact .sankey-chart__scroll-area,
+.cove-visualization .sankey-chart--scrollable .sankey-chart__scroll-area {
+  padding-bottom: 0.5rem;
+}
+.cove-visualization .sankey-chart--compact .sankey-chart__diagram,
+.cove-visualization .sankey-chart--scrollable .sankey-chart__diagram {
+  max-width: none;
+}
+.cove-visualization .sankey-chart .sankey-chart__link,
+.cove-visualization .sankey-chart .sankey-chart__node {
+  cursor: pointer;
+  transition: opacity 150ms ease, stroke-opacity 150ms ease, fill-opacity 150ms ease;
+}
+.cove-visualization .sankey-chart .sankey-chart__link {
+  pointer-events: stroke;
+}
+.cove-visualization .sankey-chart .sankey-chart__node:focus {
+  outline: none;
+  stroke: #1c1d1f;
+  stroke-width: 2px;
+}
+.cove-visualization .sankey-chart .sankey-chart__label {
+  font-size: var(--sankey-label-size);
+  letter-spacing: 0;
+}
+.cove-visualization .sankey-chart .divider {
+  border-top: 1px solid #000;
+  margin: 10px 0;
+}
+.cove-visualization .sankey-chart .sankey-chart__tooltip {
+  color: black;
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+.cove-visualization .sankey-chart .sankey-chart__tooltip--tooltip-header {
+  font-weight: 700;
+}
+.cove-visualization .sankey-chart .sankey-chart__tooltip--info-section {
+  column-gap: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.cove-visualization .sankey-chart span {
+  max-width: 500px;
+  overflow-wrap: break-word;
+}

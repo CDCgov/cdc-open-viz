@@ -94,6 +94,38 @@ describe('ChooseTab', () => {
     expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
   })
 
+  it('opts new Forecast Charts into expanded confidence interval legends', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Forecast Chart' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      visualizationType: 'Forecasting',
+      newViz: true,
+      legend: { expandForecastConfidenceIntervals: true }
+    })
+  })
+
   it('creates Network as a chart with edge-list defaults', () => {
     const dispatch = vi.fn()
     window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)

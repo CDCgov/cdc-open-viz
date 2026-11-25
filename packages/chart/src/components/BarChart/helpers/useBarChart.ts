@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
+import type { Series } from '@cdc/core/types/Series'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
@@ -84,6 +85,18 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (indexedRow && String(indexedRow[originalXAxisDataKey]) === String(xAxisValue)) return indexedRow
 
     return sourceRowsByXAxisAndSeries.get(String(xAxisValue))?.get(String(seriesKey))
+  }
+
+  const getCustomValueLabel = (seriesKey: string, xAxisValue: unknown, rowIndex?: number): string | undefined => {
+    if (config.visualizationType !== 'Bar' || config.visualizationSubType !== 'regular') return undefined
+    const series = config.series.find((entry: Series[number]) => entry.dataKey === seriesKey) || dynamicSeries
+    const labelsEnabled = config.orientation === 'horizontal' ? config.yAxis.displayNumbersOnBar : config.labels
+    if (series?.valueLabelMode === 'none') return ''
+    if (series?.valueLabelMode === 'numeric') return labelsEnabled ? undefined : ''
+    if (!series?.valueLabelColumn) return series?.valueLabelMode === 'column' || !labelsEnabled ? '' : undefined
+    const value = findSourceDataRow(seriesKey, xAxisValue, rowIndex)?.[series.valueLabelColumn]
+    if (typeof value !== 'string' && typeof value !== 'number') return ''
+    return String(value).trim() ? String(value) : ''
   }
 
   useEffect(() => {
@@ -256,6 +269,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     hasMultipleSeries,
     labelFontSize,
     formatTooltipValue,
+    getCustomValueLabel,
     applyRadius,
     assignColorsToValues,
     getHighlightedBarColorByValue,

@@ -47,6 +47,24 @@ describe('resolveNetworkLabels', () => {
     expect(placements[1].anchor).not.toBe('right')
   })
 
+  it('keeps labels inside the viewport when a clear in-bounds placement is available', () => {
+    const labeled = makeNode('Long label', 100, 10)
+    const source = makeNode('Source', 0, 10)
+    const target = makeNode('Target', 160, 10)
+
+    const [placement] = resolveNetworkLabels([labeled, source, target], [makeLink(source, target)], {
+      nodeRadius: 6,
+      width: 160,
+      height: 100
+    })
+
+    expect(placement.anchor).toBe('bottom')
+    expect(placement.bounds.y).toBeGreaterThanOrEqual(0)
+    expect(placement.bounds.y + placement.bounds.height).toBeLessThanOrEqual(100)
+    expect(placement.bounds.x).toBeGreaterThanOrEqual(0)
+    expect(placement.bounds.x + placement.bounds.width).toBeLessThanOrEqual(160)
+  })
+
   it('uses the lowest-conflict stable priority when every candidate is blocked', () => {
     const target = makeNode('Target', 100, 100)
     const blockers = [

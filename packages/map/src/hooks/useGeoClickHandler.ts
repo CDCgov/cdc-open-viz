@@ -1,3 +1,4 @@
+import { canNavigateMap } from '../helpers/locationLinks'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { navigationHandler } from '../helpers/navigationHandler'
 import { useContext } from 'react'
@@ -68,7 +69,7 @@ const useGeoClickHandler = () => {
     }
 
     // Otherwise if this item has a link specified for it, do regular navigation.
-    if (state.columns.navigate && geoData[state.columns.navigate.name]) {
+    if (canNavigateMap(state) && state.columns.navigate && geoData[state.columns.navigate.name]) {
       // Track navigation click analytics event
       if (interactionLabel) {
         const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')

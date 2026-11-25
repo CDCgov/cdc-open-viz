@@ -1,0 +1,2250 @@
+@charset "UTF-8";
+@import '../HeaderThemeSelector/HeaderThemeSelector.css';
+:root {
+  --baseColor: #1c1d1f;
+  --blue: #005eaa;
+  --lightestGray: #f2f2f2;
+  --gray2: #f5f5f5;
+  --lightGray: #c7c7c7;
+  --borderGray: #ccc;
+  --mediumGray: #565656;
+  --tooltipBgColor: rgb(34 34 34 / 90%);
+  --editorAnimationTimer: 400ms;
+  --editorAccentColor: #3e92d5;
+  --darkGray: #333;
+  --red: #d8000c;
+  --white: #fff;
+  --silver: #eee;
+  --primary: #005eaa;
+  --secondary: #88c3ea;
+  --tertiary: #c0e9ff;
+  --quaternary: #edf9ff;
+  --purple-primary: #712177;
+  --purple-secondary: #b890bb;
+  --purple-tertiary: #e3d3e4;
+  --purple-quaternary: #f7f2f7;
+  --brown-primary: #705043;
+  --brown-secondary: #ad907b;
+  --brown-tertiary: #d7ccc8;
+  --brown-quaternary: #f2ebe8;
+  --teal-primary: #00695c;
+  --teal-secondary: #4ebaaa;
+  --teal-tertiary: #ceece7;
+  --teal-quaternary: #ebf7f5;
+  --pink-primary: #af4448;
+  --pink-secondary: #e57373;
+  --pink-tertiary: #ffc2c2;
+  --pink-quaternary: #ffe7e7;
+  --orange-primary: #bb4d00;
+  --orange-secondary: #ffad42;
+  --orange-tertiary: #ffe97d;
+  --orange-quaternary: #fff4cf;
+  --slate-primary: #29434e;
+  --slate-secondary: #7e9ba5;
+  --slate-tertiary: #b6c6d2;
+  --slate-quaternary: #e2e8ed;
+  --indigo-primary: #26418f;
+  --indigo-secondary: #92a6dd;
+  --indigo-tertiary: #dee8ff;
+  --indigo-quaternary: #f2f6ff;
+  --cyan-primary: #006778;
+  --cyan-secondary: #65b0bd;
+  --cyan-tertiary: #cce5e9;
+  --cyan-quaternary: #ebf5f6;
+  --green-primary: #4b830d;
+  --green-secondary: #84bc49;
+  --green-tertiary: #dcedc8;
+  --green-quaternary: #f1f8e9;
+  --amber-primary: #fbab18;
+  --amber-secondary: #ffd54f;
+  --amber-tertiary: #ffecb3;
+  --amber-quaternary: #fff7e1;
+  --cool-gray-90: #1c1d1f;
+  --cool-gray-50: #71767a;
+  --cool-gray-30: #a9aeb1;
+  --cool-gray-10: #dfe1e2;
+  --colors-gray-cool-70: #3d4551;
+  --colors-blue-vivid-60: #005ea2;
+  --colors-cyan-5: #f4fbfc;
+  --colors-cyan-10: #eff9fa;
+  --colors-cyan-15: #dff2f6;
+  --colors-cyan-40v: #009ec1;
+  --colors-cyan-50v: #0081a1;
+  --colors-cyan-60v: #007a99;
+}
+
+:root {
+  --editorContentPadding: 30px;
+  --editorWidth: 350px;
+  --gbl-padding: 1.875em;
+  --space-between-legend-item-rows: 1rem;
+  --space-between-legend-item-columns: 1.5rem;
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1170px;
+  --breakpoint-xl: 1280px;
+  --app-font-main: 'Nunito', sans-serif;
+  --app-font-secondary: 'Poppins', sans-serif;
+  --app-font-size: 1rem;
+  --legend-title-font-size: 1rem;
+  --legend-description-font-size: 1rem;
+  --legend-item-font-size: 0.889rem;
+  --download-link-font-size: 0.772rem;
+  --filter-select-font-size: 0.833rem;
+  --filter-label-font-size: 0.889rem;
+  --filter-buttons-font-size: 0.889rem;
+  --superTitle-font-size: 0.833rem;
+  --title-font-size: 1.222rem;
+  --territory-label-font-size: 0.809rem;
+  --territory-label-font-size-mobile: 0.556rem;
+  --visualization-body-font-family: var(--app-font-main);
+  --visualization-meta-font-size: 0.889rem;
+  --visualization-body-line-height: 1.5;
+  --transition-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-amber {
+  --theme-primary: var(--amber-primary);
+  --theme-secondary: var(--amber-secondary);
+  --theme-tertiary: var(--amber-tertiary);
+  --theme-quaternary: var(--amber-quaternary);
+}
+
+.theme-blue {
+  --theme-primary: var(--primary);
+  --theme-secondary: var(--secondary);
+  --theme-tertiary: var(--tertiary);
+  --theme-quaternary: var(--quaternary);
+}
+
+.theme-brown {
+  --theme-primary: var(--brown-primary);
+  --theme-secondary: var(--brown-secondary);
+  --theme-tertiary: var(--brown-tertiary);
+  --theme-quaternary: var(--brown-quaternary);
+}
+
+.theme-cyan {
+  --theme-primary: #007b91;
+  --theme-secondary: var(--cyan-secondary);
+  --theme-tertiary: var(--cyan-tertiary);
+  --theme-quaternary: var(--cyan-quaternary);
+}
+
+.theme-green {
+  --theme-primary: var(--green-primary);
+  --theme-secondary: var(--green-secondary);
+  --theme-tertiary: var(--green-tertiary);
+  --theme-quaternary: var(--green-quaternary);
+}
+
+.theme-indigo {
+  --theme-primary: var(--indigo-primary);
+  --theme-secondary: var(--indigo-secondary);
+  --theme-tertiary: var(--indigo-tertiary);
+  --theme-quaternary: var(--indigo-quaternary);
+}
+
+.theme-orange {
+  --theme-primary: var(--orange-primary);
+  --theme-secondary: var(--orange-secondary);
+  --theme-tertiary: var(--orange-tertiary);
+  --theme-quaternary: var(--orange-quaternary);
+}
+
+.theme-pink {
+  --theme-primary: var(--pink-primary);
+  --theme-secondary: var(--pink-secondary);
+  --theme-tertiary: var(--pink-tertiary);
+  --theme-quaternary: var(--pink-quaternary);
+}
+
+.theme-purple {
+  --theme-primary: var(--purple-primary);
+  --theme-secondary: var(--purple-secondary);
+  --theme-tertiary: var(--purple-tertiary);
+  --theme-quaternary: var(--purple-quaternary);
+}
+
+.theme-slate {
+  --theme-primary: var(--slate-primary);
+  --theme-secondary: var(--slate-secondary);
+  --theme-tertiary: var(--slate-tertiary);
+  --theme-quaternary: var(--slate-quaternary);
+}
+
+.theme-teal {
+  --theme-primary: var(--teal-primary);
+  --theme-secondary: var(--teal-secondary);
+  --theme-tertiary: var(--teal-tertiary);
+  --theme-quaternary: var(--teal-quaternary);
+}
+
+.cove-visualization.type-markup-include .theme-amber,
+.cove-visualization.type-markup-include .theme-blue,
+.cove-visualization.type-markup-include .theme-brown,
+.cove-visualization.type-markup-include .theme-cyan,
+.cove-visualization.type-markup-include .theme-green,
+.cove-visualization.type-markup-include .theme-indigo,
+.cove-visualization.type-markup-include .theme-orange,
+.cove-visualization.type-markup-include .theme-pink,
+.cove-visualization.type-markup-include .theme-purple,
+.cove-visualization.type-markup-include .theme-slate,
+.cove-visualization.type-markup-include .theme-teal,
+.cove-visualization.type-waffle-chart .theme-amber,
+.cove-visualization.type-waffle-chart .theme-blue,
+.cove-visualization.type-waffle-chart .theme-brown,
+.cove-visualization.type-waffle-chart .theme-cyan,
+.cove-visualization.type-waffle-chart .theme-green,
+.cove-visualization.type-waffle-chart .theme-indigo,
+.cove-visualization.type-waffle-chart .theme-orange,
+.cove-visualization.type-waffle-chart .theme-pink,
+.cove-visualization.type-waffle-chart .theme-purple,
+.cove-visualization.type-waffle-chart .theme-slate,
+.cove-visualization.type-waffle-chart .theme-teal,
+.cove-visualization.type-data-bite .theme-amber,
+.cove-visualization.type-data-bite .theme-blue,
+.cove-visualization.type-data-bite .theme-brown,
+.cove-visualization.type-data-bite .theme-cyan,
+.cove-visualization.type-data-bite .theme-green,
+.cove-visualization.type-data-bite .theme-indigo,
+.cove-visualization.type-data-bite .theme-orange,
+.cove-visualization.type-data-bite .theme-pink,
+.cove-visualization.type-data-bite .theme-purple,
+.cove-visualization.type-data-bite .theme-slate,
+.cove-visualization.type-data-bite .theme-teal,
+.cove-visualization.type-chart .theme-amber,
+.cove-visualization.type-chart .theme-blue,
+.cove-visualization.type-chart .theme-brown,
+.cove-visualization.type-chart .theme-cyan,
+.cove-visualization.type-chart .theme-green,
+.cove-visualization.type-chart .theme-indigo,
+.cove-visualization.type-chart .theme-orange,
+.cove-visualization.type-chart .theme-pink,
+.cove-visualization.type-chart .theme-purple,
+.cove-visualization.type-chart .theme-slate,
+.cove-visualization.type-chart .theme-teal,
+.cove-visualization.type-chart.type-sparkline .theme-amber,
+.cove-visualization.type-chart.type-sparkline .theme-blue,
+.cove-visualization.type-chart.type-sparkline .theme-brown,
+.cove-visualization.type-chart.type-sparkline .theme-cyan,
+.cove-visualization.type-chart.type-sparkline .theme-green,
+.cove-visualization.type-chart.type-sparkline .theme-indigo,
+.cove-visualization.type-chart.type-sparkline .theme-orange,
+.cove-visualization.type-chart.type-sparkline .theme-pink,
+.cove-visualization.type-chart.type-sparkline .theme-purple,
+.cove-visualization.type-chart.type-sparkline .theme-slate,
+.cove-visualization.type-chart.type-sparkline .theme-teal,
+.cove-visualization.type-map .theme-amber,
+.cove-visualization.type-map .theme-blue,
+.cove-visualization.type-map .theme-brown,
+.cove-visualization.type-map .theme-cyan,
+.cove-visualization.type-map .theme-green,
+.cove-visualization.type-map .theme-indigo,
+.cove-visualization.type-map .theme-orange,
+.cove-visualization.type-map .theme-pink,
+.cove-visualization.type-map .theme-purple,
+.cove-visualization.type-map .theme-slate,
+.cove-visualization.type-map .theme-teal {
+  background-color: var(--theme-primary);
+  border-bottom-style: solid;
+  border-bottom-width: 4px;
+  border-color: var(--theme-secondary);
+}
+.cove-visualization.type-markup-include.theme-amber
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-blue
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-brown
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-cyan
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-green
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-pink
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-slate
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-markup-include.theme-teal
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-amber
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-blue
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-brown
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-cyan
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-green
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-pink
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-slate
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-waffle-chart.theme-teal
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-amber
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-blue
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-brown
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-cyan
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-green
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-pink
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-slate
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-data-bite.theme-teal
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-amber .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-blue .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-brown .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-green .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-pink .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-slate .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.theme-teal .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-amber
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-blue
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-brown
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-cyan
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-green
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-pink
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-slate
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-chart.type-sparkline.theme-teal
+  .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-amber .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-blue .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-brown .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-cyan .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-green .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-indigo .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-orange .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-pink .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-purple .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-slate .cove-visualization__body:not(.no-borders).component--has-border-color-theme,
+.cove-visualization.type-map.theme-teal .cove-visualization__body:not(.no-borders).component--has-border-color-theme {
+  border: 1px solid var(--theme-primary);
+}
+.cove-visualization.type-markup-include.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-markup-include.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-waffle-chart.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-data-bite.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-chart.type-sparkline.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-amber
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-blue
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-brown
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-cyan
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-green
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-indigo
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-orange
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-pink
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-purple
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-slate
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme),
+.cove-visualization.type-map.theme-teal
+  .cove-visualization__body:not(.no-borders):not(.component--has-border-color-theme) {
+  border: 1px solid var(--lightGray);
+}
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-amber .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-blue .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-brown .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-green .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-orange .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-pink .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-purple .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-slate .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.theme-teal .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-amber
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-blue
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-brown
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-cyan
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-green
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-indigo
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-orange
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-pink
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-purple
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-slate
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-chart.type-sparkline.theme-teal
+  .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-amber .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-blue .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-brown .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-cyan .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-green .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-indigo .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-orange .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-pink .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-purple .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-slate .cove-visualization__body:not(.no-borders).component--has-title,
+.cove-visualization.type-map.theme-teal .cove-visualization__body:not(.no-borders).component--has-title {
+  border-top: none !important;
+}
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.theme-teal .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-chart.type-sparkline.theme-teal .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-amber .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-blue .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-brown .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-cyan .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-green .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-indigo .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-orange .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-pink .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-purple .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-slate .cove-visualization__body.component--has-accent,
+.cove-visualization.type-map.theme-teal .cove-visualization__body.component--has-accent {
+  border-left: 0.5rem solid var(--theme-primary) !important;
+}
+.cove-visualization.type-markup-include.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-markup-include.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-waffle-chart.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-data-bite.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-chart.type-sparkline.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-amber
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-blue
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-brown
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-cyan
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-green
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-indigo
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-orange
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-pink
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-purple
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-slate
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ),
+.cove-visualization.type-map.theme-teal
+  .cove-visualization__body.component--has-background:not(.component--hide-background-color):not(
+    .component--tp5-treatment
+  ) {
+  background: var(--theme-tertiary);
+}
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__header,
+.cove-visualization.type-chart.theme-amber .cove-visualization__title,
+.cove-visualization.type-chart.theme-amber .cove-visualization__header,
+.cove-visualization.type-chart.theme-blue .cove-visualization__title,
+.cove-visualization.type-chart.theme-blue .cove-visualization__header,
+.cove-visualization.type-chart.theme-brown .cove-visualization__title,
+.cove-visualization.type-chart.theme-brown .cove-visualization__header,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__title,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__header,
+.cove-visualization.type-chart.theme-green .cove-visualization__title,
+.cove-visualization.type-chart.theme-green .cove-visualization__header,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__title,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__header,
+.cove-visualization.type-chart.theme-orange .cove-visualization__title,
+.cove-visualization.type-chart.theme-orange .cove-visualization__header,
+.cove-visualization.type-chart.theme-pink .cove-visualization__title,
+.cove-visualization.type-chart.theme-pink .cove-visualization__header,
+.cove-visualization.type-chart.theme-purple .cove-visualization__title,
+.cove-visualization.type-chart.theme-purple .cove-visualization__header,
+.cove-visualization.type-chart.theme-slate .cove-visualization__title,
+.cove-visualization.type-chart.theme-slate .cove-visualization__header,
+.cove-visualization.type-chart.theme-teal .cove-visualization__title,
+.cove-visualization.type-chart.theme-teal .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-amber .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-amber .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-blue .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-blue .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-brown .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-brown .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-cyan .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-cyan .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-green .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-green .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-indigo .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-indigo .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-orange .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-orange .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-pink .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-pink .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-purple .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-purple .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-slate .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-slate .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-teal .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-teal .cove-visualization__header,
+.cove-visualization.type-map.theme-amber .cove-visualization__title,
+.cove-visualization.type-map.theme-amber .cove-visualization__header,
+.cove-visualization.type-map.theme-blue .cove-visualization__title,
+.cove-visualization.type-map.theme-blue .cove-visualization__header,
+.cove-visualization.type-map.theme-brown .cove-visualization__title,
+.cove-visualization.type-map.theme-brown .cove-visualization__header,
+.cove-visualization.type-map.theme-cyan .cove-visualization__title,
+.cove-visualization.type-map.theme-cyan .cove-visualization__header,
+.cove-visualization.type-map.theme-green .cove-visualization__title,
+.cove-visualization.type-map.theme-green .cove-visualization__header,
+.cove-visualization.type-map.theme-indigo .cove-visualization__title,
+.cove-visualization.type-map.theme-indigo .cove-visualization__header,
+.cove-visualization.type-map.theme-orange .cove-visualization__title,
+.cove-visualization.type-map.theme-orange .cove-visualization__header,
+.cove-visualization.type-map.theme-pink .cove-visualization__title,
+.cove-visualization.type-map.theme-pink .cove-visualization__header,
+.cove-visualization.type-map.theme-purple .cove-visualization__title,
+.cove-visualization.type-map.theme-purple .cove-visualization__header,
+.cove-visualization.type-map.theme-slate .cove-visualization__title,
+.cove-visualization.type-map.theme-slate .cove-visualization__header,
+.cove-visualization.type-map.theme-teal .cove-visualization__title,
+.cove-visualization.type-map.theme-teal .cove-visualization__header {
+  border-color: var(--theme-secondary);
+}
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-amber .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-blue .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-brown .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-cyan .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-green .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-indigo .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-orange .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-pink .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-purple .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-slate .cove-visualization__header,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__title,
+.cove-visualization.type-markup-include.theme-teal .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-amber .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-blue .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-brown .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-cyan .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-green .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-indigo .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-orange .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-pink .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-purple .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-slate .cove-visualization__header,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__title,
+.cove-visualization.type-waffle-chart.theme-teal .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-amber .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-blue .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-brown .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-cyan .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-green .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-indigo .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-orange .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-pink .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-purple .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-slate .cove-visualization__header,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__title,
+.cove-visualization.type-data-bite.theme-teal .cove-visualization__header,
+.cove-visualization.type-chart.theme-amber .cove-visualization__title,
+.cove-visualization.type-chart.theme-amber .cove-visualization__header,
+.cove-visualization.type-chart.theme-blue .cove-visualization__title,
+.cove-visualization.type-chart.theme-blue .cove-visualization__header,
+.cove-visualization.type-chart.theme-brown .cove-visualization__title,
+.cove-visualization.type-chart.theme-brown .cove-visualization__header,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__title,
+.cove-visualization.type-chart.theme-cyan .cove-visualization__header,
+.cove-visualization.type-chart.theme-green .cove-visualization__title,
+.cove-visualization.type-chart.theme-green .cove-visualization__header,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__title,
+.cove-visualization.type-chart.theme-indigo .cove-visualization__header,
+.cove-visualization.type-chart.theme-orange .cove-visualization__title,
+.cove-visualization.type-chart.theme-orange .cove-visualization__header,
+.cove-visualization.type-chart.theme-pink .cove-visualization__title,
+.cove-visualization.type-chart.theme-pink .cove-visualization__header,
+.cove-visualization.type-chart.theme-purple .cove-visualization__title,
+.cove-visualization.type-chart.theme-purple .cove-visualization__header,
+.cove-visualization.type-chart.theme-slate .cove-visualization__title,
+.cove-visualization.type-chart.theme-slate .cove-visualization__header,
+.cove-visualization.type-chart.theme-teal .cove-visualization__title,
+.cove-visualization.type-chart.theme-teal .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-amber .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-amber .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-blue .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-blue .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-brown .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-brown .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-cyan .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-cyan .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-green .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-green .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-indigo .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-indigo .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-orange .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-orange .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-pink .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-pink .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-purple .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-purple .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-slate .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-slate .cove-visualization__header,
+.cove-visualization.type-chart.type-sparkline.theme-teal .cove-visualization__title,
+.cove-visualization.type-chart.type-sparkline.theme-teal .cove-visualization__header,
+.cove-visualization.type-map.theme-amber .cove-visualization__title,
+.cove-visualization.type-map.theme-amber .cove-visualization__header,
+.cove-visualization.type-map.theme-blue .cove-visualization__title,
+.cove-visualization.type-map.theme-blue .cove-visualization__header,
+.cove-visualization.type-map.theme-brown .cove-visualization__title,
+.cove-visualization.type-map.theme-brown .cove-visualization__header,
+.cove-visualization.type-map.theme-cyan .cove-visualization__title,
+.cove-visualization.type-map.theme-cyan .cove-visualization__header,
+.cove-visualization.type-map.theme-green .cove-visualization__title,
+.cove-visualization.type-map.theme-green .cove-visualization__header,
+.cove-visualization.type-map.theme-indigo .cove-visualization__title,
+.cove-visualization.type-map.theme-indigo .cove-visualization__header,
+.cove-visualization.type-map.theme-orange .cove-visualization__title,
+.cove-visualization.type-map.theme-orange .cove-visualization__header,
+.cove-visualization.type-map.theme-pink .cove-visualization__title,
+.cove-visualization.type-map.theme-pink .cove-visualization__header,
+.cove-visualization.type-map.theme-purple .cove-visualization__title,
+.cove-visualization.type-map.theme-purple .cove-visualization__header,
+.cove-visualization.type-map.theme-slate .cove-visualization__title,
+.cove-visualization.type-map.theme-slate .cove-visualization__header,
+.cove-visualization.type-map.theme-teal .cove-visualization__title,
+.cove-visualization.type-map.theme-teal .cove-visualization__header {
+  border-color: var(--theme-secondary);
+}
+
+.cove-visualization.theme-amber .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-blue .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-brown .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-cyan .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-green .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-indigo .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-orange .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-pink .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-purple .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-slate .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization.theme-teal .single-filters--tab .tab--active:not(.tab--simple) {
+  border: 1px solid var(--theme-primary);
+  border-bottom: none;
+  border-top: 3px solid var(--theme-primary);
+}
+.cove-visualization.theme-amber .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-blue .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-brown .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-cyan .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-green .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-indigo .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-orange .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-pink .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-purple .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-slate .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization.theme-teal .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
+  border-bottom: 1px solid var(--theme-primary);
+}
+.cove-visualization.theme-amber .single-filters--pill .pill--active,
+.cove-visualization.theme-blue .single-filters--pill .pill--active,
+.cove-visualization.theme-brown .single-filters--pill .pill--active,
+.cove-visualization.theme-cyan .single-filters--pill .pill--active,
+.cove-visualization.theme-green .single-filters--pill .pill--active,
+.cove-visualization.theme-indigo .single-filters--pill .pill--active,
+.cove-visualization.theme-orange .single-filters--pill .pill--active,
+.cove-visualization.theme-pink .single-filters--pill .pill--active,
+.cove-visualization.theme-purple .single-filters--pill .pill--active,
+.cove-visualization.theme-slate .single-filters--pill .pill--active,
+.cove-visualization.theme-teal .single-filters--pill .pill--active {
+  background-color: var(--theme-primary);
+  color: #fff;
+}
+.cove-visualization.theme-amber .button__tab-bar--active,
+.cove-visualization.theme-blue .button__tab-bar--active,
+.cove-visualization.theme-brown .button__tab-bar--active,
+.cove-visualization.theme-cyan .button__tab-bar--active,
+.cove-visualization.theme-green .button__tab-bar--active,
+.cove-visualization.theme-indigo .button__tab-bar--active,
+.cove-visualization.theme-orange .button__tab-bar--active,
+.cove-visualization.theme-pink .button__tab-bar--active,
+.cove-visualization.theme-purple .button__tab-bar--active,
+.cove-visualization.theme-slate .button__tab-bar--active,
+.cove-visualization.theme-teal .button__tab-bar--active {
+  outline: 2px solid var(--theme-primary);
+}
+.cove-visualization.theme-amber .apply:not([disabled]),
+.cove-visualization.theme-blue .apply:not([disabled]),
+.cove-visualization.theme-brown .apply:not([disabled]),
+.cove-visualization.theme-cyan .apply:not([disabled]),
+.cove-visualization.theme-green .apply:not([disabled]),
+.cove-visualization.theme-indigo .apply:not([disabled]),
+.cove-visualization.theme-orange .apply:not([disabled]),
+.cove-visualization.theme-pink .apply:not([disabled]),
+.cove-visualization.theme-purple .apply:not([disabled]),
+.cove-visualization.theme-slate .apply:not([disabled]),
+.cove-visualization.theme-teal .apply:not([disabled]) {
+  background-color: var(--theme-primary);
+}
+.cove-visualization.theme-amber button.cove-button.cove-button--theme-primary.theme-amber:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-amber button.cove-button.cove-button--theme-primary.theme-amber:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-amber
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-amber:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-amber
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-amber:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-amber button.cove-button.apply.theme-amber:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-amber button.cove-button.apply.theme-amber:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-blue button.cove-button.cove-button--theme-primary.theme-blue:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-blue button.cove-button.cove-button--theme-primary.theme-blue:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-blue
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-blue:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-blue
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-blue:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-blue button.cove-button.apply.theme-blue:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-blue button.cove-button.apply.theme-blue:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-brown button.cove-button.cove-button--theme-primary.theme-brown:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-brown button.cove-button.cove-button--theme-primary.theme-brown:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-brown
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-brown:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-brown
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-brown:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-brown button.cove-button.apply.theme-brown:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-brown button.cove-button.apply.theme-brown:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-cyan button.cove-button.cove-button--theme-primary.theme-cyan:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-cyan button.cove-button.cove-button--theme-primary.theme-cyan:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-cyan
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-cyan:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-cyan
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-cyan:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-cyan button.cove-button.apply.theme-cyan:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-cyan button.cove-button.apply.theme-cyan:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-green button.cove-button.cove-button--theme-primary.theme-green:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-green button.cove-button.cove-button--theme-primary.theme-green:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-green
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-green:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-green
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-green:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-green button.cove-button.apply.theme-green:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-green button.cove-button.apply.theme-green:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-indigo button.cove-button.cove-button--theme-primary.theme-indigo:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-indigo button.cove-button.cove-button--theme-primary.theme-indigo:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-indigo
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-indigo:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-indigo
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-indigo:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-indigo button.cove-button.apply.theme-indigo:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-indigo button.cove-button.apply.theme-indigo:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-orange button.cove-button.cove-button--theme-primary.theme-orange:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-orange button.cove-button.cove-button--theme-primary.theme-orange:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-orange
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-orange:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-orange
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-orange:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-orange button.cove-button.apply.theme-orange:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-orange button.cove-button.apply.theme-orange:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-pink button.cove-button.cove-button--theme-primary.theme-pink:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-pink button.cove-button.cove-button--theme-primary.theme-pink:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-pink
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-pink:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-pink
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-pink:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-pink button.cove-button.apply.theme-pink:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-pink button.cove-button.apply.theme-pink:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-purple button.cove-button.cove-button--theme-primary.theme-purple:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-purple button.cove-button.cove-button--theme-primary.theme-purple:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-purple
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-purple:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-purple
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-purple:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-purple button.cove-button.apply.theme-purple:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-purple button.cove-button.apply.theme-purple:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-slate button.cove-button.cove-button--theme-primary.theme-slate:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-slate button.cove-button.cove-button--theme-primary.theme-slate:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-slate
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-slate:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-slate
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-slate:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-slate button.cove-button.apply.theme-slate:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-slate button.cove-button.apply.theme-slate:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-teal button.cove-button.cove-button--theme-primary.theme-teal:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-teal button.cove-button.cove-button--theme-primary.theme-teal:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization.theme-teal
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-teal:not([disabled]) {
+  background-color: #fff;
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: var(--theme-primary);
+}
+.cove-visualization.theme-teal
+  button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-teal:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  border-bottom: 1px solid var(--theme-primary);
+  color: #fff;
+  filter: none;
+}
+.cove-visualization.theme-teal button.cove-button.apply.theme-teal:not([disabled]) {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+}
+.cove-visualization.theme-teal button.cove-button.apply.theme-teal:not([disabled]):hover {
+  background-color: var(--theme-primary);
+  border: 0;
+  border-bottom: 0;
+  filter: brightness(0.92);
+}
+.cove-visualization .theme-amber .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-blue .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-brown .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-cyan .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-green .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-indigo .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-orange .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-pink .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-purple .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-slate .single-filters--tab .tab--active:not(.tab--simple),
+.cove-visualization .theme-teal .single-filters--tab .tab--active:not(.tab--simple) {
+  border: 1px solid var(--theme-primary);
+  border-bottom: none;
+  border-top: 3px solid var(--theme-primary);
+}
+.cove-visualization .theme-amber .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-blue .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-brown .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-cyan .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-green .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-indigo .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-orange .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-pink .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-purple .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-slate .single-filters--tab .tab:not(.tab--active):not(.tab--simple),
+.cove-visualization .theme-teal .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
+  border-bottom: 1px solid var(--theme-primary);
+}
+.cove-visualization .theme-amber .single-filters--pill .pill--active,
+.cove-visualization .theme-blue .single-filters--pill .pill--active,
+.cove-visualization .theme-brown .single-filters--pill .pill--active,
+.cove-visualization .theme-cyan .single-filters--pill .pill--active,
+.cove-visualization .theme-green .single-filters--pill .pill--active,
+.cove-visualization .theme-indigo .single-filters--pill .pill--active,
+.cove-visualization .theme-orange .single-filters--pill .pill--active,
+.cove-visualization .theme-pink .single-filters--pill .pill--active,
+.cove-visualization .theme-purple .single-filters--pill .pill--active,
+.cove-visualization .theme-slate .single-filters--pill .pill--active,
+.cove-visualization .theme-teal .single-filters--pill .pill--active {
+  background-color: var(--theme-primary);
+  color: #fff;
+}
+.cove-visualization .theme-amber .button__tab-bar--active,
+.cove-visualization .theme-blue .button__tab-bar--active,
+.cove-visualization .theme-brown .button__tab-bar--active,
+.cove-visualization .theme-cyan .button__tab-bar--active,
+.cove-visualization .theme-green .button__tab-bar--active,
+.cove-visualization .theme-indigo .button__tab-bar--active,
+.cove-visualization .theme-orange .button__tab-bar--active,
+.cove-visualization .theme-pink .button__tab-bar--active,
+.cove-visualization .theme-purple .button__tab-bar--active,
+.cove-visualization .theme-slate .button__tab-bar--active,
+.cove-visualization .theme-teal .button__tab-bar--active {
+  outline: 2px solid var(--theme-primary);
+}
+.cove-visualization .theme-amber .apply:not([disabled]),
+.cove-visualization .theme-blue .apply:not([disabled]),
+.cove-visualization .theme-brown .apply:not([disabled]),
+.cove-visualization .theme-cyan .apply:not([disabled]),
+.cove-visualization .theme-green .apply:not([disabled]),
+.cove-visualization .theme-indigo .apply:not([disabled]),
+.cove-visualization .theme-orange .apply:not([disabled]),
+.cove-visualization .theme-pink .apply:not([disabled]),
+.cove-visualization .theme-purple .apply:not([disabled]),
+.cove-visualization .theme-slate .apply:not([disabled]),
+.cove-visualization .theme-teal .apply:not([disabled]) {
+  background-color: var(--theme-primary);
+}
+
+.cove-editor {
+  display: grid;
+  grid-template-areas: 'panel content';
+  grid-template-columns: auto 1fr;
+  height: 100vh;
+}
+.cove-editor *,
+.cove-editor *::before,
+.cove-editor *::after {
+  box-sizing: border-box;
+}
+.cove-editor body,
+.cove-editor h1,
+.cove-editor h2,
+.cove-editor h3,
+.cove-editor h4,
+.cove-editor p,
+.cove-editor figure,
+.cove-editor blockquote,
+.cove-editor dl,
+.cove-editor dd {
+  margin: 0;
+}
+.cove-editor ul[role='list'],
+.cove-editor ol[role='list'] {
+  list-style: none;
+}
+.cove-editor html:focus-within {
+  scroll-behavior: smooth;
+}
+.cove-editor body {
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+}
+.cove-editor a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+.cove-editor img,
+.cove-editor picture {
+  display: block;
+  max-width: 100%;
+}
+.cove-editor sub,
+.cove-editor sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.cove-editor sup {
+  top: -0.5em;
+}
+.cove-editor sub {
+  bottom: -0.25em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cove-editor html:focus-within {
+    scroll-behavior: auto;
+  }
+  .cove-editor *,
+  .cove-editor *::before,
+  .cove-editor *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.cove-editor .cove-editor__panel {
+  background: #fff;
+  border-right: 1px solid #c2c2c2;
+  font-size: 15px;
+  grid-area: panel;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: width 500ms ease;
+  width: var(--editorWidth);
+  z-index: 7;
+}
+.cove-editor .cove-editor__heading {
+  font-size: 1.125em;
+  padding: 0.625rem 1.125rem;
+  user-select: none;
+}
+.cove-editor .cove-editor__panel-container {
+  min-width: var(--editorWidth);
+  width: var(--editorWidth);
+}
+.cove-editor .cove-editor__content {
+  grid-area: content;
+}
+.cove-editor .cove-editor__content .cove-editor__content-wrap {
+  margin: 3em auto 0;
+  max-width: 35em;
+}
+.cove-editor .cove-editor--toggle {
+  background-color: #f2f2f2;
+  border: 0;
+  border-radius: 60px;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  color: #000;
+  cursor: pointer;
+  font-size: 1em;
+  height: 25px;
+  left: 307px;
+  position: absolute;
+  top: 10px;
+  transition: left 400ms ease 65ms, background-color 200ms ease;
+  user-select: none;
+  width: 25px;
+  z-index: 8;
+}
+.cove-editor .cove-editor--toggle:before {
+  content: '«';
+  left: 50%;
+  position: absolute;
+  top: 43%;
+  transform: translate(-50%, -50%);
+}
+.cove-editor .cove-editor--toggle.collapsed {
+  left: 1em;
+  margin-left: 0;
+}
+.cove-editor .cove-editor--toggle.collapsed:before {
+  content: '»';
+}
+.cove-editor .cove-editor--toggle:hover {
+  background-color: #ffffff;
+}
+
+.cove-editor__panel.hidden {
+  width: 0;
+}
+.cove-editor__panel .two-col-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
+}
+.cove-editor__panel .two-col-inputs > label {
+  margin-top: 0 !important;
+  width: 48%;
+}
+.cove-editor__panel .divider-heading {
+  display: block;
+  font-size: 1em;
+  margin-top: 1em;
+}
+.cove-editor__panel .series-list {
+  border: var(--lightGray) 1px solid;
+  list-style: none;
+}
+.cove-editor__panel .series-list:empty {
+  border: none !important;
+}
+.cove-editor__panel .series-list li {
+  align-items: center;
+  display: flex;
+  font-size: 0.9em;
+  justify-content: space-between;
+  padding: 0.3em 0.5em;
+}
+.cove-editor__panel .series-list li:hover {
+  background-color: var(--lightestGray);
+}
+.cove-editor__panel .series-list li span {
+  color: #f00;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+.cove-editor__panel .series-list li + li {
+  border-top: var(--lightGray) 1px solid;
+}
+.cove-editor__panel .form-container {
+  border-right: var(--lightGray) 1px solid;
+  flex-grow: 1;
+}
+.cove-editor__panel .guidance-link {
+  margin: 2em 1em 0;
+  padding: 0.75em 1em;
+}
+.cove-editor__panel .guidance-link svg {
+  color: var(--blue);
+  height: 60px;
+  margin-right: 1rem;
+  width: 60px;
+}
+.cove-editor__panel .guidance-link svg path {
+  fill: currentColor;
+}
+.cove-editor__panel h2 {
+  background: #565656;
+  border-bottom: #565656 3px solid;
+  color: #fff;
+  font-size: 1.1em;
+  padding: 0.6em 1em;
+  position: relative;
+  z-index: 3;
+}
+.cove-editor__panel fieldset {
+  display: block;
+}
+.cove-editor__panel .primary-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.cove-editor__panel ul.column-edit {
+  list-style: none;
+  padding-left: 0;
+}
+.cove-editor__panel ul.column-edit li {
+  margin-top: 1em;
+}
+.cove-editor__panel ul.column-edit .three-col {
+  display: flex;
+  justify-content: space-between;
+}
+.cove-editor__panel ul.column-edit .three-col > label {
+  display: inline-block;
+  margin-top: 0;
+  width: 30%;
+}
+.cove-editor__panel ul.column-edit .three-col > label input[type='text'],
+.cove-editor__panel ul.column-edit .three-col > label input[type='number'] {
+  width: 50px;
+}
+.cove-editor__panel .remove-column {
+  border: 0;
+  border-radius: 5px;
+  color: #c32b2b;
+  cursor: pointer;
+  float: right;
+  font-size: 0.7em;
+  font-weight: bold;
+  line-height: 1.6em;
+  margin: 0 auto;
+  outline: 0;
+  text-decoration: underline;
+  text-transform: uppercase;
+  transition: 0.1s all;
+}
+.cove-editor__panel .edit-block {
+  border: 0;
+  border-left: rgba(0, 0, 0, 0.2) 4px solid;
+  padding-left: 1em;
+  transition: 0.2s all;
+}
+.cove-editor__panel .edit-block:not(:first-child) {
+  margin-top: 2em;
+}
+.cove-editor__panel .edit-block input[type='text'],
+.cove-editor__panel .edit-block input[type='number'] {
+  font-size: 1em;
+}
+.cove-editor__panel .edit-block label {
+  margin-top: 0;
+}
+.cove-editor__panel .edit-block label + label {
+  margin-top: 1em;
+}
+.cove-editor__panel .edit-block:hover {
+  border-left: rgba(0, 0, 0, 0.7) 4px solid;
+  transition: 0.2s all;
+}
+.cove-editor__panel span.subtext {
+  color: rgba(0, 0, 0, 0.5);
+  display: block;
+  font-weight: normal;
+  text-transform: none;
+}
+.cove-editor__panel .sort-list {
+  list-style: none;
+  padding: 0;
+}
+.cove-editor__panel .sort-list > li {
+  margin-bottom: 0.3em;
+}
+.cove-editor__panel .sort-list li > div {
+  background: #f1f1f1;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  box-sizing: border-box;
+  cursor: move;
+  display: block;
+  font-size: 0.8em;
+  padding: 0.4em 0.6em;
+  width: 100%;
+}
+.cove-editor__panel .info {
+  font-size: 0.8em;
+  font-style: italic;
+  line-height: 1.4em;
+  padding-top: 10px;
+}
+.cove-editor__panel .react-tags__search {
+  width: 100%;
+}
+.cove-editor__panel .react-tags {
+  cursor: text;
+  position: relative;
+}
+.cove-editor__panel .react-tags input.react-tags__search-input {
+  font-size: 0.8rem;
+}
+.cove-editor__panel .react-tags span {
+  display: inline;
+}
+.cove-editor__panel .react-tags.is-focused {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+.cove-editor__panel .react-tags__selected {
+  display: inline;
+}
+.cove-editor__panel .react-tags__selected-tag {
+  background: #f1f1f1;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  box-sizing: border-box;
+  display: inline-block;
+  font-size: 0.8em;
+  margin-bottom: 0.3em;
+  margin-right: 0.3em;
+  padding: 0.4em 0.6em;
+}
+.cove-editor__panel .react-tags__selected-tag::after {
+  color: #aaa;
+  content: '✕';
+  margin-left: 8px;
+}
+.cove-editor__panel .react-tags__selected-tag:hover,
+.cove-editor__panel .react-tags__selected-tag:focus {
+  border-color: #b1b1b1;
+}
+.cove-editor__panel .react-tags__search {
+  display: inline-block;
+  max-width: 100%;
+}
+.cove-editor__panel .react-tags__search input {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  max-width: 100%;
+  outline: none;
+  padding: 0.5em 0.3em;
+}
+.cove-editor__panel .react-tags__search input::-ms-clear {
+  display: none;
+}
+@media screen and (min-width: 30em) {
+  .cove-editor__panel .react-tags__search {
+    position: relative;
+  }
+}
+.cove-editor__panel .react-tags__suggestions {
+  left: 0;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+}
+.cove-editor__panel .react-tags__suggestions ul {
+  background: white;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  list-style: none;
+  margin: 4px -1px;
+  padding: 0;
+}
+.cove-editor__panel .react-tags__suggestions li {
+  border-bottom: 1px solid #ddd;
+  padding: 6px 8px;
+}
+.cove-editor__panel .react-tags__suggestions li:hover {
+  background: #eee;
+  cursor: pointer;
+}
+.cove-editor__panel .react-tags__suggestions li.is-active {
+  background: #b7cfe0;
+}
+.cove-editor__panel .react-tags__suggestions li.is-disabled {
+  cursor: auto;
+  opacity: 0.5;
+}
+.cove-editor__panel .react-tags__suggestions li mark {
+  background: none;
+  font-weight: 600;
+  text-decoration: underline;
+}
+@media screen and (min-width: 30em) {
+  .cove-editor__panel .react-tags__suggestions {
+    width: 240px;
+  }
+}
+
+.advanced {
+  padding: 0 1em 1em;
+  text-align: left;
+}
+.advanced p {
+  font-size: 0.8rem;
+}
+.advanced .advanced-toggle-link {
+  cursor: pointer;
+  display: block;
+  padding-top: 1em;
+  text-align: left;
+  text-decoration: underline;
+}
+.advanced .advanced-toggle-link span {
+  display: inline-block;
+  font-family: monospace;
+  padding-right: 5px;
+  text-decoration: none;
+}
+.advanced .advanced-toggle-link:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+.advanced textarea {
+  box-sizing: border-box;
+  font-family: monospace;
+  font-size: 0.9em;
+  height: 400px;
+  padding: 0.5em;
+  width: 100%;
+}
+
+ul.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  max-width: 100%;
+  padding: 0;
+}
+ul.color-palette li {
+  border-radius: 40px;
+  cursor: pointer;
+  display: flex;
+  height: 21px;
+  margin-bottom: 10px;
+  margin-right: 4px;
+  overflow: hidden;
+  position: relative;
+  width: 21px;
+}
+ul.color-palette li .click-target {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+ul.color-palette li.selected {
+  border: rgba(0, 0, 0, 0.8) 2px solid;
+}
+ul.color-palette li span {
+  width: 33.3%;
+}
+
+.header ul.color-palette li {
+  border-radius: 40px;
+  height: 21px;
+  margin-right: 2.8px;
+  width: 21px;
+}
+
+.edit-checkbox {
+  margin-right: 8px;
+}
+
+.accordion__button svg.warning-icon,
+.cove-accordion__button svg.warning-icon {
+  left: auto;
+  position: absolute;
+  right: 35px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.warning-icon {
+  color: #d72f00;
+  height: 15px;
+  width: 15px;
+}
+
+.warning-icon path {
+  fill: #d8000c;
+}
+
+.checkbox-group {
+  border: 1px solid #c4c4c4;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  margin-top: 8px;
+  padding: 16px;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox,
+.panel-visual .checkbox-group label.checkbox,
+.panel-visual .reverse-labels label.checkbox {
+  align-items: center !important;
+  display: flex !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox input[type='checkbox'],
+.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.panel-visual .reverse-labels label.checkbox input[type='checkbox'] {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox span,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox span,
+.panel-visual .checkbox-group label.checkbox span,
+.panel-visual .reverse-labels label.checkbox span {
+  display: inline-block !important;
+  flex: 1 !important;
+}

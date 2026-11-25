@@ -6,8 +6,18 @@ import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { computeAreaPosition } from '../data/continent-bounding-boxes'
+import { getActiveHiddenDensitySeries, getDotDensityConfig } from '../helpers/dotDensityConfig'
 
 export const getInitialState = (configObj = {}): MapState => {
+  const config = { ...configObj } as MapConfig
+  if (config.filters) {
+    // Apply author defaults at load time only; runtime updates must keep user selections.
+    config.filters = config.filters.map(filter => {
+      const initialFilter = { ...filter }
+      if (filter.defaultValue != null && filter.defaultValue !== '') initialFilter.active = filter.defaultValue
+      return initialFilter
+    })
+  }
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
   const filteredCountyCode = typeof window !== 'undefined' ? getQueryParam('county-code') || '' : ''
   const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
@@ -16,7 +26,7 @@ export const getInitialState = (configObj = {}): MapState => {
     : { coordinates: [0, 0], zoom: 1 }
   return {
     dataUrl: configObj.dataUrl || '',
-    config: configObj as MapConfig,
+    config,
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
@@ -36,6 +46,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeFilters: [],
     runtimeLegend: [],
     runtimeBubbleLegend: [],
+    hiddenDensitySeries: [],
     statesToShow: []
   }
 }
@@ -61,14 +72,34 @@ export type MapState = {
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
   runtimeBubbleLegend: GeneratedLegend | GeneratedLegend[] | []
+  hiddenDensitySeries: string[]
   statesToShow: string[]
   dataUrl: string
 }
 
 const reducer = (state: MapState, action: MapActions): MapState => {
   switch (action.type) {
-    case 'SET_CONFIG':
-      return { ...state, config: action.payload }
+    case 'SET_CONFIG': {
+      const mappedSeries = (config: MapConfig) =>
+        getDotDensityConfig(config).series.filter(series => typeof series.column === 'string' && series.column.trim())
+      const previousSeries = mappedSeries(state.config)
+      const hidden = new Set(getActiveHiddenDensitySeries(previousSeries, state.hiddenDensitySeries))
+      const isolatedId =
+        hidden.size > 0 && hidden.size === previousSeries.length - 1
+          ? previousSeries.find(series => !hidden.has(series.id))?.id
+          : undefined
+      const nextSeries = mappedSeries(action.payload)
+      return {
+        ...state,
+        config: action.payload,
+        hiddenDensitySeries:
+          isolatedId !== undefined
+            ? nextSeries.some(series => series.id === isolatedId)
+              ? nextSeries.filter(series => series.id !== isolatedId).map(series => series.id)
+              : []
+            : getActiveHiddenDensitySeries(nextSeries, state.hiddenDensitySeries)
+      }
+    }
     case 'SET_LOADING':
       return { ...state, loading: action.payload }
     case 'SET_ACCESSIBLE_STATUS':
@@ -107,6 +138,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeLegend: action.payload }
     case 'SET_RUNTIME_BUBBLE_LEGEND':
       return { ...state, runtimeBubbleLegend: action.payload }
+    case 'SET_HIDDEN_DENSITY_SERIES':
+      return { ...state, hiddenDensitySeries: action.payload ?? [] }
     case 'SET_STATES_TO_SHOW':
       return { ...state, statesToShow: action.payload }
     default:

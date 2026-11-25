@@ -16,7 +16,7 @@ import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
 import { getInitialState, reducer, State } from './store/dataTable.reducer'
 import { Config } from './types/Config'
-const EditorPanel = lazy(() => import('./components/EditorPanel'))
+const EditorPanel = lazy(() => import('./panels'))
 
 type CdcDataTableProps = {
   config?: Config

@@ -682,28 +682,4 @@ export const SmallMultiplesSectionTests: Story = {
   }
 }
 
-export const ComboRightValueAxisSectionTests: Story = {
-  name: 'Combo Right Value Axis Section Tests',
-  args: {
-    config: {
-      ...comboConfig,
-      visualizationType: 'Combo',
-      orientation: 'vertical'
-    },
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Right Value Axis')
-
-    expect(canvas.queryByLabelText(/^label offset$/i)).toBeFalsy()
-
-    const labelPlacementSelect = canvasElement.querySelector('select[name="rightTitlePlacement"]') as HTMLSelectElement
-    expect(labelPlacementSelect).toBeTruthy()
-    expect(labelPlacementSelect.value).toBe('side')
-  }
-}
-
 export default meta

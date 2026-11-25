@@ -7,6 +7,7 @@ import { type TooltipRow } from '../../helpers/tooltipHelpers'
 import { type ChartConfig } from '../../types/ChartConfig'
 import { type ChartContext } from '../../types/ChartContext'
 import { useTooltip } from '../useTooltip'
+import { getHighlightedBarLegendKey } from '../../helpers/barLegendHighlight'
 
 vi.mock('@visx/event', () => ({
   localPoint: () => ({ x: 5, y: 5 })
@@ -160,6 +161,40 @@ describe('useTooltip', () => {
         expect.objectContaining({ key: 'Percentage', value: '22.0%', kind: 'series' }),
         expect.objectContaining({ key: 'Count', value: '146', kind: 'extra' })
       ])
+    )
+  })
+
+  it('keeps the selected highlighted bar series in the shared tooltip', () => {
+    const highlightLabel = 'Highlighted category'
+    const highlightedConfig = createMockConfig({
+      ...config,
+      legend: { ...config.legend, behavior: 'isolate' },
+      highlightedBarValues: [
+        {
+          dataKey: 'Percentage',
+          value: row['Cause of death'],
+          legendLabel: highlightLabel,
+          color: '#FFA500',
+          borderWidth: 5
+        }
+      ]
+    })
+    const highlightedWrapper = ({ children }: React.PropsWithChildren) => (
+      <ConfigContext.Provider
+        value={createMockChartContext(highlightedConfig, {
+          tableData: [row],
+          seriesHighlight: [getHighlightedBarLegendKey(highlightLabel)]
+        })}
+      >
+        {children}
+      </ConfigContext.Provider>
+    )
+    const { result } = renderHook(() => useTooltip({ xScale, yScale, showTooltip, hideTooltip, yAxisWidth: 0 }), {
+      wrapper: highlightedWrapper
+    })
+    act(() => result.current.handleTooltipMouseOver({}))
+    expect(showTooltip.mock.calls[0][0].tooltipData.data).toEqual(
+      expect.arrayContaining([expect.objectContaining({ key: 'Percentage', value: '22.0%', kind: 'series' })])
     )
   })
 

@@ -21,6 +21,17 @@ import { generateRuntimeLegend } from '../generateRuntimeLegend'
 const makeMemo = () => ({ current: new Map<string, number>() })
 
 describe('bubbleLayers', () => {
+  it.each([undefined, false, '', null, 'true', 1])('defaults label placement to false for %s', value => {
+    expect(normalizeBubbleLayer({ placeOverLabels: value } as any).placeOverLabels).toBe(false)
+  })
+
+  it('preserves explicit label placement through normalization and JSON reload', () => {
+    for (const placeOverLabels of [true, false]) {
+      const layer = normalizeBubbleLayer({ placeOverLabels })
+      expect(normalizeBubbleLayer(JSON.parse(JSON.stringify(layer))).placeOverLabels).toBe(placeOverLabels)
+    }
+  })
+
   it('hides the bubble size legend by default while preserving explicit opt-in', () => {
     expect(normalizeBubbleLayer({}).legend?.size?.show).toBe(false)
     expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)

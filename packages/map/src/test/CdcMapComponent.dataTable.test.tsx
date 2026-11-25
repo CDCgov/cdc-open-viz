@@ -13,6 +13,8 @@ vi.hoisted(() => {
     })
   })
 })
+const mapContextProbe = vi.hoisted(() => ({ current: undefined as any }))
+
 const dataTableRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((props: any) => void) }))
 
 const nextDataTableRender = (isReady: (props: any) => boolean = () => true) =>
@@ -37,9 +39,13 @@ vi.mock('@cdc/core/components/DataTable', async () => {
 
 vi.mock('../components/MapContainer', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
+  const { default: Context } = await vi.importActual<typeof import('../context')>('../context')
 
   return {
-    default: () => React.createElement('div', { 'data-testid': 'mock-map-container' })
+    default: function MockMapContainer() {
+      mapContextProbe.current = React.useContext(Context)
+      return React.createElement('div', { 'data-testid': 'mock-map-container' })
+    }
   }
 })
 
@@ -102,6 +108,49 @@ const renderPlaybackMap = config =>
 describe('CdcMapComponent data table wiring', () => {
   beforeEach(() => {
     dataTableRender.onRender = undefined
+  })
+
+  it('passes assigned dataset columns to runtime density without restoring filtered rows', async () => {
+    const filtered = [{ FIPS: '04013', a: 50, derived: 12 }]
+    const source = [
+      { FIPS: '04013', a: 50 },
+      { FIPS: '04001', b: 25 }
+    ]
+    const config = createPlaybackMapConfig(filtered, {
+      dataKey: 'dashboardData',
+      general: { title: 'Sparse density map', geoType: 'us-county', type: 'data' },
+      timePlayback: { enabled: false },
+      columns: { geo: { name: 'FIPS' }, primary: { name: '' } },
+      dotDensity: {
+        enabled: true,
+        dotValue: 5,
+        radius: 2,
+        seed: 42,
+        series: [
+          { id: 'a', column: 'a', label: 'A', color: '#0072b2' },
+          { id: 'b', column: 'b', label: 'B', color: '#d55e00' }
+        ]
+      }
+    })
+    render(
+      <CdcMapComponent
+        config={config}
+        datasets={{ dashboardData: { data: source } } as any}
+        isDashboard
+        interactionLabel='density-schema-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+    await waitFor(() =>
+      expect(mapContextProbe.current?.densitySourceColumns).toEqual(
+        expect.arrayContaining(['FIPS', 'a', 'b', 'derived'])
+      )
+    )
+    expect(mapContextProbe.current.config.data).toHaveLength(1)
+    expect(mapContextProbe.current.config.data[0]).toMatchObject(filtered[0])
+    expect(config).not.toHaveProperty('densitySourceColumns')
   })
 
   it('hides Previous and Next when playback step buttons are disabled', async () => {

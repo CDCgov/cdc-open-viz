@@ -1,7 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 
 import MultiDashboardWrapper from './CdcDashboard'
@@ -13,7 +13,7 @@ let domContainer = document.getElementsByClassName('react-container')[0] as HTML
 let configUrl = domContainer.dataset.configUrl
 let injectedConfig = domContainer.coveConfig
 
-ReactDOM.createRoot(domContainer).render(
+createDevRoot(domContainer).render(
   <React.StrictMode>
     <MultiDashboardWrapper
       config={injectedConfig}

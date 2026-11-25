@@ -58,7 +58,13 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     e.preventDefault()
     const placeHolderLayer = {
       name: 'New Custom Layer',
-      url: ''
+      url: '',
+      namespace: '',
+      fill: '',
+      fillOpacity: '',
+      stroke: '',
+      strokeWidth: '',
+      tooltip: ''
     }
     const newConfig = cloneConfig(config)
     newConfig.map.layers.unshift(placeHolderLayer)
@@ -89,6 +95,10 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     if (!config.map.layers) return
 
     for (const mapLayer of config.map.layers) {
+      if (!mapLayer.url?.trim()) {
+        TopoJSONObjects.push([])
+        continue
+      }
       let newLayerItem = await fetch(mapLayer.url)
         .then(res => res.json())
         .catch(e => console.warn('error with newLayer item', e)) // eslint-disable-line

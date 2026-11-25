@@ -30,6 +30,8 @@ export default defineConfig({
           setupFiles: ['./vitest.setup.ts'],
           ...(isQuickStorybookMode ? { exclude: quickStorybookExclude } : {}),
           testTimeout: 600000,
+          // Axe runs after every story, so keep the shared Chromium/Vite session below runner saturation.
+          maxWorkers: 2,
           browser: {
             enabled: true,
             instances: [
@@ -44,6 +46,17 @@ export default defineConfig({
             }),
             headless: true
           }
+        },
+        optimizeDeps: {
+          include: [
+            '@hello-pangea/dnd',
+            'react-accessible-accordion',
+            'lodash/keys',
+            'use-debounce',
+            'lodash/flatten',
+            'prop-types',
+            'json-edit-react'
+          ]
         },
         plugins: [storybookTest()]
       }

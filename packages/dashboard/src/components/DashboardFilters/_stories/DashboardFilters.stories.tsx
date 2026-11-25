@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
-import '../../../scss/main.scss'
+import '../../../css/main.css'
 
 const longConditionLabel = 'Paratyphoid fever (Salmonella enterica serotypes Paratyphi A, B (tartrate negative) and C)'
 

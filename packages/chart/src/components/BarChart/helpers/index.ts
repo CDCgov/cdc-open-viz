@@ -60,7 +60,7 @@ export const getBarConfig = ({
   }
   // Handle undefined, null, or non-calculable bar.value
 
-  if (!isSuppressed && bar.value === '0' && config.general.showZeroValueData) {
+  if (!isSuppressed && isNumber(bar.value) && Number(bar.value) === 0 && config.general.showZeroValueData) {
     const labelWidth = getTextWidth('0', `normal ${labelFontSize}px sans-serif`)
     const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     showZeroValueData = true

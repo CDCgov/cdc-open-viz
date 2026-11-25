@@ -41,12 +41,19 @@ const HeaderThemeSelector: React.FC<HeaderThemeSelectorProps> = ({
     onThemeSelect(theme)
   }
 
+  const preventLabelClickSelection = (e: React.MouseEvent) => {
+    if (e.target instanceof HTMLButtonElement) return
+    e.preventDefault()
+  }
+
   return (
-    <label className='header'>
+    <label className='header' onClick={preventLabelClickSelection}>
       <span className='edit-label'>{label}</span>
       <ul className={className}>
         {headerColors.map(theme => (
           <button
+            type='button'
+            aria-label={theme}
             title={theme}
             key={theme}
             onClick={handleThemeSelection(theme)}

@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import initialState from '../../data/initial-state'
 import { getBubbleRenderData } from '../bubbleRenderData'
+import { createNewMapConfig } from '../createNewMapConfig'
+import { generateBubbleSizeDomainData, generateBubbleLayerRuntimeData } from '../generateRuntimeData'
+import { createBubbleSizeScale, getBubbleSizeLegendItems } from '../bubbleLayers'
+import { getOrderedBubbleSizeCategories } from '../bubbleSize'
+import numericFixture from '../../_stories/_mock/bubble-tabbed-numeric.json'
+import categoryFixture from '../../_stories/_mock/bubble-tabbed-category.json'
 
 const makeMemo = (entries: [number, number][] = []) => ({ current: new Map(entries) })
 const noopBubbleMemo = () => makeMemo()
@@ -206,5 +212,87 @@ describe('bubbleRenderData', () => {
 
     expect(rows.map(row => row.uid)).toEqual(['US-AL'])
     expect(rows[0].fillColor).toBe('#111111')
+  })
+})
+
+describe('tabbed size domains', () => {
+  it.each([numericFixture, categoryFixture])(
+    'preserves all eligible rows independent of tab and row order',
+    fixture => {
+      const config = createNewMapConfig(fixture)
+      const reversed = createNewMapConfig({ ...fixture, data: [...fixture.data].reverse() })
+      const layer = config.bubble.layers[0]
+      const domain = generateBubbleSizeDomainData(config, layer)
+      const reversedDomain = generateBubbleSizeDomainData(reversed, layer)
+      const sizeColumn = layer.columns.size.name
+      expect(domain).toHaveLength(6)
+      expect(domain.map(row => row[sizeColumn]).sort()).toEqual(reversedDomain.map(row => row[sizeColumn]).sort())
+      expect(getOrderedBubbleSizeCategories(domain, sizeColumn)).toEqual(
+        getOrderedBubbleSizeCategories(reversedDomain, sizeColumn)
+      )
+      expect(
+        getBubbleSizeLegendItems(
+          domain.map(row => row.Cases),
+          layer,
+          'en-US'
+        )
+      ).toEqual(
+        getBubbleSizeLegendItems(
+          reversedDomain.map(row => row.Cases),
+          layer,
+          'en-US'
+        )
+      )
+      const scale = createBubbleSizeScale(
+        domain.map(row => row.Cases),
+        layer
+      )
+      expect(scale.getRadius(100)).toBe(20)
+      // Rendering continues to filter before deduplication, while the domain stays unfiltered.
+      for (const active of ['Earlier', 'Later']) {
+        const runtimeFilters = [{ columnName: 'Tab', active }]
+        const summarize = config =>
+          getRows(config, { runtimeFilters })
+            .map(row => [row.uid, row.radius])
+            .sort()
+        expect(summarize(config)).toEqual(summarize(reversed))
+        expect(Object.values(generateBubbleLayerRuntimeData(config, layer, runtimeFilters as any, 0))).toHaveLength(3)
+      }
+    }
+  )
+
+  it('retains the categorical-only unmatched geography opt-in', () => {
+    const config = createNewMapConfig(categoryFixture)
+    const layer = config.bubble.layers[0]
+    layer.includeNonGeoDataInSizeDomain = true
+    expect(generateBubbleSizeDomainData(config, layer)).toHaveLength(7)
+    layer.sizeType = 'numeric'
+    expect(generateBubbleSizeDomainData(config, layer)).toHaveLength(6)
+  })
+
+  it('validates coordinate domain rows even when their geography matches', () => {
+    const config = createNewMapConfig(numericFixture)
+    const layer = config.bubble.layers[0]
+    layer.locationSource = 'latitude-longitude'
+    layer.columns.latitude = { name: 'lat' }
+    layer.columns.longitude = { name: 'lng' }
+    config.data = [
+      { State: 'Alabama', lat: 0, lng: 0, Cases: 10 },
+      { State: 'Alabama', lat: 32, lng: -86, Cases: 100 },
+      { State: 'Alabama', lat: '', lng: -86, Cases: 1000 },
+      { State: 'California', lat: 'bad', lng: -120, Cases: 2000 }
+    ] as any
+    expect(generateBubbleSizeDomainData(config, layer).map(row => row.Cases)).toEqual([10, 100])
+  })
+
+  it('builds a separate domain for each layer without changing ordinary row deduplication', () => {
+    const config = createNewMapConfig(numericFixture)
+    const first = config.bubble.layers[0]
+    const second = { ...first, columns: { ...first.columns, geo: { name: 'Other State' } } }
+    config.bubble.layers.push(second)
+    config.data = config.data.map(row => ({ ...row, 'Other State': row.Tab === 'Earlier' ? 'Alabama' : 'Unmatched' }))
+    expect(generateBubbleSizeDomainData(config, first)).toHaveLength(6)
+    expect(generateBubbleSizeDomainData(config, second)).toHaveLength(3)
+    expect(Object.values(generateBubbleLayerRuntimeData(config, first, [], 0))).toHaveLength(3)
   })
 })

@@ -1,0 +1,55 @@
+.color-palette li.theme-purple,
+.btn.theme-purple {
+  background: #712177;
+  border-bottom-color: #b890bb;
+}
+.color-palette li.theme-brown,
+.btn.theme-brown {
+  background: #705043;
+  border-bottom-color: #ad907b;
+}
+.color-palette li.theme-teal,
+.btn.theme-teal {
+  background: #00695c;
+  border-bottom-color: #4ebaaa;
+}
+.color-palette li.theme-pink,
+.btn.theme-pink {
+  background: #af4448;
+  border-bottom-color: #e57373;
+}
+.color-palette li.theme-orange,
+.btn.theme-orange {
+  background: #bb4d00;
+  border-bottom-color: #ffad42;
+}
+.color-palette li.theme-slate,
+.btn.theme-slate {
+  background: #29434e;
+  border-bottom-color: #7e9ba5;
+}
+.color-palette li.theme-indigo,
+.btn.theme-indigo {
+  background: #26418f;
+  border-bottom-color: #92a6dd;
+}
+.color-palette li.theme-cyan,
+.btn.theme-cyan {
+  background: #007b91;
+  border-bottom-color: #65b0bd;
+}
+.color-palette li.theme-green,
+.btn.theme-green {
+  background: #4b830d;
+  border-bottom-color: #84bc49;
+}
+.color-palette li.theme-amber,
+.btn.theme-amber {
+  background: #fbab18;
+  border-bottom-color: #ffd54f;
+}
+.color-palette li.theme-blue,
+.btn.theme-blue {
+  background: #005eaa;
+  border-bottom-color: #88c3ea;
+}

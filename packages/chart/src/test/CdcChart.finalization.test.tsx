@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import ResizeObserver from 'resize-observer-polyfill'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { performAndAssert } from '@cdc/core/helpers/testing'
@@ -22,6 +23,16 @@ vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
   default: ({ children }) => children({ width: 640, height: 360 })
 }))
 
+// Finalization does not depend on layout. Avoid the real polyfill's timers and
+// animation frames, which can outlive the jsdom document during teardown.
+vi.mock('resize-observer-polyfill', () => ({
+  default: class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}))
+
 vi.mock('../components/LinearChart', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
   const { default: ConfigContext } = await vi.importActual<typeof import('../ConfigContext')>('../ConfigContext')
@@ -40,7 +51,7 @@ vi.mock('../components/EditorPanel', async () => {
   const { default: ConfigContext } = await vi.importActual<typeof import('../ConfigContext')>('../ConfigContext')
 
   return {
-    default: () => {
+    default: function MockEditorPanel() {
       const { config, setConfig } = React.useContext(ConfigContext)
       return React.createElement(
         'button',
@@ -82,6 +93,26 @@ describe('CdcChart new visualization finalization', () => {
   })
 
   afterAll(() => canvasContext.mockRestore())
+
+  it('disconnects the chart container resize observer when unmounted', async () => {
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe')
+    const disconnect = vi.spyOn(ResizeObserver.prototype, 'disconnect')
+    try {
+      const { container, unmount, setTempConfig } = renderChart(getConfig(), { isEditor: true })
+      await waitFor(() => expect(setTempConfig).toHaveBeenCalled())
+      const chartContainer = container.querySelector('.cove-visualization')!
+      const observationIndex = observe.mock.calls.findIndex(([target]) => target === chartContainer)
+      expect(observationIndex).toBeGreaterThanOrEqual(0)
+      const chartObserver = observe.mock.contexts[observationIndex]
+
+      unmount()
+
+      expect(disconnect.mock.contexts).toContain(chartObserver)
+    } finally {
+      observe.mockRestore()
+      disconnect.mockRestore()
+    }
+  })
 
   it('finalizes an initially valid standalone editor chart before saving and rendering', async () => {
     const { setTempConfig } = renderChart(getConfig(), { isEditor: true })

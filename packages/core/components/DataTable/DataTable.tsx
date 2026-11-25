@@ -57,6 +57,8 @@ export type DataTableProps = {
   isEditor?: boolean
   showTable?: boolean
   navigationHandler?: Function
+  /** Optional map-owned link behavior; other consumers retain the legacy defaults. */
+  mapLinkSettings?: { enabled: boolean; target: '_self' | '_blank' }
   outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] & Record<string, Object>

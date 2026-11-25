@@ -1,7 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 
-import '@cdc/core/styles/cove-main.scss'
+import '@cdc/core/styles/cove-main.css'
 
 import CdcEditor from './CdcEditor'
 
@@ -14,7 +14,7 @@ let injectedConfig = domContainer.coveConfig
 
 let isDebug = window.location.href.includes('debug=true')
 
-ReactDOM.createRoot(domContainer).render(
+createDevRoot(domContainer).render(
   <React.StrictMode>
     <CdcEditor startingTab={activeTab} containerEl={domContainer} config={injectedConfig} isDebug={isDebug} />
   </React.StrictMode>

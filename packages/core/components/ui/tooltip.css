@@ -1,0 +1,184 @@
+:root {
+  --cove-tooltip-bg: #fff;
+  --cove-tooltip-color: black;
+  --cove-tooltip-font-size: 14px;
+  --cove-tooltip-border-color: #bdbdbd;
+  --cove-tooltip-heading-fontWeight: bold;
+  --cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
+  --cove-tooltip-maxWidth: 280px;
+}
+
+.cove .capitalize,
+.cove-visualization .capitalize {
+  text-transform: capitalize;
+}
+.cove .react-tooltip .styles-module_arrow,
+.cove .react-tooltip .react-tooltip-arrow,
+.cove-visualization .react-tooltip .styles-module_arrow,
+.cove-visualization .react-tooltip .react-tooltip-arrow {
+  backface-visibility: hidden;
+  border-bottom: var(--cove-tooltip-border-color) 1px solid;
+  border-right: var(--cove-tooltip-border-color) 1px solid;
+}
+.cove .react-tooltip,
+.cove .tooltip,
+.cove-visualization .react-tooltip,
+.cove-visualization .tooltip {
+  border: 1px solid var(--cove-tooltip-border-color);
+  color: var(--cove-tooltip-color);
+  opacity: 1;
+  padding: 0.3rem 0.5rem;
+  z-index: 1000;
+}
+.cove .react-tooltip .interactive a,
+.cove .tooltip .interactive a,
+.cove-visualization .react-tooltip .interactive a,
+.cove-visualization .tooltip .interactive a {
+  pointer-events: all;
+}
+.cove .react-tooltip ul,
+.cove .tooltip ul,
+.cove-visualization .react-tooltip ul,
+.cove-visualization .tooltip ul {
+  list-style: none;
+  padding-left: 0;
+}
+.cove .react-tooltip ul li,
+.cove .tooltip ul li,
+.cove-visualization .react-tooltip ul li,
+.cove-visualization .tooltip ul li {
+  font-size: var(--cove-tooltip-font-size) !important;
+}
+.cove .react-tooltip ul > li.tooltip-body,
+.cove .tooltip ul > li.tooltip-body,
+.cove-visualization .react-tooltip ul > li.tooltip-body,
+.cove-visualization .tooltip ul > li.tooltip-body {
+  border-top: 1px solid black;
+  padding-top: 5px;
+}
+.cove .react-tooltip ul li.tooltip-body:first-of-type,
+.cove .tooltip ul li.tooltip-body:first-of-type,
+.cove-visualization .react-tooltip ul li.tooltip-body:first-of-type,
+.cove-visualization .tooltip ul li.tooltip-body:first-of-type {
+  border-top: 1px solid black;
+  padding-top: 5px;
+}
+.cove .react-tooltip ul > li.tooltip-body ~ li.tooltip-body,
+.cove .tooltip ul > li.tooltip-body ~ li.tooltip-body,
+.cove-visualization .react-tooltip ul > li.tooltip-body ~ li.tooltip-body,
+.cove-visualization .tooltip ul > li.tooltip-body ~ li.tooltip-body {
+  border-top: initial;
+  padding-top: initial;
+}
+.cove .react-tooltip .tooltip-body--marker-layout,
+.cove .tooltip .tooltip-body--marker-layout,
+.cove-visualization .react-tooltip .tooltip-body--marker-layout,
+.cove-visualization .tooltip .tooltip-body--marker-layout {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.25rem;
+}
+.cove .react-tooltip .tooltip-marker-slot,
+.cove .tooltip .tooltip-marker-slot,
+.cove-visualization .react-tooltip .tooltip-marker-slot,
+.cove-visualization .tooltip .tooltip-marker-slot {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 12px;
+  justify-content: center;
+  min-height: 1em;
+  width: 12px;
+}
+.cove .react-tooltip .tooltip-marker-swatch,
+.cove .tooltip .tooltip-marker-swatch,
+.cove-visualization .react-tooltip .tooltip-marker-swatch,
+.cove-visualization .tooltip .tooltip-marker-swatch {
+  border: rgba(0, 0, 0, 0.3) 1px solid;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+}
+.cove .react-tooltip .tooltip-marker-swatch--circle,
+.cove .tooltip .tooltip-marker-swatch--circle,
+.cove-visualization .react-tooltip .tooltip-marker-swatch--circle,
+.cove-visualization .tooltip .tooltip-marker-swatch--circle {
+  border-radius: 999px;
+}
+.cove .react-tooltip .tooltip-marker-swatch--square,
+.cove .tooltip .tooltip-marker-swatch--square,
+.cove-visualization .react-tooltip .tooltip-marker-swatch--square,
+.cove-visualization .tooltip .tooltip-marker-swatch--square {
+  border-radius: 0;
+}
+.cove .react-tooltip .tooltip-body-content,
+.cove .tooltip .tooltip-body-content,
+.cove-visualization .react-tooltip .tooltip-body-content,
+.cove-visualization .tooltip .tooltip-body-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.cove .react-tooltip .tooltip-heading,
+.cove .tooltip .tooltip-heading,
+.cove-visualization .react-tooltip .tooltip-heading,
+.cove-visualization .tooltip .tooltip-heading {
+  display: block;
+  font-size: var(--cove-tooltip-font-size) !important;
+  font-weight: var(--cove-tooltip-heading-fontWeight) !important;
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
+.cove-tooltip {
+  display: inline-block;
+  line-height: 1em;
+  position: relative;
+}
+
+.cove-tooltip--target {
+  cursor: pointer;
+  display: inherit;
+}
+
+.cove-accordion__button + .cove-tooltip--target {
+  display: inline-flex;
+  line-height: inherit;
+}
+
+.react-tooltip.cove-tooltip__content {
+  background-color: var(--cove-tooltip-bg);
+  border-radius: 5px;
+  color: var(--cove-tooltip-color);
+  cursor: default;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+  max-width: var(--cove-tooltip-maxWidth);
+  padding: 10px 8px;
+  text-align: left;
+  user-select: none;
+  z-index: 1;
+}
+.react-tooltip.cove-tooltip__content.place-top.has-shadow {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.react-tooltip.cove-tooltip__content.place-top.cove-tooltip__content--animated[class*='styles-module_show__'] {
+  animation: tooltip-btt var(--cove-tooltip-animation);
+}
+.react-tooltip.cove-tooltip__content.place-right.has-shadow {
+  box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+.react-tooltip.cove-tooltip__content.place-right.cove-tooltip__content--animated[class*='styles-module_show__'] {
+  animation: tooltip-ltr var(--cove-tooltip-animation);
+}
+.react-tooltip.cove-tooltip__content.place-bottom.has-shadow {
+  box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+}
+.react-tooltip.cove-tooltip__content.place-bottom.cove-tooltip__content--animated[class*='styles-module_show__'] {
+  animation: tooltip-ttb var(--cove-tooltip-animation);
+}
+.react-tooltip.cove-tooltip__content.place-left.has-shadow {
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+.react-tooltip.cove-tooltip__content.place-left.cove-tooltip__content--animated[class*='styles-module_show__'] {
+  animation: tooltip-rtl var(--cove-tooltip-animation);
+}

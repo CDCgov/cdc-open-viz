@@ -26,8 +26,8 @@ import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
 
-import './data-import.scss'
-import '@cdc/core/components/managers/data-designer.scss'
+import './data-import.css'
+import '@cdc/core/components/managers/data-designer.css'
 
 import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
 import { displaySize } from '../helpers/displaySize'

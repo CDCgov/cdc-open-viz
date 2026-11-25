@@ -1,4 +1,4 @@
-import { forwardRef, useContext, useEffect, useRef, useState } from 'react'
+import { forwardRef, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import PlaybackButton from '@cdc/core/components/PlaybackButton'
 import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
@@ -6,9 +6,14 @@ import { clampRaceSecondsPerFrame } from '../raceTiming'
 import { type LineRaceEligibility } from './helpers'
 import './line-chart-race.css'
 
-type Props = { parentHeight: number; parentWidth: number; race: LineRaceEligibility }
+type Props = {
+  parentHeight: number
+  parentWidth: number
+  race: LineRaceEligibility
+  topYAxisTitles?: ReactNode
+}
 
-const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidth, race }, ref) => {
+const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidth, race, topYAxisTitles }, ref) => {
   const context = useContext(ConfigContext)
   const chartParentRef = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
@@ -121,6 +126,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
           {frame.key}
         </strong>
       </div>
+      {topYAxisTitles}
       <ConfigContext.Provider value={raceContext}>
         <div ref={chartParentRef}>
           <LinearChart ref={ref} parentWidth={parentWidth} parentHeight={parentHeight} />

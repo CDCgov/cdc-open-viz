@@ -1,12 +1,28 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildChartMargins,
+  buildGridLayout,
   buildHeatMapData,
+  buildTooltipHtml,
+  buildXLabelLookup,
+  getFormattedValueText,
   getHeatMapBucketPalette,
+  getHeatMapCellLabel,
   getHeatMapColorBucketCount,
   getHeatMapColorScale,
-  getHeatMapDataGroupRanges
+  getHeatMapDataGroupRanges,
+  getHeatMapPalette,
+  getHeatMapSeriesLabels,
+  getHeatMapSeriesTooltipEnabled,
+  getNonNegativeConfigNumber,
+  getTooltipColumns,
+  getXAxisTickLabelProps,
+  getHeatMapXAxisTickValues,
+  type HeatMapCell,
+  type HeatMapColumn,
+  type HeatMapDataGroupRange,
+  type HeatMapSourceRow
 } from '../helpers'
-import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import { type ChartConfig } from '../../../types/ChartConfig'
 
 describe('buildHeatMapData', () => {
@@ -65,6 +81,49 @@ describe('buildHeatMapData', () => {
     expect(columns).toHaveLength(2)
     expect(columns[0].bins[1].value).toBeNull()
     expect(columns[1].bins[0].value).toBeNull()
+  })
+
+  it('preserves current coercion behavior for sparse, nonnumeric, and non-finite values', () => {
+    const { columns, minValue, maxValue } = buildHeatMapData({
+      data: [
+        { category: 'Null', Austin: null },
+        { category: 'Empty', Austin: '' },
+        { category: 'Undefined', Austin: undefined },
+        { category: 'Missing' },
+        { category: 'Nonnumeric', Austin: 'not-a-number' },
+        { category: 'Positive Infinity', Austin: 'Infinity' },
+        { category: 'Negative Infinity', Austin: '-Infinity' }
+      ],
+      xDataKey: 'category',
+      series: [{ dataKey: 'Austin', name: 'Austin' }],
+      xAxisType: 'categorical'
+    })
+
+    const valueByCategory = Object.fromEntries(columns.map(column => [column.key, column.bins[0].value]))
+    const sourceRowCountByCategory = Object.fromEntries(
+      columns.map(column => [column.key, column.bins[0].sourceRows.length])
+    )
+
+    expect(valueByCategory).toEqual({
+      Null: 0,
+      Empty: 0,
+      Undefined: null,
+      Missing: null,
+      Nonnumeric: null,
+      'Positive Infinity': Infinity,
+      'Negative Infinity': -Infinity
+    })
+    expect(sourceRowCountByCategory).toEqual({
+      Null: 1,
+      Empty: 1,
+      Undefined: 0,
+      Missing: 0,
+      Nonnumeric: 0,
+      'Positive Infinity': 1,
+      'Negative Infinity': 1
+    })
+    expect(minValue).toBe(-Infinity)
+    expect(maxValue).toBe(Infinity)
   })
 
   it('builds series-driven rows when data series are provided', () => {
@@ -137,6 +196,32 @@ describe('HeatMap data grouping', () => {
     expect(getHeatMapColorBucketCount(buildPaletteConfig(12))).toBe(9)
   })
 
+  it('preserves palette selection through the helper barrel', () => {
+    const colors = ['#111111', '#eeeeee']
+    const config = buildPaletteConfig(2)
+    config.general.palette = { customColors: colors, isReversed: true }
+
+    expect(getHeatMapPalette(config)).toEqual([...colors].reverse())
+  })
+
+  it('preserves the legacy helper type exports', () => {
+    const sourceRow: HeatMapSourceRow = { category: 'A', value: 1 }
+    const cell: HeatMapCell = {
+      rowKey: 'value',
+      rowLabel: 'Value',
+      xValue: 'A',
+      xLabel: 'A',
+      value: 1,
+      sourceRows: [sourceRow]
+    }
+    const column: HeatMapColumn = { key: 'A', label: 'A', rawValue: 'A', bins: [cell] }
+    const range: HeatMapDataGroupRange = { min: 0, max: 1, label: '0–1' }
+
+    expect(column.bins[0]).toBe(cell)
+    expect(cell.sourceRows[0]).toBe(sourceRow)
+    expect(range.label).toBe('0–1')
+  })
+
   it('supports one bucket as the minimum heatmap color count', () => {
     const colorScale = getHeatMapColorScale(buildPaletteConfig(1), 0, 100)
 
@@ -164,6 +249,282 @@ describe('HeatMap data grouping', () => {
       '0.6\u20130.8',
       '0.8\u20131.0'
     ])
+  })
+})
+
+describe('HeatMap layout helpers', () => {
+  const margins = { top: 50, right: 16, bottom: 30, left: 100 }
+
+  it('builds margins for a bottom axis without visible labels or ticks', () => {
+    const config = {
+      heatmap: { xAxisPosition: 'bottom' },
+      xAxis: { hideLabel: true, hideTicks: true },
+      yAxis: { hideLabel: true },
+      hideXAxisLabel: true,
+      hideYAxisLabel: true
+    } as ChartConfig
+
+    expect(buildChartMargins(config, ['Row'], ['Column'], 800)).toEqual({
+      top: 24,
+      right: 16,
+      bottom: 16,
+      left: 72
+    })
+  })
+
+  it('builds a responsive grid from the available chart area', () => {
+    expect(buildGridLayout(800, 320, margins, 4, 2)).toEqual({
+      availableWidth: 684,
+      availableHeight: 240,
+      responsiveGridWidth: 684,
+      gridWidth: 684,
+      gridHeight: 240,
+      cellWidth: 171,
+      cellHeight: 120,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('honors minimum column width without changing the available chart area', () => {
+    expect(buildGridLayout(800, 320, margins, 4, 2, 200)).toEqual({
+      availableWidth: 684,
+      availableHeight: 240,
+      responsiveGridWidth: 684,
+      gridWidth: 800,
+      gridHeight: 240,
+      cellWidth: 200,
+      cellHeight: 120,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('keeps empty layouts finite and nonnegative', () => {
+    expect(buildGridLayout(0, 0, margins, 0, 0)).toEqual({
+      availableWidth: 0,
+      availableHeight: 0,
+      responsiveGridWidth: 0,
+      gridWidth: 0,
+      gridHeight: 0,
+      cellWidth: 0,
+      cellHeight: 0,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('normalizes configured layout numbers without changing fallback behavior', () => {
+    expect(getNonNegativeConfigNumber('12', 4)).toBe(12)
+    expect(getNonNegativeConfigNumber(-2, 4)).toBe(0)
+    expect(getNonNegativeConfigNumber('not-a-number', 4)).toBe(4)
+  })
+
+  it('preserves top and bottom x-axis label anchoring', () => {
+    expect(getXAxisTickLabelProps('top', 0, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'middle',
+      angle: 0,
+      dx: 0,
+      y: -10
+    })
+    expect(getXAxisTickLabelProps('bottom', -45, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'end',
+      angle: -45,
+      dx: 0,
+      y: 10
+    })
+    expect(getXAxisTickLabelProps('top', -60, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'start',
+      angle: -60,
+      dx: 0,
+      y: -10,
+      verticalAnchor: 'middle'
+    })
+  })
+})
+
+describe('HeatMap tooltip and label helpers', () => {
+  const buildConfig = (overrides: Record<string, unknown> = {}) =>
+    ({
+      xAxis: { dataKey: 'month', label: 'Month' },
+      yAxis: { label: 'Region' },
+      legend: { label: 'Cases' },
+      dataFormat: {
+        abbreviated: false,
+        commas: false,
+        preserveOriginalDecimals: false,
+        roundTo: 0
+      },
+      columns: {},
+      series: [],
+      runtime: { seriesLabels: {} },
+      ...overrides
+    } as unknown as ChartConfig)
+
+  const cell: HeatMapCell = {
+    rowKey: 'North',
+    rowLabel: 'Northern Region',
+    xValue: 'Jan',
+    xLabel: 'Jan',
+    value: 12,
+    sourceRows: [{ month: 'Jan', North: 12 }]
+  }
+
+  it('keeps categorical labels unchanged and preserves separate axis and tooltip date formatters', () => {
+    const columns: HeatMapColumn[] = [
+      { key: 'Jan', label: 'January', rawValue: '2024-01-01', bins: [] },
+      { key: 'Feb', label: 'February', rawValue: '2024-02-01', bins: [] }
+    ]
+    const parseDate = (value: string, showError?: boolean) => {
+      expect(showError).toBe(false)
+      return new Date(`${value}T00:00:00Z`)
+    }
+
+    expect(buildXLabelLookup(columns, 'categorical', () => 'unused', parseDate)).toEqual({
+      Jan: 'January',
+      Feb: 'February'
+    })
+    expect(buildXLabelLookup(columns, 'date', value => `Axis ${value.getUTCMonth() + 1}`, parseDate)).toEqual({
+      Jan: 'Axis 1',
+      Feb: 'Axis 2'
+    })
+    expect(buildXLabelLookup(columns, 'date', value => `Tooltip ${value.getUTCMonth() + 1}`, parseDate)).toEqual({
+      Jan: 'Tooltip 1',
+      Feb: 'Tooltip 2'
+    })
+  })
+
+  it('preserves configured, runtime, series-name, and data-key label precedence', () => {
+    const config = buildConfig({
+      columns: {
+        configured: { name: 'configured', label: 'Configured Label' },
+        unchanged: { name: 'runtime', label: 'runtime' }
+      },
+      runtime: {
+        seriesLabels: { configured: 'Runtime Configured', runtime: 'Runtime Label' }
+      }
+    })
+
+    expect(
+      getHeatMapSeriesLabels(config, [
+        { dataKey: 'configured', name: 'Series Configured' },
+        { dataKey: 'runtime', name: 'Series Runtime' },
+        { dataKey: 'named', name: 'Series Name' },
+        { dataKey: 'fallback' }
+      ])
+    ).toEqual({
+      configured: 'Configured Label',
+      runtime: 'Runtime Label',
+      named: 'Series Name',
+      fallback: 'fallback'
+    })
+  })
+
+  it('selects only additional tooltip columns in configured order with their formatting', () => {
+    const config = buildConfig({
+      columns: {
+        month: { name: 'month', label: 'Month', tooltips: true },
+        North: { name: 'North', label: 'North', tooltips: true },
+        notes: { name: 'notes', label: 'Notes', tooltips: true },
+        rate: {
+          name: 'rate',
+          label: 'Rate',
+          tooltips: true,
+          suffix: '%',
+          roundToPlace: 1,
+          commas: true
+        },
+        hidden: { name: 'hidden', label: 'Hidden', tooltips: false }
+      }
+    })
+
+    expect(getTooltipColumns(config, 'month', [{ dataKey: 'North' }])).toEqual([
+      {
+        label: 'Notes',
+        name: 'notes',
+        options: { addColPrefix: '', addColSuffix: '' }
+      },
+      {
+        label: 'Rate',
+        name: 'rate',
+        options: { addColPrefix: '', addColSuffix: '%', addColRoundTo: 1, addColCommas: true }
+      }
+    ])
+  })
+
+  it('builds exact populated and empty accessible cell labels', () => {
+    const config = buildConfig()
+
+    expect(
+      getHeatMapCellLabel({
+        cell,
+        config,
+        formatNumber: value => String(value.value),
+        xLabel: 'January',
+        xDataKey: 'month'
+      })
+    ).toBe('Month: January; Region: Northern Region; Cases: 12')
+    expect(
+      getHeatMapCellLabel({
+        cell: { ...cell, value: null },
+        config,
+        formatNumber: () => 'not used',
+        xLabel: 'January',
+        xDataKey: 'month'
+      })
+    ).toBe('Month: January; Region: Northern Region; Cases: No data')
+    expect(getFormattedValueText({ ...cell, value: null }, () => 'not used')).toBe('No data')
+  })
+
+  it('preserves aggregation, extra-column formatting, row order, and hidden-series output', () => {
+    const config = buildConfig({ series: [{ dataKey: 'North', tooltip: false }] })
+    const aggregatedCell: HeatMapCell = {
+      ...cell,
+      sourceRows: [
+        { month: 'Jan', North: 5, notes: 'Low', rate: 1234.51, missing: null },
+        { month: 'Jan', North: 7, notes: 'High', rate: 1234.54, missing: '' }
+      ]
+    }
+    const additionalColumns = [
+      { label: 'Notes', name: 'notes', options: { addColPrefix: '', addColSuffix: '' } },
+      {
+        label: 'Rate',
+        name: 'rate',
+        options: { addColPrefix: '', addColSuffix: '%', addColRoundTo: 1, addColCommas: true }
+      },
+      { label: 'Missing', name: 'missing', options: { addColPrefix: '', addColSuffix: '' } }
+    ]
+    const visibleHtml = buildTooltipHtml({
+      cell: aggregatedCell,
+      additionalColumns,
+      config,
+      formatNumber: () => '12',
+      xLabel: 'January',
+      xDataKey: 'month',
+      showSeriesRows: true
+    })
+
+    expect(visibleHtml).toBe(
+      '<ul><li class="tooltip-heading">Month: January</li><li class="tooltip-body">Region: Northern Region</li><li class="tooltip-body">Cases: 12</li><li class="tooltip-body">Aggregated Rows: 2</li><li class="tooltip-body">Notes: Multiple values</li><li class="tooltip-body">Rate: 1,234.5%</li><li class="tooltip-body">Missing: No data</li></ul>'
+    )
+    expect(
+      buildTooltipHtml({
+        cell: aggregatedCell,
+        additionalColumns,
+        config,
+        formatNumber: () => '12',
+        xLabel: 'January',
+        xDataKey: 'month',
+        showSeriesRows: false
+      })
+    ).toBe(
+      '<ul><li class="tooltip-heading">Month: January</li><li class="tooltip-body">Aggregated Rows: 2</li><li class="tooltip-body">Notes: Multiple values</li><li class="tooltip-body">Rate: 1,234.5%</li><li class="tooltip-body">Missing: No data</li></ul>'
+    )
+    expect(getHeatMapSeriesTooltipEnabled(config, 'North')).toBe(false)
+    expect(getHeatMapSeriesTooltipEnabled(config, 'Missing')).toBe(true)
   })
 })
 

@@ -138,7 +138,7 @@ const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggl
         <Widget
           title={handleTitle(widget, config.dashboard?.sharedFilters)}
           widgetConfig={{ rowIdx, colIdx, ...widget, uid: data.widget }}
-          type={widget.visualizationType ?? widget.general?.geoType}
+          type={widget.visualizationType || (widget.type === 'map' ? widget.general?.geoType : widget.type)}
           toggleRow={toggleRow}
           widgetInRow
         />
@@ -243,7 +243,7 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
         <Widget
           title={handleTitle(widget, config.dashboard?.sharedFilters)}
           widgetConfig={{ rowIdx, colIdx, entryIdx: entryIndex, ...widget, uid: widgetKey }}
-          type={widget.visualizationType ?? widget.general?.geoType}
+          type={widget.visualizationType || (widget.type === 'map' ? widget.general?.geoType : widget.type)}
           toggleRow={toggleRow}
           widgetInRow
         />

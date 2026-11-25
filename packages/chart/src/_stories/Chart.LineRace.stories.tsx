@@ -25,6 +25,15 @@ const newestFirstLineRaceExample = {
   data: lineRaceExample.data.map(({ Year, ...row }) => ({ Date: `${Year}-01-01`, ...row }))
 }
 
+const topAxisTitleLineRaceExample = {
+  ...lineRaceExample,
+  title: 'Line race with top value axis title',
+  yAxis: {
+    ...lineRaceExample.yAxis,
+    titlePlacement: 'top'
+  }
+}
+
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Line Race',
   component: Chart,
@@ -72,6 +81,30 @@ export const ChangesOverTime: Story = {
         after.seriesWeight === '7' &&
         after.axis === before.axis
     )
+  }
+}
+
+export const TopValueAxisTitle: Story = {
+  name: 'Top Value Axis Title',
+  args: {
+    config: topAxisTitleLineRaceExample as any,
+    isEditor: false,
+    interactionLabel: 'Line race with top value axis title'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    const playButton = canvas.getByRole('button', { name: 'Play' })
+    const header = canvasElement.querySelector('.line-chart-race__header')
+    const titleRow = canvasElement.querySelector('.y-axis-top-title-row')
+    const chart = canvasElement.querySelector('[data-line-race-series-path]')?.closest('svg')
+
+    expect(playButton).toBeInTheDocument()
+    expect(canvasElement.querySelectorAll('.y-axis-top-title-row')).toHaveLength(1)
+    expect(titleRow).toHaveTextContent('Population (millions)')
+    expect(header).toContainElement(playButton)
+    expect(header?.nextElementSibling).toBe(titleRow)
+    expect(titleRow?.nextElementSibling).toContainElement(chart)
   }
 }
 

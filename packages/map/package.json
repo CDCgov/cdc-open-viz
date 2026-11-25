@@ -1,11 +1,11 @@
 {
   "name": "@cdc/map",
-  "version": "4.26.7",
+  "version": "4.26.11",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "license": "Apache-2.0",
   "bugs": "https://github.com/CDCgov/cdc-open-viz/issues",
   "dependencies": {
-    "@cdc/core": "^4.26.7",
+    "@cdc/core": "^4.26.11",
     "@hello-pangea/dnd": "^16.2.0",
     "@rollup/plugin-dsv": "^3.0.2",
     "@visx/annotation": "^3.12.0",
@@ -31,7 +31,6 @@
     "react-icons": "^5.5.0",
     "react-tooltip": "5.8.2-beta.3",
     "resize-observer-polyfill": "^1.5.1",
-    "sass": "^1.89.2",
     "topojson-client": "^3.1.0",
     "use-debounce": "^10.1.0",
     "vite": "^7.3.7",

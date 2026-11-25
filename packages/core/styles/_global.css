@@ -1,0 +1,221 @@
+strong {
+  font-weight: 600;
+}
+
+.error-box {
+  background: #ffc2c2;
+  display: flex;
+  font-size: 0.9rem;
+  justify-content: space-between;
+  padding: 0.3rem 1rem;
+}
+.error-box strong {
+  font-weight: 600;
+}
+.error-box p {
+  margin: 0;
+}
+.error-box .dismiss-error {
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+}
+
+.cdcdataviz-sr-only,
+.cdcdataviz-sr-only-focusable:not(:focus) {
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0) !important;
+  display: flex;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  white-space: nowrap !important;
+  width: 1px !important;
+}
+
+.cdcdataviz-sr-only-focusable:focus {
+  margin-bottom: 0.5em;
+  margin-left: 1em;
+  width: fit-content;
+}
+
+.inline-icon {
+  color: inherit;
+  font-size: 1rem;
+  height: auto !important;
+  width: 1em !important;
+}
+@media all and (-ms-high-contrast: none) {
+  .inline-icon {
+    height: 30px !important;
+  }
+}
+.inline-icon path {
+  fill: currentColor;
+}
+
+[data-cove-svg-size='parent-height'] {
+  --cove-inline-svg-width: auto;
+  --cove-inline-svg-height-fallback: 100%;
+  --cove-inline-svg-height: 100%;
+  --cove-inline-svg-inner-width: auto;
+  --cove-inline-svg-inner-height: 100%;
+}
+
+.btn.full-width {
+  width: 100%;
+}
+.btn:not(.btn-link) {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease,
+    transform 160ms ease;
+}
+@media (hover: hover) {
+  .btn:hover:not(:disabled):not(.disabled):not(.btn-link) {
+    box-shadow: 0 0.35rem 0.9rem rgba(0, 94, 170, 0.16);
+    transform: translateY(-1px);
+  }
+}
+.btn:active:not(:disabled):not(.disabled):not(.btn-link) {
+  box-shadow: 0 0.15rem 0.45rem rgba(0, 94, 170, 0.12);
+  transform: translateY(0);
+}
+.btn.secondary {
+  background: rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  font-size: 0.8em;
+  margin-bottom: 1em;
+  padding: 0.3em 1em;
+}
+.btn.secondary:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+.btn.danger {
+  background-color: var(--red);
+  color: #fff;
+  font-size: 0.8 em;
+  height: 1.6em;
+  padding: 0em 0.6em 0em;
+}
+.btn.danger:hover {
+  background-color: rgb(190.5, 0, 10.5833333333);
+}
+.btn svg {
+  height: 16px;
+  position: relative;
+  top: 2px;
+  width: 16px;
+}
+
+input[type='text'],
+input[type='date'],
+input[role='combobox'],
+input[type='number'],
+input[type='search'],
+textarea {
+  border: rgba(0, 0, 0, 0.3) 1px solid !important;
+  font-family: sans-serif;
+  font-size: 1em;
+  font-weight: normal;
+  padding: 0.5em 0.5em;
+}
+input[type='text']:focus,
+input[type='date']:focus,
+input[role='combobox']:focus,
+input[type='number']:focus,
+input[type='search']:focus,
+textarea:focus {
+  border: rgba(0, 0, 0, 0.7) 1px solid !important;
+  outline: 0;
+}
+
+.input-group-text {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.guidance-link {
+  border: var(--lightGray) 1px solid;
+  color: #444;
+  display: flex;
+  font-size: 1em;
+  margin: 2em 0 1em;
+  padding: 0.75em 1em;
+  position: relative;
+  text-decoration: none;
+  transition: 0.2s all;
+}
+.guidance-link:before {
+  background: var(--blue);
+  bottom: -1px;
+  content: ' ';
+  left: -1px;
+  position: absolute;
+  top: -1px;
+  width: 5px;
+}
+.guidance-link:hover {
+  background: var(--lightestGray);
+  color: #444;
+  transition: 0.2s all;
+}
+.guidance-link > div {
+  font-size: 0.9em;
+}
+.guidance-link svg {
+  color: var(--blue);
+  margin-right: 1rem;
+  width: 60px;
+}
+.guidance-link svg path {
+  fill: currentColor;
+}
+.guidance-link h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+section.introText {
+  width: 100%;
+}
+
+section.footnotes {
+  border-top: 1px solid var(--cool-gray-10);
+  width: 100%;
+}
+
+.margin-left-href {
+  margin-left: 15px;
+}
+
+.btn.btn-primary:not([disabled]) {
+  background-color: var(--blue);
+  border-color: var(--blue);
+}
+@media (hover: hover) {
+  .btn.btn-primary:not([disabled]):hover:not([disabled]) {
+    background-color: rgb(0, 82.72, 149.6);
+    border-color: rgb(0, 82.72, 149.6);
+    box-shadow: 0 0.5rem 1.1rem rgba(0, 94, 170, 0.22);
+  }
+}
+
+select.cove-form-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1em;
+  border: 1px solid var(--cool-gray-10) !important;
+  border-radius: 0.333rem;
+  color: var(--cool-gray-90);
+  cursor: pointer;
+  font-family: var(--app-font-secondary);
+  font-size: var(--filter-select-font-size);
+  font-weight: 300;
+  line-height: normal;
+  padding-right: 3rem;
+}

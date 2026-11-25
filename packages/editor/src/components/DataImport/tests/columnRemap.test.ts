@@ -20,6 +20,27 @@ import {
 } from '../helpers/columnRemap'
 
 describe('column remapping', () => {
+  it('remaps density count columns while preserving placement identity and source payloads', () => {
+    const config = {
+      type: 'map',
+      dotDensity: {
+        enabled: true,
+        series: [{ id: 'density-series-123', column: 'oldCases', label: 'Disease cases', color: '#0072b2' }]
+      },
+      data: [{ oldCases: 32 }]
+    }
+    const result = applyColumnMapping(config, { oldCases: 'newCases' })
+    expect(result.conflicts).toEqual([])
+    expect(result.value.dotDensity.series[0]).toEqual({
+      id: 'density-series-123',
+      column: 'newCases',
+      label: 'Disease cases',
+      color: '#0072b2'
+    })
+    expect(result.value.data).toEqual([{ oldCases: 32 }])
+    expect(config.dotDensity.series[0].column).toBe('oldCases')
+  })
+
   it('collects the union of columns across sparse rows', () => {
     expect(collectColumnNames([{ beta: 1 }, null, { alpha: 2, beta: 3 }, ['ignored']])).toEqual(['alpha', 'beta'])
   })

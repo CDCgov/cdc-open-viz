@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useGlobalContext } from '../GlobalContext'
 
-import './overlay.scss'
+import './overlay.css'
 
 const Overlay = ({ disableBgClose, children, override = null }) => {
   //Access global modal state

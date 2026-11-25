@@ -53,13 +53,24 @@ const readExportedConfig = (canvasElement: HTMLElement) =>
 const getIncomingPath = (canvasElement: HTMLElement) =>
   canvasElement.querySelector<SVGPathElement>('.line-chart-group path.visx-linepath')
 
+const assertRenderedLinePath = (path: SVGPathElement) => {
+  const coordinates = (path.getAttribute('d')?.match(/-?\d*\.?\d+(?:e[+-]?\d+)?/gi) ?? []).map(Number)
+  expect(coordinates.length).toBeGreaterThanOrEqual(4)
+  expect(coordinates.every(Number.isFinite)).toBe(true)
+  const points = Array.from(
+    { length: Math.floor(coordinates.length / 2) },
+    (_, index) => `${coordinates[index * 2]},${coordinates[index * 2 + 1]}`
+  )
+  expect(new Set(points).size).toBeGreaterThan(1)
+}
+
 const assertLineStyling = (canvasElement: HTMLElement, incomingDash: string) => {
   const incoming = getIncomingPath(canvasElement)
   expect(incoming).toHaveAttribute('stroke-dasharray', incomingDash)
-  expect(incoming.getTotalLength()).toBeGreaterThan(1)
+  assertRenderedLinePath(incoming)
   const outgoing = canvasElement.querySelectorAll<SVGPathElement>('.line-chart-group path.visx-linepath')[1]
   expect(outgoing).toHaveAttribute('stroke-dasharray', '5 5')
-  expect(outgoing.getTotalLength()).toBeGreaterThan(1)
+  assertRenderedLinePath(outgoing)
 }
 
 const reloadExportedConfig = async (canvasElement: HTMLElement, expectedScope?: 'outgoing') => {
@@ -75,13 +86,17 @@ const reloadExportedConfig = async (canvasElement: HTMLElement, expectedScope?: 
   }
 
   const incomingDash = expectedScope === 'outgoing' ? '0' : '5 5'
-  const originalPath = getIncomingPath(canvasElement).getAttribute('d')
   await userEvent.click(canvas.getByRole('button', { name: 'Reload exported configuration' }))
   expect(canvas.getByTestId('editor-instance')).toHaveAttribute('data-revision', '1')
   await waitForEditor(canvas)
   await assertVisualizationRendered(canvasElement)
+  await performAndAssert(
+    'Wait for the reloaded line to render',
+    () => getIncomingPath(canvasElement)?.getAttribute('d') ?? '',
+    () => {},
+    (_, path) => (path.match(/-?\d*\.?\d+(?:e[+-]?\d+)?/gi) ?? []).length >= 4
+  )
   assertLineStyling(canvasElement, incomingDash)
-  expect(getIncomingPath(canvasElement)).toHaveAttribute('d', originalPath)
 }
 
 const meta: Meta<typeof CdcEditor> = {

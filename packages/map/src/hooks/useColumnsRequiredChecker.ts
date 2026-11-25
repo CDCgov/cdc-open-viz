@@ -10,26 +10,21 @@ const useColumnsRequiredChecker = () => {
   const columnsRequiredChecker = () => {
     const { primaryColumnName, geoColumnName } = getColumnNames(config.columns)
     const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
-    const isDataMap = ['data', 'map'].includes(config.general.type as string)
+    const usesStructuredAlerts = ['data', 'map', 'navigation'].includes(config.general.type as string)
 
     let columnList = []
 
     // Bubble layers can supply the only mapped data columns for bubble-only maps.
-    if (!hasBubbleLayers && !isDataMap) {
+    if (!hasBubbleLayers && !usesStructuredAlerts) {
       // Geo is always required
       if (!geoColumnName) {
         columnList.push('Geography')
       }
 
-      // Primary is required if we're on a data map or a point map
-      if ('navigation' !== config.general.type && '' === primaryColumnName) {
+      // Primary is required for point maps
+      if ('' === primaryColumnName) {
         columnList.push('Primary')
       }
-    }
-
-    // Navigate is required for navigation maps
-    if ('navigation' === config.general.type && '' === config.columns.navigate.name) {
-      columnList.push('Navigation')
     }
 
     if (

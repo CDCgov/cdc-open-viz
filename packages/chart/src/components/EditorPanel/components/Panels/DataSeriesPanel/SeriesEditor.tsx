@@ -1,0 +1,877 @@
+import React, { useContext } from 'react'
+import ConfigContext from '../../../../../ConfigContext'
+
+// Core
+import Check from '@cdc/core/assets/icon-check.svg'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import Icon from '@cdc/core/components/ui/Icon'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import Button from '@cdc/core/components/elements/Button'
+import PanelHeader from '@cdc/core/components/panels/PanelHeader'
+import { buildForecastPaletteOptions } from '../../../../../helpers/buildForecastPaletteOptions'
+import { getSeriesColumnConfig, upsertSeriesColumnConfig } from '../../../../../helpers/seriesColumnSettings'
+
+// Third Party
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
+import { Draggable } from '@hello-pangea/dnd'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+
+const SeriesContext = React.createContext({})
+
+const SeriesWrapper = props => {
+  const { updateConfig, config, rawData } = useContext(ConfigContext)
+
+  const { getColumns, selectComponent, handleForecastPaletteSelection } = props
+
+  const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
+
+  const updateSeries = (index, value, property) => {
+    let series = [...config.series]
+    series[index][property] = value
+
+    // Reset bars to the left axis if changed.
+    if (property === 'type') {
+      if (value === 'Bar') {
+        series[index].axis = 'Left'
+      }
+    }
+
+    // dynamically add in the forecasting fields
+    if (series[index].type === 'Forecasting') {
+      let forecastingStages = Array.from(new Set(rawData.map(item => item[series[index].dataKey])))
+      let forecastingStageArr = []
+
+      forecastingStages.forEach(stage => {
+        forecastingStageArr.push({ key: stage })
+      })
+      series[index].stages = forecastingStageArr
+      series[index].stageColumn = series[index].dataKey
+    }
+
+    updateConfig({ ...config, series })
+  }
+
+  return (
+    <SeriesContext.Provider
+      value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}
+    >
+      {props.children}
+    </SeriesContext.Provider>
+  )
+}
+
+const SeriesDropdownLineType = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { series, index } = props
+
+  // Run a quick test to determine if we should even show this.
+  const supportsLineType = () => {
+    let supported = false
+    if (config.visualizationSubType === 'stacked') return supported
+    const supportedCharts = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart', 'Bump Chart']
+    if (supportedCharts.some(item => item.includes(series.type))) {
+      supported = true
+    }
+    return supported
+  }
+
+  if (!supportsLineType()) return
+
+  const changeLineType = (i, value) => {
+    let series = [...config.series]
+    series[i].lineType = value
+    updateConfig({ ...config, series })
+  }
+
+  let options = []
+
+  Object.keys(approvedCurveTypes).map(curveName => {
+    return options.push(approvedCurveTypes[curveName])
+  })
+
+  return (
+    <Select
+      initial='Select an option'
+      value={series.lineType ? series.lineType : 'curveLinear'}
+      label='Series Line Type'
+      updateField={(_section, _subsection, _fieldName, value) => {
+        changeLineType(index, value)
+      }}
+      options={options}
+    />
+  )
+}
+
+const SeriesDropdownSeriesType = props => {
+  const { config } = useContext(ConfigContext)
+  const { updateSeries } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  const getOptions = () => {
+    if (config.visualizationType === 'Combo') {
+      return [
+        { value: 'Bar', label: 'Bar' },
+        { value: 'Line', label: 'Line' },
+        { value: 'dashed-sm', label: 'Small Dashed' },
+        { value: 'dashed-md', label: 'Medium Dashed' },
+        { value: 'dashed-lg', label: 'Large Dashed' },
+        { value: 'Area Chart', label: 'Area Chart' },
+        { value: 'Forecasting', label: 'Forecasting' }
+      ]
+    }
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Bump Chart') {
+      return [
+        { value: 'Line', label: 'Line' },
+        { value: 'dashed-sm', label: 'Small Dashed' },
+        { value: 'dashed-md', label: 'Medium Dashed' },
+        { value: 'dashed-lg', label: 'Large Dashed' }
+      ]
+    }
+  }
+
+  // Allowable changes
+  if (!['Line', 'Combo', 'Bump Chart'].includes(config.visualizationType)) return
+  return (
+    <Select
+      initial='Select an option'
+      value={series.type}
+      label='Series Type'
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'type')
+      }}
+      options={getOptions()}
+    />
+  )
+}
+
+const SeriesDropdownForecastingStage = props => {
+  const { config, updateConfig, rawData } = useContext(ConfigContext)
+  const { updateSeries, getColumns } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  // Only combo charts are allowed to have different options
+
+  return (
+    <Select
+      initial='Select an option'
+      value={series.stageColumn}
+      label='Add Forecasting Stages'
+      updateField={(_section, _subsection, _fieldName, value) => {
+        let stageObjects = []
+        let tempGroups = new Set(rawData?.map(item => item[value])) // [estimate, forecast, etc.]
+        tempGroups = Array.from(tempGroups) // convert set to array
+
+        tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
+
+        tempGroups.forEach(group => stageObjects.push({ key: group }))
+
+        const copyOfSeries = [...config.series] // copy the entire series array
+        copyOfSeries[index] = { ...copyOfSeries[index], stages: stageObjects, stageColumn: value }
+
+        updateConfig({
+          ...config,
+          series: copyOfSeries
+        })
+      }}
+      options={getColumns(false)}
+    />
+  )
+}
+
+const SeriesDropdownForecastingColumn = props => {
+  const { config, rawData } = useContext(ConfigContext)
+  const { updateSeries } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  // Only combo charts are allowed to have different options
+  if (series.type !== 'Forecasting') return
+  if (!rawData) return
+  if (!series.stageColumn) return
+
+  let tempGroups = new Set(rawData.map(item => item[series.stageColumn])) // [estimate, forecast, etc.]
+  let tempGroupsArray = Array.from(tempGroups) // convert set to array
+
+  tempGroupsArray = tempGroupsArray.filter(group => group !== undefined) // removes undefined
+
+  return (
+    <Select
+      initial='Select an option'
+      value={series.stageItem}
+      label='Forecasting Item Column'
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'stageItem')
+      }}
+      options={tempGroupsArray}
+    />
+  )
+}
+
+const SeriesDropdownAxisPosition = props => {
+  const { config } = useContext(ConfigContext)
+  const { updateSeries, supportedRightAxisTypes } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  // Hide AxisPositionDropdown in certain cases.
+  if (config.visualizationType !== 'Combo' || !series) return
+  if (!supportedRightAxisTypes.includes(series.type)) {
+    return
+  }
+  return (
+    <Select
+      initial='Select an option'
+      value={series.axis ? series.axis : 'Left'}
+      label='Series Axis'
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'axis')
+      }}
+      options={[
+        { value: 'Left', label: 'Left' },
+        { value: 'Right', label: 'Right' }
+      ]}
+    />
+  )
+}
+
+const SeriesDropdownForecastColor = props => {
+  const { config } = useContext(ConfigContext)
+  const { handleForecastPaletteSelection } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  if (series.type !== 'Forecasting') return
+
+  // Hide AxisPositionDropdown in certain cases.
+  if (!series) return
+
+  // Determine palette version and use appropriate palette set
+  // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+  const paletteVersion = getColorPaletteMajorVersion(config)
+
+  // Get version-appropriate palettes (v1 uses sequentialPalettes, v2 uses filtered v2 palettes)
+  const forecastPalettes =
+    paletteVersion === 1
+      ? sequentialPalettes
+      : Object.fromEntries(Object.entries(colorPalettesChartV2).filter(([key]) => key.startsWith('sequential')))
+
+  // For dropdown options, only show version-specific palettes
+  const processedPalettes = updatePaletteNames(forecastPalettes)
+  const paletteOptionsObject = buildForecastPaletteOptions(processedPalettes, paletteVersion)
+
+  // Convert object to array format for Select component
+  const paletteOptions = Object.entries(paletteOptionsObject).map(([value, label]) => ({
+    value,
+    label
+  }))
+
+  return series?.stages?.map((stage, stageIndex) => (
+    <Select
+      key={`${stage}--${stageIndex}`}
+      initial='Select an option'
+      value={config.series?.[index].stages?.[stageIndex].color || 'Select'}
+      label={`${stage.key} Series Color`}
+      updateField={(_section, _subsection, _fieldName, value) => {
+        if (handleForecastPaletteSelection) {
+          handleForecastPaletteSelection(value, index, stageIndex)
+        }
+      }}
+      options={paletteOptions}
+    />
+  ))
+}
+
+const SeriesDropdownConfidenceInterval = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { series, index } = props
+  const { getColumns } = useContext(SeriesContext)
+
+  if (series.type !== 'Forecasting') return
+
+  return (
+    <div className='edit-block'>
+      <span className='edit-label column-heading'>Confidence Interval Groups</span>
+      <fieldset>
+        <Accordion allowZeroExpanded>
+          {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
+            return (
+              <AccordionItem className='series-item series-item--chart' key={`${ciIndex}`}>
+                <AccordionItemHeading className='series-item__title'>
+                  <>
+                    <AccordionItemButton className={'accordion__button accordion__button'}>
+                      Group {ciIndex + 1}
+                      <button
+                        className='series-list__remove'
+                        onClick={e => {
+                          e.preventDefault()
+                          const copiedIndex = [...config.series[index].confidenceIntervals]
+
+                          copiedIndex.splice(ciIndex, 1)
+                          const copyOfSeries = [...config.series] // copy the entire series array
+                          copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                          updateConfig({
+                            ...config,
+                            series: copyOfSeries
+                          })
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </AccordionItemButton>
+                  </>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <Select
+                    initial='Select an option'
+                    value={
+                      config.series[index].confidenceIntervals[ciIndex].low
+                        ? config.series[index].confidenceIntervals[ciIndex].low
+                        : 'Select'
+                    }
+                    label='Low Confidence Interval'
+                    updateField={(_section, _subsection, _fieldName, value) => {
+                      const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                      copiedConfidenceArray[ciIndex].low = value
+                      const copyOfSeries = [...config.series] // copy the entire series array
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                      updateConfig({
+                        ...config,
+                        series: copyOfSeries
+                      })
+                    }}
+                    options={getColumns()}
+                  />
+                  <Select
+                    initial='Select an option'
+                    value={
+                      config.series[index].confidenceIntervals[ciIndex].high
+                        ? config.series[index].confidenceIntervals[ciIndex].high
+                        : 'Select'
+                    }
+                    label='High Confidence Interval'
+                    updateField={(_section, _subsection, _fieldName, value) => {
+                      const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                      copiedConfidenceArray[ciIndex].high = value
+                      const copyOfSeries = [...config.series] // copy the entire series array
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                      updateConfig({
+                        ...config,
+                        series: copyOfSeries
+                      })
+                    }}
+                    options={getColumns()}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
+            )
+          })}
+        </Accordion>
+        <Button
+          variant='editor-primary'
+          onClick={e => {
+            e.preventDefault()
+            let copiedIndex = null
+            if (config.series[index].confidenceIntervals) {
+              copiedIndex = [...config.series[index].confidenceIntervals]
+            } else {
+              copiedIndex = []
+            }
+            const copyOfSeries = [...config.series] // copy the entire series array
+            copyOfSeries[index] = {
+              ...copyOfSeries[index],
+              confidenceIntervals: [...copiedIndex, { high: '', low: '' }]
+            } // update the nested array
+            updateConfig({
+              ...config,
+              series: copyOfSeries
+            })
+          }}
+        >
+          Add Confidence Interval Group
+        </Button>
+      </fieldset>
+    </div>
+  )
+}
+
+const SeriesInputWeight = props => {
+  const { series, index: i } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const adjustableWeightSeriesTypes = ['Line', 'Combo', 'dashed-sm', 'dashed-md', 'dashed-lg']
+
+  if (!adjustableWeightSeriesTypes.includes(series.type)) return
+
+  const changeSeriesWeight = (i, value, min, max) => {
+    let series = [...config.series]
+    let seriesLabelsCopy = { ...config.runtime.seriesLabels }
+    series[i].weight = !value ? value : Math.max(Number(min), Math.min(Number(max), Number(value)))
+    seriesLabelsCopy[series[i].dataKey] = series[i].weight ? series[i].weight : series[i].dataKey
+
+    const newConfig = {
+      ...config,
+      series,
+      runtime: {
+        ...config.runtime,
+        seriesLabels: seriesLabelsCopy
+      }
+    }
+
+    updateConfig(newConfig)
+  }
+
+  return (
+    <>
+      <label htmlFor='series-weight'>Line Weight</label>
+      <input
+        type='number'
+        key={`series-weight-${i}`}
+        value={series.weight ? series.weight : ''}
+        min='1'
+        max='9'
+        onChange={event => {
+          changeSeriesWeight(i, event.target.value, event.target.min, event.target.max)
+        }}
+      />
+    </>
+  )
+}
+
+const SeriesInputName = props => {
+  const { series, index: i } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const adjustableNameSeriesTypes = [
+    'Bump Chart',
+    'Bar',
+    'Line',
+    'Area Chart',
+    'Combo',
+    'Deviation',
+    'Paired',
+    'Scatter',
+    'dashed-sm',
+    'dashed-md',
+    'dashed-lg'
+  ]
+
+  if (!adjustableNameSeriesTypes.includes(series.type)) return
+
+  const changeSeriesName = (i, value) => {
+    let series = [...config.series]
+    let seriesLabelsCopy = { ...config.runtime.seriesLabels }
+    series[i].name = value
+    seriesLabelsCopy[series[i].dataKey] = series[i].name ? series[i].name : series[i].dataKey
+
+    let newConfig = {
+      ...config,
+      series,
+      runtime: {
+        ...config.runtime,
+        seriesLabels: seriesLabelsCopy
+      }
+    }
+
+    updateConfig(newConfig)
+  }
+  // if series name is emty show default data value.
+  const value = series.name !== undefined && series.name !== series.dataKey ? series.name : series.dataKey
+
+  return (
+    <>
+      <label htmlFor='series-name'>Series Name</label>
+      <input
+        type='text'
+        key={`series-name-${i}`}
+        value={value}
+        onChange={event => {
+          changeSeriesName(i, event.target.value)
+        }}
+      />
+    </>
+  )
+}
+
+const SeriesDisplayInTooltip = props => {
+  const { series, index } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+
+  if (['Paired Bar', 'Scatter Plot', 'Deviation Bar'].includes(config.visualizationType)) return
+
+  const toggleTooltip = seriesIndex => {
+    let copiedSeries = [...config.series]
+
+    const showInTooltip = copiedSeries[seriesIndex].tooltip ? copiedSeries[seriesIndex].tooltip : false
+
+    copiedSeries[seriesIndex].tooltip = !copiedSeries[seriesIndex].tooltip
+
+    updateConfig({
+      ...config,
+      series: copiedSeries
+    })
+  }
+
+  return (
+    <>
+      <div className='input-group'>
+        <label htmlFor={`series-tooltip--${index}`}>Show In Tooltip</label>
+        <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index)}>
+          <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
+            {series.tooltip && <Check className='' style={{ fill: '#025eaa' }} />}
+          </div>
+          <input
+            className='cove-input--hidden'
+            type='checkbox'
+            name={`series-tooltip--${index}`}
+            checked={series.tooltip ? series.tooltip : false}
+            readOnly
+          />
+        </div>
+      </div>
+    </>
+  )
+}
+
+const SeriesColumnSettings = props => {
+  const { series } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { columnConfig } = getSeriesColumnConfig(config.columns || {}, series.dataKey)
+
+  const updateSeriesColumn = (fieldName, value) => {
+    const columns = upsertSeriesColumnConfig(config.columns || {}, series.dataKey, {
+      [fieldName]: value
+    })
+
+    updateConfig({
+      ...config,
+      columns
+    })
+  }
+
+  const updateSeriesRoundToPlace = value => {
+    const trimmed = value === undefined || value === null ? '' : String(value).trim()
+    if (!trimmed) {
+      updateSeriesColumn('roundToPlace', undefined)
+      return
+    }
+
+    const numericValue = Number(trimmed)
+    if (!Number.isFinite(numericValue)) {
+      updateSeriesColumn('roundToPlace', undefined)
+      return
+    }
+
+    updateSeriesColumn('roundToPlace', Math.max(0, Math.min(20, Math.round(numericValue))))
+  }
+
+  return (
+    <>
+      <PanelHeader>Series Column Settings</PanelHeader>
+      <TextField
+        value={columnConfig.label || ''}
+        section='seriesColumn'
+        subsection={series.dataKey}
+        fieldName='label'
+        label='Label'
+        updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('label', value)}
+      />
+      <div className='three-col'>
+        <TextField
+          value={columnConfig.prefix || ''}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='prefix'
+          label='Prefix'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('prefix', value)}
+        />
+        <TextField
+          value={columnConfig.suffix || ''}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='suffix'
+          label='Suffix'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('suffix', value)}
+        />
+        <TextField
+          type='number'
+          value={columnConfig.roundToPlace ?? ''}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='roundToPlace'
+          label='Round'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesRoundToPlace(value)}
+          min={0}
+        />
+      </div>
+      <CheckBox
+        value={columnConfig.commas || false}
+        section='seriesColumn'
+        subsection={series.dataKey}
+        fieldName='commas'
+        label='Add Commas to Numbers'
+        updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('commas', value)}
+      />
+      {config.table.showVertical && (
+        <CheckBox
+          value={columnConfig.dataTable ?? true}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='dataTable'
+          label='Show in Data Table'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('dataTable', value)}
+        />
+      )}
+    </>
+  )
+}
+
+const SeriesButtonRemove = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { series, index } = props
+
+  const removeSeries = seriesKey => {
+    let series = [...config.series]
+    let seriesIndex = -1
+
+    for (let i = 0; i < series.length; i++) {
+      if (series[i].dataKey === seriesKey) {
+        seriesIndex = i
+        break
+      }
+    }
+
+    if (seriesIndex !== -1) {
+      series.splice(seriesIndex, 1)
+
+      let newConfig = { ...config, series }
+
+      if (series.length === 0) {
+        delete newConfig.series
+      }
+
+      updateConfig(newConfig)
+    }
+
+    if (config.visualizationType === 'Paired Bar') {
+      updateConfig({
+        ...config,
+        series: []
+      })
+    }
+  }
+
+  const handleRemoveSeries = (e, series) => {
+    e.preventDefault()
+    removeSeries(series.dataKey)
+  }
+
+  return (
+    config.series &&
+    (config.series.length > 1 || config.visualizationType === 'HeatMap') && (
+      <Button variant='danger' size='sm' className='grouped-list__remove' onClick={e => handleRemoveSeries(e, series)}>
+        Remove
+      </Button>
+    )
+  )
+}
+
+const SeriesItem = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { updateSeries, getColumns } = useContext(SeriesContext)
+  const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
+  const legendOrderOptions: { label: string; value: string }[] = [
+    { label: 'Order By Data Column', value: 'dataColumn' },
+    {
+      label: 'Ascending Alphanumeric',
+      value: 'asc'
+    },
+    {
+      label: 'Descending Alphanumeric',
+      value: 'desc'
+    }
+  ]
+  const showDynamicCategory =
+    ['Bar', 'Line'].includes(config.visualizationType) &&
+    config.visualizationSubType !== 'Stacked' &&
+    !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
+  const SELECT = '- Select -'
+  const valueLabelsEnabled = config.orientation === 'horizontal' ? config.yAxis.displayNumbersOnBar : config.labels
+  const valueLabelMode =
+    series.valueLabelMode || (series.valueLabelColumn ? 'column' : valueLabelsEnabled ? 'numeric' : 'none')
+  return (
+    <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+      {(provided, snapshot) => (
+        <div
+          key={i}
+          className={snapshot.isDragging ? 'currently-dragging' : ''}
+          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <Accordion allowZeroExpanded>
+            <AccordionItem className='series-item series-item--chart'>
+              <AccordionItemHeading className='series-item__title'>
+                <AccordionItemButton
+                  className={
+                    chartsWithOptions.includes(config.visualizationType)
+                      ? 'accordion__button'
+                      : 'accordion__button hide-arrow'
+                  }
+                >
+                  <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                  {config.visualizationType === 'HeatMap' ? series.name || series.dataKey : series.dataKey}
+                </AccordionItemButton>
+              </AccordionItemHeading>
+              {chartsWithOptions.includes(config.visualizationType) && (
+                <AccordionItemPanel>
+                  <div className='series-item__panel-actions'>
+                    <Series.Button.Remove series={series} index={i} />
+                  </div>
+                  <Series.Input.Name series={series} index={i} />
+                  <Series.Input.ColumnSettings series={series} index={i} />
+                  {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && (
+                    <Select
+                      label='Value label column'
+                      section='series'
+                      subsection={i}
+                      fieldName='valueLabelColumn'
+                      value={valueLabelMode === 'column' ? `column:${series.valueLabelColumn || ''}` : valueLabelMode}
+                      options={[
+                        { value: 'none', label: 'None' },
+                        { value: 'numeric', label: 'Use numeric value' },
+                        ...getColumns(false).map((column: string) => ({ value: `column:${column}`, label: column }))
+                      ]}
+                      updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
+                        const mode = value.startsWith('column:') ? 'column' : value === 'numeric' ? 'numeric' : 'none'
+                        const enableLabels = mode !== 'none'
+                        const nextSeries = config.series.map((entry, index) => {
+                          if (index !== i) {
+                            return enableLabels &&
+                              !valueLabelsEnabled &&
+                              !entry.valueLabelMode &&
+                              !entry.valueLabelColumn
+                              ? { ...entry, valueLabelMode: 'none' as const }
+                              : entry
+                          }
+                          const nextEntry = { ...entry, valueLabelMode: mode }
+                          if (mode === 'column') nextEntry.valueLabelColumn = value.slice('column:'.length)
+                          else delete nextEntry.valueLabelColumn
+                          return nextEntry
+                        })
+                        updateConfig!({
+                          ...config,
+                          series: nextSeries,
+                          ...(enableLabels && config.orientation === 'horizontal'
+                            ? { yAxis: { ...config.yAxis, displayNumbersOnBar: true } }
+                            : enableLabels
+                            ? { labels: true }
+                            : {})
+                        })
+                      }}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Choose None to hide value labels, or select numeric values or a data column. Column text
+                              appears exactly as entered in that column. Blank cells have no label.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
+                  {showDynamicCategory && (
+                    <>
+                      <Select
+                        label='Dynamic Category'
+                        value={series.dynamicCategory}
+                        options={[SELECT, ...getColumns().filter(col => series.dataKey !== col)]}
+                        updateField={(_section, _subsection, _fieldName, value) => {
+                          if (value === SELECT) value = ''
+                          updateSeries(i, value, 'dynamicCategory')
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                This field is Optional. If you have a dynamic data series you can select the category
+                                field here. You can only add one dynamic category per visualization.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+
+                      <>
+                        <Select
+                          value={config.legend.order}
+                          options={legendOrderOptions}
+                          section='legend'
+                          fieldName='order'
+                          updateField={(_section, _subsection, _fieldName, value) => {
+                            updateConfig({ ...config, legend: { ...config.legend, order: value } })
+                          }}
+                          label='Dynamic Series Order'
+                        />
+                      </>
+                    </>
+                  )}
+                  <Series.Input.Weight series={series} index={i} />
+                  <Series.Dropdown.SeriesType series={series} index={i} />
+                  <Series.Dropdown.AxisPosition series={series} index={i} />
+                  <Series.Dropdown.LineType series={series} index={i} />
+                  <Series.Dropdown.ForecastingColor series={series} index={i} />
+                  <Series.Dropdown.ConfidenceInterval series={series} index={i} />
+                  <Series.Checkbox.DisplayInTooltip series={series} index={i} />
+                </AccordionItemPanel>
+              )}
+            </AccordionItem>
+          </Accordion>
+        </div>
+      )}
+    </Draggable>
+  )
+}
+
+const Series = {
+  Wrapper: SeriesWrapper,
+  Dropdown: {
+    SeriesType: SeriesDropdownSeriesType,
+    AxisPosition: SeriesDropdownAxisPosition,
+    ConfidenceInterval: SeriesDropdownConfidenceInterval,
+    LineType: SeriesDropdownLineType,
+    ForecastingStage: SeriesDropdownForecastingStage,
+    ForecastingColumn: SeriesDropdownForecastingColumn,
+    ForecastingColor: SeriesDropdownForecastColor
+  },
+  Input: {
+    Name: SeriesInputName,
+    Weight: SeriesInputWeight,
+    ColumnSettings: SeriesColumnSettings
+  },
+  Checkbox: {
+    DisplayInTooltip: SeriesDisplayInTooltip
+  },
+  Button: {
+    Remove: SeriesButtonRemove
+  },
+  Item: SeriesItem
+}
+
+export default Series

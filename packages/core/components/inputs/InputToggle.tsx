@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import './index.scss'
+import './index.css'
 
 type InputSliderProps = {
   /** Add label to the input field */

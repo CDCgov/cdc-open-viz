@@ -29,6 +29,57 @@ const makeMultiDashConfig = (version: string) => ({
 })
 
 describe('coveUpdateWorker', () => {
+  it('restores heavy data arrays throughout dashboards without mutating the input', () => {
+    const dataFields = (location: string) => ({
+      data: [{ location, value: 1 }],
+      formattedData: [{ location, value: 2 }],
+      originalFormattedData: [{ location, value: 3 }],
+      yAxisDomainData: [{ location, value: 4 }]
+    })
+    const chart = (location: string) => ({
+      type: 'chart',
+      annotations: [{ text: location, colors: { label: 'black' } }],
+      ...dataFields(location),
+      datasets: { local: { ...dataFields(`${location}-dataset`), dataUrl: '/local.json' } }
+    })
+    const dashboard = (location: string) => ({
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      rows: [],
+      ...dataFields(location),
+      datasets: { shared: { ...dataFields(`${location}-dataset`), dataUrl: '/shared.json' } },
+      visualizations: { chart: chart(`${location}-chart`) }
+    })
+    const config = {
+      ...dashboard('root'),
+      version: '4.26.8',
+      multiDashboards: [{ ...dashboard('child'), multiDashboards: [dashboard('grandchild')] }]
+    }
+    const original = structuredClone(config)
+    const result = coveUpdateWorker(config)
+
+    const expectRestoredData = (actual, expected) => {
+      for (const field of ['data', 'formattedData', 'originalFormattedData', 'yAxisDomainData']) {
+        expect(actual[field]).toEqual(expected[field])
+      }
+      for (const [key, dataset] of Object.entries(expected.datasets || {})) {
+        expectRestoredData(actual.datasets[key], dataset)
+        expect(actual.datasets[key].dataUrl).toBe(expected.datasets[key].dataUrl)
+      }
+      for (const [key, visualization] of Object.entries(expected.visualizations || {})) {
+        expectRestoredData(actual.visualizations[key], visualization)
+      }
+      expected.multiDashboards?.forEach((child, index) => expectRestoredData(actual.multiDashboards[index], child))
+    }
+
+    expectRestoredData(result, original)
+    // Data restoration must retain actual migration work alongside the original arrays.
+    for (const dashboard of [result, result.multiDashboards[0], result.multiDashboards[0].multiDashboards[0]]) {
+      expect(dashboard.visualizations.chart.annotations[0]).toEqual({ text: expect.any(String) })
+    }
+    expect(config).toEqual(original)
+  })
+
   describe('multi-dashboard recursion', () => {
     it('migrates sparse multi-dashboard containers without materializing root dashboard collections', () => {
       const config: any = {

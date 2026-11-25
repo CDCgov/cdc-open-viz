@@ -1,3 +1,4 @@
+import { isBarLegendSelectionActive } from '../../../helpers/barLegendHighlight'
 import { useContext } from 'react'
 
 // Local context and hooks
@@ -45,6 +46,7 @@ const BarChartHorizontal = () => {
     getHighlightedBarByValue,
     getAdditionalColumn,
     formatTooltipValue,
+    getCustomValueLabel,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar
@@ -175,14 +177,9 @@ const BarChartHorizontal = () => {
                     config.xAxis.type === 'date'
                       ? HighLightedBarUtils.formatDates(highlightedBarValues)
                       : highlightedBarValues
-                  let transparentBar =
-                    config.legend.behavior === 'highlight' &&
-                    seriesHighlight.length > 0 &&
-                    seriesHighlight.indexOf(bar.key) === -1
-                  let displayBar =
-                    config.legend.behavior === 'highlight' ||
-                    seriesHighlight.length === 0 ||
-                    seriesHighlight.indexOf(bar.key) !== -1
+                  const isSelected = isBarLegendSelectionActive(config, seriesHighlight, bar.key, dataValue)
+                  let transparentBar = config.legend.behavior === 'highlight' && !isSelected
+                  let displayBar = config.legend.behavior === 'highlight' || isSelected
                   let barHeight = config.barHeight
                   let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
                   if (isNaN(numbericBarHeight)) {
@@ -218,7 +215,17 @@ const BarChartHorizontal = () => {
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
+                  const customValueLabel = getCustomValueLabel(bar.key, dataValue, barGroup.index)
+                  const hasCustomValueLabel = customValueLabel !== undefined && isNumber(bar.value) && !isSuppressed
+                  const barDefaultLabel = hasCustomValueLabel
+                    ? config.yAxis.displayNumbersOnBar
+                      ? customValueLabel
+                      : ''
+                    : (customValueLabel !== undefined && isSuppressed) ||
+                      !config.yAxis.displayNumbersOnBar ||
+                      absentDataLabel
+                    ? ''
+                    : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel, `normal ${labelFontSize}px sans-serif`)
@@ -492,7 +499,7 @@ const BarChartHorizontal = () => {
                             textAnchor={textAnchor}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
 
@@ -508,7 +515,7 @@ const BarChartHorizontal = () => {
                             textAnchor={bar.value < 0 ? 'end' : 'start'}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         <Text // prettier-ignore
@@ -527,7 +534,7 @@ const BarChartHorizontal = () => {
                           textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
                           fontSize={labelFontSize}
                         >
-                          {absentDataLabel}
+                          {hasCustomValueLabel ? '' : absentDataLabel}
                         </Text>
 
                         {config.isLollipopChart && (
@@ -542,7 +549,7 @@ const BarChartHorizontal = () => {
                             fontWeight={'normal'}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         {isLabelBelowBar &&
