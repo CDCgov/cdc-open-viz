@@ -9,7 +9,6 @@ import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
 import BubbleMarker from '../../../BubbleMarker'
 import useMapHighlight from '../../../../hooks/useMapHighlight'
-import './Territory.Rectangle.styles.css'
 
 const EMPTY_BUBBLE_RENDER_ROWS: NonNullable<TerritoryShape['bubbleRenderRows']> = []
 

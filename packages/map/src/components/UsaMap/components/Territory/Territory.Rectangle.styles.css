@@ -1,7 +1,0 @@
-.territory-rectangle:hover > .territory-rectangle__shape {
-  fill: var(--territory-hover-fill, inherit);
-}
-
-.territory-rectangle:active > .territory-rectangle__shape {
-  fill: var(--territory-active-fill, inherit);
-}
