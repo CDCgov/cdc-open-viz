@@ -33,22 +33,20 @@ export const generateDensityDots = ({
   value,
   dotValue,
   seed = 42,
-  maxDots = 100000,
   maxAttempts = 1000000
 }: {
   feature: DotDensityGeometry
   value: number
   dotValue: number
   seed?: number
-  maxDots?: number
   maxAttempts?: number
 }): { points: DotPosition[]; requested: number; complete: boolean } => {
   const requested = getDotCount(value, dotValue)
   if (!Number.isFinite(seed)) throw new RangeError('Seed must be finite')
-  if (!Number.isSafeInteger(maxDots) || maxDots < 0 || !Number.isSafeInteger(maxAttempts) || maxAttempts < 0) {
-    throw new RangeError('Sampling limits must be nonnegative safe integers')
+  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 0) {
+    throw new RangeError('Sampling attempts must be a nonnegative safe integer')
   }
-  if (!Number.isSafeInteger(requested) || requested > maxDots) throw new RangeError('Dot budget exceeded')
+  if (!Number.isSafeInteger(requested)) throw new RangeError('Dot count must be a safe integer')
   if (!requested) return { points: [], requested, complete: true }
 
   const coordinates: Position[][][] =

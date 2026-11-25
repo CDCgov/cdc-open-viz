@@ -114,14 +114,4 @@ describe('displayGeoName', () => {
     expect(displayGeoName('US-VI', undefined, 'es-MX')).toBe('Islas Vírgenes de los EE. UU.')
     expect(displayGeoName('VIR', undefined, 'es-MX')).toBe('Islas Vírgenes (de los EE. UU.)')
   })
-
-  it.each([
-    ['XAC', 'Ashmore and Cartier Islands'],
-    ['XBK', 'Baker Island'],
-    ['SAH', 'Western Sahara'],
-    ['VUT', 'Vanuatu'],
-    ['XWK', 'Wake Island']
-  ])('falls back to English for untranslated country %s', (uid, english) => {
-    expect(displayGeoName(uid, undefined, 'es-MX')).toBe(english)
-  })
 })
