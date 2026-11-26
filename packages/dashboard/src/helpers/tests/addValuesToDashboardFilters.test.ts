@@ -282,3 +282,43 @@ describe('addValuesToDashboardFilters', () => {
     expect(result[0].subGrouping.valuesLookup['2023']).not.toHaveProperty('descriptionsByValue')
   })
 })
+
+describe('DEV-13957 data multiselect initialization', () => {
+  const filter = {
+    key: 'Substance',
+    columnName: 'substance',
+    type: 'datafilter',
+    filterStyle: 'multi-select',
+    showAllOption: true,
+    showDropdown: true,
+    order: 'data',
+    values: [],
+    defaultValue: 'All'
+  } as SharedFilter
+  const data = { small: [{ substance: 'Acetone' }, { substance: 'Benzene' }] }
+
+  it('creates All without requiring a literal data cell and normalizes its default to an array', () => {
+    const [result] = addValuesToDashboardFilters([filter], data)
+    expect(result.values).toEqual(['All', 'Acetone', 'Benzene'])
+    expect(result.orderedValues).toEqual(['All', 'Acetone', 'Benzene'])
+    expect(result.active).toEqual(['All'])
+    expect(filter.values).toEqual([])
+  })
+
+  it('normalizes legacy scalar selections for data multiselects without enabling All', () => {
+    const [result] = addValuesToDashboardFilters([{ ...filter, showAllOption: false, active: 'Acetone' }], data)
+    expect(result.active).toEqual(['Acetone'])
+    expect(result.values).not.toContain('All')
+  })
+
+  it('deduplicates an existing All option and preserves explicit empty selection', () => {
+    const [result] = addValuesToDashboardFilters([{ ...filter, values: ['All', 'Acetone'], active: [] }], data)
+    expect(result.values.filter(value => value === 'All')).toHaveLength(1)
+    expect(result.active).toEqual([])
+  })
+
+  it('removes All from imported mixed specific selections', () => {
+    const [result] = addValuesToDashboardFilters([{ ...filter, active: ['All', 'Benzene'] }], data)
+    expect(result.active).toEqual(['Benzene'])
+  })
+})

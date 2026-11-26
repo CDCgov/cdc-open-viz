@@ -1,5 +1,5 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { DashboardContext, DashboardDispatchContext, initialState } from '../../DashboardContext'
 import DashboardFiltersWrapper from './DashboardFiltersWrapper'
@@ -25,12 +25,14 @@ const renderWrapper = ({
   grayBackground,
   sharedFilters = [createSharedFilter()],
   sharedFilterIndexes = [0],
-  isEditor = false
+  isEditor = false,
+  mixedApply = false
 }: {
   grayBackground?: boolean
   sharedFilters?: any[]
   sharedFilterIndexes?: any[]
   isEditor?: boolean
+  mixedApply?: boolean
 } = {}) => {
   const visualizationConfig = {
     uid: 'dashboardFilters1',
@@ -43,7 +45,8 @@ const renderWrapper = ({
     visual: grayBackground === undefined ? undefined : { grayBackground }
   } as any
 
-  return render(
+  const dispatch = vi.fn()
+  const rendered = render(
     <DashboardContext.Provider
       value={{
         ...initialState,
@@ -53,7 +56,10 @@ const renderWrapper = ({
           datasets: {},
           rows: [],
           visualizations: {
-            dashboardFilters1: visualizationConfig
+            dashboardFilters1: visualizationConfig,
+            ...(mixedApply
+              ? { otherFilters: { type: 'dashboardFilters', filterBehavior: 'Apply Button', autoLoad: false } }
+              : {})
           }
         } as any,
         data: {},
@@ -67,7 +73,7 @@ const renderWrapper = ({
         setAPILoading: vi.fn()
       }}
     >
-      <DashboardDispatchContext.Provider value={vi.fn()}>
+      <DashboardDispatchContext.Provider value={dispatch}>
         <DashboardFiltersWrapper
           apiFilterDropdowns={{}}
           visualizationConfig={visualizationConfig}
@@ -79,6 +85,7 @@ const renderWrapper = ({
       </DashboardDispatchContext.Provider>
     </DashboardContext.Provider>
   )
+  return { ...rendered, dispatch }
 }
 
 describe('DashboardFiltersWrapper visual styles', () => {
@@ -147,5 +154,18 @@ describe('DashboardFiltersWrapper visual styles', () => {
     const { container } = renderWrapper({ sharedFilters: [filter] })
 
     expect(container.querySelector('.cove-dashboard-filters-container')).toBeInTheDocument()
+  })
+})
+
+describe('DEV-13957 mixed dashboard filter modes', () => {
+  it('replaces a stale queue on a Filter Change block when another block uses Apply', () => {
+    const { getByRole, dispatch } = renderWrapper({
+      mixedApply: true,
+      sharedFilters: [createSharedFilter({ active: '2023', queuedActive: '2023' })]
+    })
+    fireEvent.change(getByRole('combobox'), { target: { value: '2024' } })
+    const action = dispatch.mock.calls.find(([action]) => action.type === 'SET_SHARED_FILTERS')[0]
+    expect(action.payload[0].active).toBe('2024')
+    expect(action.payload[0].queuedActive).toBe('2024')
   })
 })

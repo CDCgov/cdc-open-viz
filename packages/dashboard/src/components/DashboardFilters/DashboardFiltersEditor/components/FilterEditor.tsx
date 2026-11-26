@@ -465,6 +465,21 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
             value={filter.note || ''}
             updateField={(_section, _subSection, _key, value) => updateFilterProp('note', value)}
           />
+          {filter.type === 'datafilter' && filter.filterStyle === FILTER_STYLE.multiSelect && (
+            <div>
+              <label className='d-block'>
+                <input
+                  type='checkbox'
+                  checked={filter.showAllOption === true}
+                  onChange={e => updateFilterProp('showAllOption', e.target.checked)}
+                />{' '}
+                Show All Option
+              </label>
+              <span className='d-block'>
+                Adds All to show every value in this category. Leave off to filter a literal All value in your data.
+              </span>
+            </div>
+          )}
           {filter.filterStyle === FILTER_STYLE.multiSelect && (
             <TextField
               label='Select Limit'
