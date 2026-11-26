@@ -351,7 +351,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   </Button>
                 )}
 
-                <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
+                <LegendSuppression
+                  config={config}
+                  isLegendBottom={isLegendBottom}
+                  colorScale={colorScale}
+                  data={data || []}
+                />
 
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (

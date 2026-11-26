@@ -96,7 +96,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       hideLineStyle: false,
       circleSize: 6,
       displayGray: true,
-      weight: undefined
+      weight: undefined,
+      inheritSeriesStyle: false
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -156,7 +157,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             hideBarSymbol,
             hideLineStyle,
             lineEffectScope,
-            weight
+            weight,
+            inheritSeriesStyle
           },
           i
         ) => (
@@ -502,6 +504,14 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               fieldName='weight'
                               label='Line Weight'
                               placeholder='Default'
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && style !== 'Filled Circles' && (
+                            <CheckBox
+                              value={inheritSeriesStyle}
+                              fieldName='inheritSeriesStyle'
+                              label='Inherit series style'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                             />
                           )}
