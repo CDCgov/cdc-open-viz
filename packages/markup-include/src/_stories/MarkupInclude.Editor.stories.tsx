@@ -60,7 +60,7 @@ import {
 } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
-  title: 'Components/Templates/Markup Include/Editor Tests',
+  title: 'Regression Tests/Misc/Markup Include',
   component: CdcMarkupInclude,
   parameters: {
     layout: 'fullscreen'
@@ -118,6 +118,7 @@ const testConfig = {
 // Tests title input and display
 // ============================================================================
 export const GeneralSectionTests: Story = {
+  name: 'MARKUP-001 — General Section',
   args: {
     config: testConfig as any,
     isEditor: true
@@ -207,6 +208,7 @@ export const GeneralSectionTests: Story = {
 // Tests ALL content editing functionality: basic controls, variables, and advanced features
 // ============================================================================
 export const ContentEditorTests: Story = {
+  name: 'MARKUP-002 — Content Editor',
   args: {
     config: testConfig as any,
     isEditor: true
@@ -332,6 +334,7 @@ export const ContentEditorTests: Story = {
 // Tests theme and visual styling controls
 // ============================================================================
 export const VisualSectionTests: Story = {
+  name: 'MARKUP-003 — Visual Section',
   args: {
     config: testConfig as any,
     isEditor: true

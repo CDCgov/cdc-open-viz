@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-deviation-bar-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Deviation Bar',
+  title: 'Regression Tests/Charts/Deviation Bar',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

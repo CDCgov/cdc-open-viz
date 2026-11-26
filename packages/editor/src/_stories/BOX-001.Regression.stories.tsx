@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-box-plot.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Box Plot',
+  title: 'Regression Tests/Charts/Box Plot',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

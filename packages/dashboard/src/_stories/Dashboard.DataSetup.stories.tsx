@@ -4,7 +4,7 @@ import CdcEditor from '@cdc/editor/src/CdcEditor'
 import customOrderDemoData from '../../../../.storybook/assets/custom-order-demo-data.csv?raw'
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Components/Pages/Dashboard/Data Setup Integration Tests',
+  title: 'Regression Tests/Dashboards/Editor',
   component: CdcEditor
 }
 
@@ -21,6 +21,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 // This test matches the Playwright codegen test exactly
 
 export const MultiVizConfigurationWorkflow: Story = {
+  name: 'DASH-EDITOR-002 — MultiViz Data Setup',
   args: {
     config: {}
   },

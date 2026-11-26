@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-waffle-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc Scripts/Waffle Chart Scripts',
+  title: 'Regression Tests/Charts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
@@ -74,7 +74,7 @@ const filterSelect = (row: HTMLFieldSetElement, label: string) =>
   within(row).getByRole('combobox', { name: label }) as HTMLSelectElement
 
 export const WAFFLE001: Story = {
-  name: 'WAFFLE-001 — Build and configure a Waffle Chart',
+  name: 'CHART-004 — Waffle Chart',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

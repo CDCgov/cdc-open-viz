@@ -136,7 +136,7 @@ const reverseCustomConfig = editConfigKeys(timePlaybackConfig, [
 let capturedEditorTimePlayback: MapConfig['timePlayback']
 
 const meta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Time Playback',
+  title: 'Regression Tests/Maps/Time Playback',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen',
@@ -605,6 +605,7 @@ export const PlaybackNoteHidden: Story = {
 }
 
 export const TimePlaybackEditorControls: Story = {
+  name: 'MAP-012 — Time Playback Authoring',
   args: {
     config: timePlaybackConfig,
     isEditor: true

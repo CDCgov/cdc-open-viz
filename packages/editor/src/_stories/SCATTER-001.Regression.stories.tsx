@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-scatter-plot.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Chart Scripts/Scatter Plot',
+  title: 'Regression Tests/Charts/Scatter Plot',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }

@@ -14,7 +14,7 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 
 const meta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Editor Tests',
+  title: 'Regression Tests/Maps/Custom Map Layers',
   component: CdcMap,
   parameters: { layout: 'fullscreen' }
 }
@@ -101,6 +101,7 @@ const getNestedLayerButtons = (section: HTMLElement) =>
   Array.from(section.querySelectorAll<HTMLButtonElement>('.map-layers-list--title .accordion__button'))
 
 export const ExistingLayerAuthoringAndEmptyState: Story = {
+  name: 'MAP-013 — Custom Map Layer Authoring',
   args: {
     isEditor: true,
     config: configWithLayers([localLayer])

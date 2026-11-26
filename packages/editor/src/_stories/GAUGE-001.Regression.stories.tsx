@@ -13,7 +13,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-gauge-chart.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc Scripts/Gauge Chart Scripts',
+  title: 'Regression Tests/Charts',
   component: CdcEditor,
   parameters: { layout: 'fullscreen' }
 }
@@ -59,7 +59,7 @@ const pasteText = async (user: User, input: HTMLElement, value: string) => {
 }
 
 export const GAUGE001: Story = {
-  name: 'GAUGE-001 — Build and configure a Gauge Chart',
+  name: 'CHART-003 — Gauge Chart',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Markdown } from '@storybook/addon-docs/blocks'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
@@ -13,10 +14,52 @@ import CdcEditor from '../CdcEditor'
 
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-pie-chart.md
 
+const CHART_SCRIPT_DOCS = `# Chart regression scripts
+
+Named chooser-to-editor chart regressions and their current coverage.
+
+## Coverage
+
+- **CHART-001 — Pie Chart:** Required fields, formatting, segment ordering and exclusion, legends, filters, data tables, Donut mode, and animation.
+- **CHART-002 — Sparkline:** Line-to-Sparkline conversion, date parsing, data series, filtering, HTML text, color stability, and visual settings.
+- **CHART-003 — Gauge Chart:** Numerator functions and conditions, static and column denominators, formatting, trend thresholds, filters, HTML text, markup variables, and title editing.
+- **CHART-004 — Waffle Chart:** Exact filled-node counts, functions and conditions, square and vertical structures, themes, HTML text, filters, and markup variables.
+- **AREA-001 — Area Chart:** Complete chooser-to-editor setup and representative Area Chart configuration.
+- **AREA-002 — Categorical Area Chart:** Categorical Y-axis behavior and ordered filtering.
+- **BAR-001 — Multi-Series Bar Chart:** Multi-series setup and General-panel behavior.
+- **BAR-002 — Bar Data Series:** Multi-series Data Series configuration and rendered changes.
+- **BAR-003 — Suppressed and Isolated Bar Data:** Suppression and isolation behavior in a Bar chart.
+- **BOX-001 — Box Plot:** Complete Box Plot authoring and editor configuration.
+- **BUMP-001 — Bump Chart:** Complete Bump Chart authoring and editor settings.
+- **COMBO-001 — Combo Chart:** Combined series setup and Combo Chart configuration.
+- **DEVIATION-001 — Deviation Bar:** Deviation Bar setup, formatting, and divergent presentation.
+- **FORECAST-001 — Forecast Chart:** Forecast series, confidence intervals, and editor behavior.
+- **HBAR-001 — Horizontal Stacked Bar:** Horizontal stacked Bar setup and editor configuration.
+- **LINE-001 — Line Chart:** Complete Line Chart authoring and representative settings.
+- **LINE-002 — Open-Circle Special Line:** Special Line configuration with open-circle rendering.
+- **PAIRED-001 — Paired Bar:** Paired Bar authoring and editor behavior.
+- **SANKEY-001 — Sankey Diagram:** Sankey data mapping, required fields, and editor configuration.
+- **SCATTER-001 — Scatter Plot:** Scatter Plot data mapping and editor configuration.
+- **CHART-005 — Brush Slider Authoring:** Editor selection changes and recent-date defaults with rendered brush output.
+- **CHART-006 — HeatMap Spacing and Cell Values:** HeatMap spacing, categorical cells, and visible values.
+- **CHART-007 — Epi Chart:** Date-time parsing, daily bar rendering, and supporting table data.
+- **CHART-008 — Horizon Chart:** Multi-series horizon-band rendering from the maintained fixture.
+- **CHART-009 — Radar Chart:** Six-dimension program comparison without minimum-dimension errors.
+- **CHART-010 — Warming Stripes:** Temperature-anomaly stripes and gradient legend output.
+- **CHART-011 — Network:** Network editor configuration with observable nodes, links, and controls.
+- **CHART-012 — Dendrogram:** Dendrogram editor configuration with observable hierarchy output.`
+
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc Scripts/Chart Scripts',
+  title: 'Regression Tests/Charts',
   component: CdcEditor,
-  parameters: { layout: 'fullscreen' }
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      page: () => <Markdown>{CHART_SCRIPT_DOCS}</Markdown>,
+      description: { component: CHART_SCRIPT_DOCS }
+    }
+  },
+  tags: ['autodocs']
 }
 
 export default meta
@@ -180,7 +223,7 @@ const expectedSegments = [
 ]
 
 export const PIE001: Story = {
-  name: 'PIE-001 — Build and configure a Pie Chart',
+  name: 'CHART-001 — Pie Chart',
   args: { config: {} },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

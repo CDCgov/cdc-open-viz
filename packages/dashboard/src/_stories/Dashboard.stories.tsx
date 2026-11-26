@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { faker } from '@faker-js/faker'
 import {
   waitForOptionsToPopulate,
   performAndAssert,
@@ -7,14 +6,12 @@ import {
   waitForPresence
 } from '@cdc/core/helpers/testing'
 import APIFiltersMapData from './_mock/api-filter-map.json'
-import APIFiltersChartData from './_mock/api-filter-chart.json'
 import APIFilterErrorConfig from './_mock/api-filter-error.json'
 import ExampleConfig_1 from './_mock/dashboard-gallery.json'
 import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import SingleStateDashboardFilters from './_mock/single-state-dashboard-filters.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
-import MultiVizConfig from './_mock/multi-viz.json'
 import MultiDashboardConfig from './_mock/multi-dashboards.json'
 import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
@@ -25,9 +22,6 @@ import { userEvent, waitFor, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import cloneDeep from 'lodash/cloneDeep'
 import times from 'lodash/times'
-import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
-import FootnotesConfig from '@cdc/core/types/Footnotes'
-import { ConfigRow } from '../types/ConfigRow'
 import BumpChartConfig from './_mock/bump-chart.json'
 import MethodologyConfig from './_mock/methodology.json'
 import methodologyAPI from './_mock/methodologyAPI'
@@ -494,49 +488,9 @@ export const SingleStateDashboardWithFilters: Story = {
   }
 }
 
-faker.seed(123)
-
-const countries = times(5, faker.location.country)
-const categories = times(3, val => `category-${val + 1}`)
-
-const data = []
-countries.forEach((country, i) => {
-  categories.forEach((category, j) => {
-    if ((i + j) % 3 === 0) return
-    data.push({
-      Country: country,
-      'Sample Categories': category,
-      Data: faker.number.int({ min: 5, max: 50 })
-    })
-  })
-})
-
-const footnoteData = countries.map((country, i) => {
-  return { Country: country, symbol: footnotesSymbols[i][0], text: faker.lorem.sentence() }
-})
-
-const multiVizData = {
-  'valid-world-data.json': { data },
-  'footnote-data.json': { data: footnoteData }
-}
-
 export const MultiDashboard: Story = {
   args: {
     config: MultiDashboardConfig,
-    isEditor: false
-  }
-}
-
-const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
-const footnoteConfig: Partial<FootnotesConfig> = {
-  dataKey: 'footnote-data.json',
-  dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' },
-  staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }]
-}
-const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
-export const Footnotes: Story = {
-  args: {
-    config: { ...MultiVizConfig, datasets: multiVizData, rows: FNrows, visualizations: FNViz },
     isEditor: false
   }
 }
@@ -4647,35 +4601,6 @@ export const RegressionAPIFiltersMap: Story = {
   //   const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
   //   await user.selectOptions(stratFilter, ['Some Stratification 0'])
   //   await user.click(canvas.getByText('GO!'))
-  // }
-}
-
-export const RegressionAPIFiltersChart: Story = {
-  args: {
-    config: APIFiltersChartData as unknown as Config,
-    isEditor: false
-  },
-  parameters: {
-    fetchMock
-  }
-  // TODO: Re-enable play function when fetch-mock is fully compatible with Storybook 9 + Vitest
-  // play: async ({ canvasElement }) => {
-  //   const canvas = within(canvasElement)
-  //   const user = userEvent.setup()
-  //   // play is running before full rendering is complete so sleep function
-  //   // is needed to delay the execution.
-  //   // possible related bug: https://github.com/storybookjs/storybook/issues/18258
-  //   await sleep(1000)
-  //   const locationFilter = canvas.getByLabelText('Location', { selector: 'select' })
-  //   await user.selectOptions(locationFilter, ['MS'])
-  //   const topicsFilter = canvas.getByLabelText('Category', { selector: 'select' })
-  //   await user.selectOptions(topicsFilter, ['topicId'])
-  //   const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
-  //   await user.selectOptions(indicatorsFilter, ['indicatorID'])
-  //   await user.click(canvas.getByText('GO!'))
-  //   await sleep(1000)
-  //   const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
-  //   await user.selectOptions(yearFilter, ['Some Year 1'])
   // }
 }
 

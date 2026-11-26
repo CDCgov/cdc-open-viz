@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Markdown } from '@storybook/addon-docs/blocks'
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test'
 import {
   assertVisualizationRendered,
@@ -13,10 +14,37 @@ import CdcEditor from '../CdcEditor'
 
 // Source regression: docs/qa/regression-scripts/build-and-configure-a-data-bite.md
 
+const MISC_SCRIPT_DOCS = `# Miscellaneous regression scripts
+
+Named regressions for visualization types outside maps, charts, and dashboards.
+
+## Coverage
+
+- **DB-001 — Data Bite:** Builds and configures a Data Bite, including value functions, comparisons, filters, trend mappings, colors, static and dynamic images, and markup variables.
+- **TABLE-001 — Columns Section:** Exercises Data Table column selection, labels, formatting, ordering, and visible output.
+- **TABLE-002 — Data Table Section:** Exercises table presentation, searching, sorting, sizing, and supporting accessibility settings.
+- **TABLE-003 — Filters Section:** Exercises Data Table filter creation, updates, removal, and rendered results.
+- **MARKUP-001 — General Section:** Exercises Markup Include titles and general presentation settings.
+- **MARKUP-002 — Content Editor:** Exercises authored markup content and its rendered output.
+- **MARKUP-003 — Visual Section:** Exercises Markup Include visual styling controls and observable presentation changes.
+- **MISC-001 — Data Table Empty-Editor Workflow:** Chooses Data Table, imports a CSV, completes data description, and verifies finished table output.
+- **MISC-002 — Markup Include Empty-Editor Workflow:** Chooses Markup Include, authors a title and inline content, and verifies rendered output.
+- **MISC-003 — Data Table Dashboard Embedding:** Verifies a configured table inside a dashboard.
+- **MISC-004 — Data Bite Dashboard Embedding:** Verifies configured Data Bite content inside a dashboard.
+- **MISC-005 — Markup Include Dashboard Embedding:** Verifies configured Markup Include content inside a dashboard.
+- **MISC-006 — Save and Reload Markup Configuration:** Serializes and reloads a Markup Include configuration while preserving output.`
+
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Misc Scripts/Data Bite Scripts',
+  title: 'Regression Tests/Misc/Data Bite',
   component: CdcEditor,
-  parameters: { layout: 'fullscreen' }
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      page: () => <Markdown>{MISC_SCRIPT_DOCS}</Markdown>,
+      description: { component: MISC_SCRIPT_DOCS }
+    }
+  },
+  tags: ['autodocs']
 }
 
 export default meta

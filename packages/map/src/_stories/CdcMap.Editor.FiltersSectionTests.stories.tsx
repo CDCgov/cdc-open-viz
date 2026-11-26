@@ -12,7 +12,7 @@ import { createNewMapConfig } from '../helpers/createNewMapConfig'
 type Story = StoryObj<typeof CdcMap>
 
 const mapMeta: Meta<typeof CdcMap> = {
-  title: 'Regression Tests/Map Scripts/Filters',
+  title: 'Regression Tests/Maps/Filters',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen'
