@@ -111,6 +111,28 @@ export const Bump_Chart: Story = {
   render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/bump-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bump Chart')
+
+    const leaders = Array.from(
+      canvasElement.querySelectorAll<SVGRectElement>('.left-axis rect[data-bump-chart-leader="true"]')
+    )
+    const circles = Array.from(
+      canvasElement.querySelectorAll<SVGCircleElement>('circle[data-tooltip-id$="-bump"][data-tooltip-html]')
+    )
+    expect(leaders).toHaveLength(10)
+    leaders.forEach(leader => {
+      const leaderBounds = leader.getBoundingClientRect()
+      const leaderCenterY = leaderBounds.top + leaderBounds.height / 2
+      const firstCircle = circles
+        .filter(circle => {
+          const bounds = circle.getBoundingClientRect()
+          return Math.abs(bounds.top + bounds.height / 2 - leaderCenterY) < 1
+        })
+        .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)[0]
+      expect(firstCircle, 'Expected a first circle for each Gallery bump leader').toBeTruthy()
+      const gap = firstCircle!.getBoundingClientRect().left - leaderBounds.right
+      expect(gap).toBeGreaterThanOrEqual(-0.5)
+      expect(gap).toBeLessThanOrEqual(1)
+    })
   }
 }
 

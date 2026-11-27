@@ -6,6 +6,7 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import ConfigContext from '../../../ConfigContext'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { buildBumpChartTooltipHtml } from '../../../helpers/bumpChartTooltip'
+import { BUMP_CIRCLE_RADIUS } from '../../Axis/axis.constants'
 
 type LineChartBumpCircleProp = {
   config: ChartConfig
@@ -60,12 +61,13 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
                     }
                   })}
                   data-tooltip-id={tooltipId}
-                  r={10}
+                  r={BUMP_CIRCLE_RADIUS}
                   cx={Number(checkBandScale(xScale(handleX(axis_dataKey))))}
                   cy={Number(yScale(series_dataKey))}
                   stroke='#CACACA'
                   strokeWidth={1}
                   fill='#E5E4E2'
+                  style={{ opacity: 1 }}
                 />
                 {series_dataKey.toString().length === 2 ? (
                   // prettier-ignore
