@@ -62,18 +62,15 @@ describe('VisualizationsPanel', () => {
     const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
     expect(creationTypes).toContain('markup-include')
     expect(creationTypes).not.toContain('filtered-text')
-    expect(creationTypes).not.toContain('Network')
-    expect(creationTypes).not.toContain('Dendrogram')
   })
 
-  it('exposes developer-only charts in COVE developer mode', () => {
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
-
+  it('exposes Network and Dendrogram without COVE developer mode', () => {
+    window.history.replaceState({}, '', window.location.pathname)
     renderPanel()
 
     const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
-    expect(creationTypes).toContain('Network')
-    expect(creationTypes).toContain('Dendrogram')
+    expect(creationTypes.filter(type => type === 'Network')).toHaveLength(1)
+    expect(creationTypes.filter(type => type === 'Dendrogram')).toHaveLength(1)
   })
 
   it('strips URL-backed dataset data from the Advanced Editor config view', () => {
