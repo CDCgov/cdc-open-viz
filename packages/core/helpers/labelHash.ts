@@ -20,6 +20,8 @@ export const labelHash = {
   'single-state': 'U.S. State',
   dashboardFilters: 'Dashboard Filters',
   Sankey: 'Sankey Chart',
+  Network: 'Network',
+  Dendrogram: 'Dendrogram',
   Combo: 'Combo',
   'Scatter Plot': 'Scatter Plot',
   'Area Chart': 'Area Chart',

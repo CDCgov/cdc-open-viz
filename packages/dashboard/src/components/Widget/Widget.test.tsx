@@ -258,6 +258,38 @@ describe('Widget', () => {
     expect(screen.getByText('Waffle Chart')).toBeInTheDocument()
   })
 
+  it.each(['Network', 'Dendrogram'])('shows the %s visualization type label', visualizationType => {
+    renderWidget({
+      type: visualizationType,
+      title: '',
+      widgetConfig: {
+        uid: `${visualizationType.toLowerCase()}-1`,
+        rowIdx: 0,
+        colIdx: 0,
+        type: 'chart',
+        visualizationType
+      }
+    })
+
+    expect(screen.getByText(visualizationType)).toBeInTheDocument()
+  })
+
+  it('uses the Network visualization icon', () => {
+    renderWidget({
+      type: 'Network',
+      title: '',
+      widgetConfig: {
+        uid: 'network-1',
+        rowIdx: 0,
+        colIdx: 0,
+        type: 'chart',
+        visualizationType: 'Network'
+      }
+    })
+
+    expect(screen.getAllByTestId('mock-icon').some(icon => icon.getAttribute('display') === 'network')).toBe(true)
+  })
+
   it('marks the copied widget and lets the active copy button cancel copy mode', () => {
     const clearCopiedWidget = vi.fn()
     const { container, copyWidget } = renderWidget({
