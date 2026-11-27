@@ -7,7 +7,6 @@ import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
-import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
@@ -262,11 +261,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(
-                  button =>
-                    button.category === label &&
-                    (!['Network', 'Dendrogram'].includes(button.label) || isCoveDeveloperMode())
-                )
+                .filter(button => button.category === label)
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
