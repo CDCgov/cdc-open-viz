@@ -328,7 +328,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `dateDisplayFormat` | `string` | No | Date format used by table output. | Optional. |
 | `indexLabel` | `string` | No | Label for the row index column. | Optional. |
 | `download` | `boolean` | No | Shows the generated CSV download control. | `true`, `false`. Chart renderers can enable it independently of `show` and omit table-specific markup. |
-| `downloadVisibleDataOnly` | `boolean` | No | Restricts downloads to the currently visible subset. | `true`, `false` |
+| `downloadVisibleDataOnly` | `boolean` | No | Restricts downloads to the currently visible subset. | `true`, `false`. Map downloads include active filter fields, but do not repeat a filter field already represented by a visible column. |
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
 | `downloadFileName` | `string` | No | Custom filename for generated CSV downloads and the fallback base name for table image/PDF downloads. | `.csv` is appended automatically for CSV downloads and omitted from media filenames. When unset, runtime derives the filename from dataset metadata or the visualization title. A visualization title still takes precedence for media downloads. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |

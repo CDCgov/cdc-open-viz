@@ -81,21 +81,34 @@ export const getMapRowData = (
   filterColumns: string[]
 ) => {
   const orderedColumnKeys = getMapDataTableColumnKeys(columns as any)
+  const visibleSourceNames = new Set(orderedColumnKeys.map(columnKey => columns[columnKey]?.name || columnKey))
+  const filterSourceNames = new Set<string>()
+  const uniqueFilterColumns = filterColumns.filter(sourceName => {
+    if (visibleSourceNames.has(sourceName) || filterSourceNames.has(sourceName)) return false
+
+    filterSourceNames.add(sourceName)
+    return true
+  })
+  const exportColumns = [
+    ...uniqueFilterColumns.map(column => ({ column, isFilter: true })),
+    ...orderedColumnKeys.map(column => ({ column, isFilter: false }))
+  ]
 
   return rows.map((row: string) => {
     const dataRow = {}
     const usedLabels = new Set<string>()
-    ;[...filterColumns, ...orderedColumnKeys].forEach(column => {
+    exportColumns.forEach(({ column, isFilter }) => {
       const requestedLabel = getDataTableCsvColumnLabel({
         config: config as DataTableProps['config'],
         columns,
-        columnConfig: columns[column],
-        columnKey: column
+        columnConfig: isFilter ? undefined : columns[column],
+        columnKey: isFilter ? undefined : column,
+        columnName: isFilter ? column : undefined
       })
       const label = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
       if (column === 'geo') {
         dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
-      } else if (filterColumns.includes(column)) {
+      } else if (isFilter) {
         dataRow[label] = runtimeData[row][column]
       } else {
         const dataValue = getDataValue(config, runtimeData[row], column)

@@ -111,6 +111,92 @@ describe('getMapRowData', () => {
     })
   })
 
+  it('deduplicates filter sources while preserving filters that are not visible columns', () => {
+    const filterConfig = {
+      ...config,
+      general: { ...config.general, geoType: 'us-state' }
+    }
+    const result = getMapRowData(
+      ['row1'],
+      columns,
+      filterConfig,
+      formatLegendLocation,
+      runtimeData,
+      displayGeoName,
+      ['column1', 'somethingElse', 'somethingElse']
+    )
+
+    expect(result).toEqual([
+      {
+        somethingElse: 'data5',
+        Geo: 'displayGeoName -> row1',
+        'Column 1': 'data1',
+        'Column 2': 'data2'
+      }
+    ])
+  })
+
+  it('preserves configured visible columns that share a source', () => {
+    const duplicateSourceColumns = {
+      ...columns,
+      column1Alias: { dataTable: true, name: 'column1', label: 'Column 1 Alias' }
+    }
+    const duplicateSourceConfig = {
+      ...config,
+      general: { ...config.general, geoType: 'us-state' },
+      columns: duplicateSourceColumns
+    }
+
+    const result = getMapRowData(
+      ['row1'],
+      duplicateSourceColumns,
+      duplicateSourceConfig,
+      formatLegendLocation,
+      runtimeData,
+      displayGeoName,
+      ['column1']
+    )
+
+    expect(result).toEqual([
+      {
+        Geo: 'displayGeoName -> row1',
+        'Column 1': 'data1',
+        'Column 2': 'data2',
+        'Column 1 Alias': 'data1'
+      }
+    ])
+  })
+
+  it('distinguishes filter source names from visible column keys', () => {
+    const collidingColumns = {
+      geo: columns.geo,
+      somethingElse: { dataTable: true, name: 'column1', label: 'Column 1' }
+    }
+    const collidingConfig = {
+      ...config,
+      general: { ...config.general, geoType: 'us-state' },
+      columns: collidingColumns
+    }
+
+    expect(
+      getMapRowData(
+        ['row1'],
+        collidingColumns,
+        collidingConfig,
+        formatLegendLocation,
+        runtimeData,
+        displayGeoName,
+        ['somethingElse']
+      )
+    ).toEqual([
+      {
+        somethingElse: 'data5',
+        Geo: 'displayGeoName -> row1',
+        'Column 1': 'data1'
+      }
+    ])
+  })
+
   it('keeps map row values when the index label collides with another CSV label', () => {
     const collisionConfig = {
       type: 'map',
