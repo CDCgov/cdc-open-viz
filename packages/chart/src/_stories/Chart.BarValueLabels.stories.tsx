@@ -175,14 +175,21 @@ const suppressionConfig = (orientation: 'vertical' | 'horizontal') => ({
 })
 const testSpecialValues: Story['play'] = async ({ canvasElement }) => {
   await assertVisualizationRendered(canvasElement)
-  const groups = Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"]'))
-  expect(groups).toHaveLength(3)
-  const labels = groups.map(group =>
-    Array.from(group.querySelectorAll('text'))
-      .map(text => text.textContent)
-      .filter(Boolean)
+  const expectedLabels = [['**'], ['N/A'], ['0']]
+  const getLabels = () =>
+    Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"]')).map(group =>
+      Array.from(group.querySelectorAll('text'))
+        .map(text => text.textContent)
+        .filter(Boolean)
+    )
+
+  await performAndAssert(
+    'Wait for suppression, missing-data, and zero labels',
+    getLabels,
+    async () => {},
+    (_before, after) => JSON.stringify(after) === JSON.stringify(expectedLabels)
   )
-  expect(labels).toEqual([['**'], ['N/A'], ['0']])
+  expect(getLabels()).toEqual(expectedLabels)
 }
 export const VerticalSpecialValues: Story = {
   args: { config: suppressionConfig('vertical') as unknown as ChartConfig, isEditor: false },
