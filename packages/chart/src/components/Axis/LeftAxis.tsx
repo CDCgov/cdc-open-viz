@@ -8,6 +8,7 @@ import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { HORIZON_DEFAULTS } from '../../types/Horizon'
 import { calculateHorizonBands } from '../HorizonChart/helpers/calculateHorizonBands'
 import {
+  BUMP_CIRCLE_RADIUS,
   DEFAULT_TICK_LENGTH,
   LOGARITHMIC_TICK_LENGTH,
   MAJOR_LOG_TICK_LENGTH,
@@ -141,16 +142,19 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
 
                 return (
                   <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                    {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
-                      <Line
-                        key={`${tick.value}--hide-hideTicks`}
-                        from={tick.from}
-                        to={isLogarithmicAxis ? to : tick.to}
-                        stroke={config.yAxis.tickColor}
-                        display={orientation === 'horizontal' ? 'none' : 'block'}
-                        fontSize={tickLabelFontSize}
-                      />
-                    )}
+                    {!runtime.yAxis.hideTicks &&
+                      !labelsAboveGridlines &&
+                      !hideTopTick &&
+                      visualizationType !== 'Bump Chart' && (
+                        <Line
+                          key={`${tick.value}--hide-hideTicks`}
+                          from={tick.from}
+                          to={isLogarithmicAxis ? to : tick.to}
+                          stroke={config.yAxis.tickColor}
+                          display={orientation === 'horizontal' ? 'none' : 'block'}
+                          fontSize={tickLabelFontSize}
+                        />
+                      )}
 
                     {orientation === 'horizontal' &&
                       visualizationType === 'Box Plot' &&
@@ -271,9 +275,16 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
                         {(seriesHighlight.length === 0 ||
                           seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
                           <rect
+                            data-bump-chart-leader='true'
                             x={0 - yAxisWidth}
                             y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                            width={yAxisWidth + xScale(xScale.domain()[0])}
+                            width={Math.max(
+                              0,
+                              yAxisWidth +
+                                Number(xScale(xScale.domain()[0])) +
+                                (typeof xScale.bandwidth === 'function' ? Number(xScale.bandwidth()) / 2 : 0) -
+                                BUMP_CIRCLE_RADIUS
+                            )}
                             height='2'
                             fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
                           />

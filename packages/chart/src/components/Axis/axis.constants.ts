@@ -16,6 +16,7 @@ export const HORIZONTAL_TICK_OFFSET_ADJUSTMENT = 5
 // Chart-specific constants
 export const ZERO_LINE_STROKE_WIDTH = 2
 export const BAR_MIN_HEIGHT = 15
+export const BUMP_CIRCLE_RADIUS = 10
 
 // Lollipop chart sizes
 export const LOLLIPOP_SIZES = { large: 7, medium: 6, small: 5 } as const
