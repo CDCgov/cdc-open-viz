@@ -9,6 +9,13 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { hasTrackedHover, markHoverTracked } from '../../utils/analyticsTracking'
+import { buildTooltipRow, type TooltipDisplayData } from '../../helpers/tooltipHelpers'
+
+type WarmingStripesTooltip = {
+  tooltipLeft: number
+  tooltipTop: number
+  tooltipData: TooltipDisplayData
+}
 
 type WarmingStripesProps = {
   xScale: any
@@ -17,7 +24,7 @@ type WarmingStripesProps = {
   yMax: number
   yAxisWidth: number
   synchronizedXValue?: any
-  showTooltip: (args: any) => void
+  showTooltip: (args: WarmingStripesTooltip) => void
   handleTooltipMouseOff: () => void
 }
 
@@ -117,8 +124,18 @@ const WarmingStripes = ({
 
       // Pass raw x-axis value — TooltipListItem handles date formatting
       const tooltipItems = [
-        [xAxisDataKey, item[xAxisDataKey]],
-        [valueKey, formattedValue, 'left']
+        buildTooltipRow({
+          key: xAxisDataKey,
+          value: item[xAxisDataKey],
+          kind: 'heading'
+        }),
+        buildTooltipRow({
+          key: valueKey,
+          value: formattedValue,
+          axisPosition: 'left',
+          kind: 'series',
+          seriesKey: valueKey
+        })
       ]
 
       const dataXPosition = index * stripeWidth + stripeWidth / 2 + yAxisWidth
@@ -130,7 +147,8 @@ const WarmingStripes = ({
         tooltipData: {
           data: tooltipItems,
           dataXPosition: dataXPosition + 10,
-          dataYPosition
+          dataYPosition,
+          useMarkerColumn: false
         }
       })
     },
