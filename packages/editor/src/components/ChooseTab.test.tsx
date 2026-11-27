@@ -14,8 +14,6 @@ import markupIncludeDefaults from '@cdc/markup-include/src/data/initial-state'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
-const originalUrl = window.location.href
-
 const hydrateFreshVisualizationConfig = (starterConfig: Record<string, any>) => {
   const migratedConfig = coveUpdateWorker(starterConfig)
   const defaultsByType = {
@@ -37,11 +35,10 @@ const hydrateFreshVisualizationConfig = (starterConfig: Record<string, any>) => 
 
 describe('ChooseTab', () => {
   afterEach(() => {
-    window.history.replaceState({}, '', originalUrl)
     vi.restoreAllMocks()
   })
 
-  it('hides developer-only charts outside COVE developer mode', () => {
+  it('shows Network and Dendrogram without COVE developer mode', () => {
     render(
       <ConfigContext.Provider
         value={
@@ -61,8 +58,8 @@ describe('ChooseTab', () => {
       </ConfigContext.Provider>
     )
 
-    expect(screen.queryByRole('button', { name: 'Network' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Dendrogram' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Network' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dendrogram' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bar' })).toBeInTheDocument()
   })
 
@@ -128,7 +125,6 @@ describe('ChooseTab', () => {
 
   it('creates Network as a chart with edge-list defaults', () => {
     const dispatch = vi.fn()
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
 
     render(
       <ConfigContext.Provider
@@ -176,7 +172,6 @@ describe('ChooseTab', () => {
 
   it('creates Dendrogram as a chart with hierarchy defaults', () => {
     const dispatch = vi.fn()
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
 
     render(
       <ConfigContext.Provider
@@ -328,7 +323,6 @@ describe('ChooseTab', () => {
 
   it('starts every standalone visualization choice without applicable modernization options', () => {
     const dispatch = vi.fn()
-    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
     const { container } = render(
       <ConfigContext.Provider
         value={
